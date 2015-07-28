@@ -506,6 +506,13 @@ typedef struct {
   int affinity_on;
 #endif
 
+#ifdef POISEUILLE_FORCE
+  double POISEUILLE_FORCE_diameter;
+  double POISEUILLE_FORCE_viscosity;
+  double POISEUILLE_FORCE_v_max;
+  double POISEUILLE_FORCE_cw;
+#endif
+
 } IA_parameters;
 
 /** thermodynamic force parameters */
@@ -905,6 +912,8 @@ typedef struct {
   int only_positive;
   /** whether to calculate tunable slip forces 1 or not 0 */
   int tunable_slip;
+  /** whether to calculate poiseuille forces 1 or not 0 */
+  int poiseuille_force;
 } Constraint_wall;
 
 /** Parameters for a SPHERE constraint. */

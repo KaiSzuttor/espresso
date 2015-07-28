@@ -129,6 +129,7 @@ HAT
 UMBRELLA
 GAY_BERNE	            implies ROTATION
 OVERLAPPED
+POISEUILLE_FORCE        implies CONSTRAINTS
 
 /* Fluid-Structure Interactions (object in fluid) */
 AREA_FORCE_GLOBAL

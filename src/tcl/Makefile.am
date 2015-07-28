@@ -61,6 +61,7 @@ libEspressoTcl_la_SOURCES = \
 	mol_cut_tcl.cpp mol_cut_tcl.hpp \
 	parser.cpp parser.hpp \
 	particle_data_tcl.cpp \
+	poiseuille_force_tcl.cpp poiseuille_force_tcl.hpp \
 	polymer_tcl.cpp polymer_tcl.hpp \
 	pressure_tcl.cpp pressure_tcl.hpp \
 	random_tcl.cpp random_tcl.hpp \

@@ -342,6 +342,12 @@ void initialize_ia_params(IA_parameters *params) {
   params->REACTION_range = 0.0;
 #endif
 
+#ifdef POISEUILLE_FORCE
+  params->POISEUILLE_FORCE_diameter = 0.0;
+  params->POISEUILLE_FORCE_viscosity = 0.0;
+  params->POISEUILLE_FORCE_v_max = 0.0;
+  params->POISEUILLE_FORCE_cw = 0.0;
+#endif
 }
 
 /** Copy interaction parameters. */

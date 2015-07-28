@@ -75,6 +75,7 @@ libEspresso_la_SOURCES = \
 	npt.hpp \
 	nsquare.cpp nsquare.hpp \
 	particle_data.cpp particle_data.hpp \
+	poiseuille_force.cpp poiseuille_force.hpp \
 	polymer.cpp polymer.hpp \
 	polynom.hpp \
 	pressure.cpp pressure.hpp \

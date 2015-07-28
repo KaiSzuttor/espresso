@@ -64,6 +64,7 @@
 #include "actor/HarmonicOrientationWell_tcl.hpp"
 #include "minimize_energy_tcl.hpp"
 #include "h5mdfile_tcl.hpp"
+#include "poiseuille_force.hpp"
 
 #ifdef TK
 #include <tk.h>

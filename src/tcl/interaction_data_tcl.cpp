@@ -67,6 +67,7 @@
 #include "steppot_tcl.hpp"
 #include "tab_tcl.hpp"
 #include "tunable_slip_tcl.hpp"
+#include "poiseuille_force_tcl.hpp"
 
 // Coulomb
 #include "debye_hueckel_tcl.hpp"
@@ -536,6 +537,11 @@ int tclprint_to_result_NonbondedIA(Tcl_Interp *interp, int i, int j)
 #ifdef TUNABLE_SLIP
   if (data->TUNABLE_SLIP_r_cut > 0.0) tclprint_to_result_tunable_slipIA(interp,i,j);
 #endif
+
+#ifdef POISEUILLE_FORCE
+  if (data->POISEUILLE_FORCE_diameter > 0.0) tclprint_to_result_poiseuille_forceIA(interp,i,j);
+#endif
+
 #ifdef SHANCHEN
   if (data->affinity_on == 1 ) tclprint_to_result_affinityIA(interp,i,j);
 #endif
@@ -749,7 +755,7 @@ int tclcommand_inter_parse_non_bonded(Tcl_Interp * interp,
 			   int argc, char ** argv)
 {
   int change;
-  
+
   Tcl_ResetResult(interp);
 
   if (argc <= 0) {
@@ -845,15 +851,23 @@ int tclcommand_inter_parse_non_bonded(Tcl_Interp * interp,
 #ifdef TABULATED
     REGISTER_NONBONDED("tabulated", tclcommand_inter_parse_tab);
 #endif
+
 #ifdef INTER_DPD
     REGISTER_NONBONDED("inter_dpd", tclcommand_inter_parse_inter_dpd);
 #endif
+
 #ifdef INTER_RF
     REGISTER_NONBONDED("inter_rf", tclcommand_inter_parse_interrf);
 #endif
+
 #ifdef TUNABLE_SLIP
     REGISTER_NONBONDED("tunable_slip", tclcommand_inter_parse_tunable_slip);
 #endif
+
+#ifdef POISEUILLE_FORCE
+    REGISTER_NONBONDED("poiseuille_force", tclcommand_inter_parse_poiseuille_force);
+#endif
+
 #ifdef MOL_CUT
     REGISTER_NONBONDED("molcut", tclcommand_inter_parse_molcut);
 #endif
@@ -869,12 +883,14 @@ int tclcommand_inter_parse_non_bonded(Tcl_Interp * interp,
       return TCL_ERROR;
     }
 
-    if (change <= 0)
+  if (change <= 0)
       return TCL_ERROR;
 
     argc -= change;
     argv += change;
   }
+  IA_parameters *data = get_ia_param(part_type_a, part_type_b);
+  printf("interaction_data_tclbla: %f\n", data->POISEUILLE_FORCE_diameter);
   return TCL_OK;
 }
 
@@ -1147,7 +1163,6 @@ int tclcommand_inter(ClientData _data, Tcl_Interp *interp,
     is_i2 = ARG_IS_I(2, j);
 
     Tcl_ResetResult(interp);
-
     // non bonded interactions
     if (is_i1 && is_i2)
       err_code = tclcommand_inter_parse_non_bonded(interp, i, j, argc-3, argv+3);

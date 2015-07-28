@@ -23,10 +23,12 @@
  *  Implementation of \ref poiseuille_force_tcl.hpp
  */
 #include "parser.hpp"
+#include "utils.hpp"
 
 #ifdef POISEUILLE_FORCE
 #include "poiseuille_force.hpp"
-#include "interaction_data.hpp"
+#include "poiseuille_force_tcl.hpp"
+#include "communication.hpp"
 
 int tclprint_to_result_poiseuille_forceIA(Tcl_Interp *interp, int i, int j)
 {
@@ -60,7 +62,6 @@ int tclcommand_inter_parse_poiseuille_force(Tcl_Interp * interp,
     return 0;
   }
 
-  /* copy lj-cos parameters */
   if ((! ARG_IS_D(1, diameter))    ||
       (! ARG_IS_D(2, viscosity))   ||
       (! ARG_IS_D(3, v_max))   ||
@@ -70,12 +71,13 @@ int tclcommand_inter_parse_poiseuille_force(Tcl_Interp * interp,
 		     (char *) NULL);
     return 0;
   }
-  change = 8;
-
+  change = 5;
+  IA_parameters *data = get_ia_param(part_type_a, part_type_b);
   if (poiseuille_force_set_params(part_type_a, part_type_b, diameter, viscosity, v_max, cw) == ES_ERROR) {
     Tcl_AppendResult(interp, "particle types must be non-negative", (char *) NULL);
     return 0;
   }
+  printf("poiseuille_force_tcl: %f\n", data->POISEUILLE_FORCE_diameter);
 
   return change;
 }

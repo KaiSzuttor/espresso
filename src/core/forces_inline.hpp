@@ -76,6 +76,7 @@
 #include "hydrogen_bond.hpp"
 #include "twist_stack.hpp"
 #include "quartic.hpp"
+#include "poiseuille_force.hpp"
 #ifdef ELECTROSTATICS
 #include "bonded_coulomb.hpp"
 #endif
@@ -415,7 +416,10 @@ calc_non_bonded_pair_force_parts(Particle *p1, Particle *p2, IA_parameters *ia_p
   add_gb_pair_force(p1,p2,ia_params,d,dist,force,torque1,torque2);
 #endif
 #ifdef INTER_RF
-  add_interrf_pair_force(p1,p2,ia_params,d,dist, force);
+  add_interrf_pair_force(p1,p2,ia_params,d,dist,force);
+#endif
+#ifdef POISEUILLE_FORCE
+  add_poiseuille_force_pair_force(p1,p2,ia_params,dist,force);
 #endif
 }
 
