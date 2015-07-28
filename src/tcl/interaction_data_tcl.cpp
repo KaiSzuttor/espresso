@@ -889,8 +889,7 @@ int tclcommand_inter_parse_non_bonded(Tcl_Interp * interp,
     argc -= change;
     argv += change;
   }
-  IA_parameters *data = get_ia_param(part_type_a, part_type_b);
-  printf("interaction_data_tclbla: %f\n", data->POISEUILLE_FORCE_diameter);
+
   return TCL_OK;
 }
 
