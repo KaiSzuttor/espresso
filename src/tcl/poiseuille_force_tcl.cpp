@@ -35,8 +35,8 @@ int tclprint_to_result_poiseuille_forceIA(Tcl_Interp *interp, int i, int j)
   char buffer[TCL_DOUBLE_SPACE];
   IA_parameters *data = get_ia_param(i, j);
 
-  Tcl_AppendResult(interp, "poiseuille_force ", buffer, " ", (char *) NULL);
   Tcl_PrintDouble(interp, data->POISEUILLE_FORCE_diameter, buffer);
+  Tcl_AppendResult(interp, "poiseuille_force ", buffer, " ", (char *) NULL);
   Tcl_AppendResult(interp, buffer, " ", (char *) NULL);
   Tcl_PrintDouble(interp, data->POISEUILLE_FORCE_viscosity, buffer);
   Tcl_AppendResult(interp, buffer, " ", (char *) NULL);
@@ -72,12 +72,11 @@ int tclcommand_inter_parse_poiseuille_force(Tcl_Interp * interp,
     return 0;
   }
   change = 5;
-  IA_parameters *data = get_ia_param(part_type_a, part_type_b);
+
   if (poiseuille_force_set_params(part_type_a, part_type_b, diameter, viscosity, v_max, cw) == ES_ERROR) {
     Tcl_AppendResult(interp, "particle types must be non-negative", (char *) NULL);
     return 0;
   }
-  printf("poiseuille_force_tcl: %f\n", data->POISEUILLE_FORCE_diameter);
 
   return change;
 }

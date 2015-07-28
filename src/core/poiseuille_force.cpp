@@ -57,8 +57,8 @@ void add_poiseuille_force_pair_force(Particle *p1, Particle *p2, IA_parameters *
   if (dist < 0.5*ia_params->POISEUILLE_FORCE_cw) {
     force[0] += 6.0*PI*0.5*ia_params->POISEUILLE_FORCE_diameter*\
                 ia_params->POISEUILLE_FORCE_viscosity*\
-                poiseuille_profile_velocity(ia_params->POISEUILLE_FORCE_v_max, dist, ia_params->POISEUILLE_FORCE_cw)*\
-                time_step*time_step;
+                poiseuille_profile_velocity(ia_params->POISEUILLE_FORCE_v_max, dist, ia_params->POISEUILLE_FORCE_cw);
+                //time_step*time_step;
   }
 }
 

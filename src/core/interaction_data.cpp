@@ -661,6 +661,13 @@ static void recalc_maximal_cutoff_nonbonded()
       }
 #endif
 
+#ifdef POISEUILLE_FORCE
+ if(max_cut_current < 0.5*data->POISEUILLE_FORCE_cw)
+ {
+   max_cut_current = 0.5*data->POISEUILLE_FORCE_cw;
+ }
+#endif
+
       IA_parameters *data_sym = get_ia_param(j, i);
 
       /* no interaction ever touched it, at least no real

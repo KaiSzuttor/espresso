@@ -889,7 +889,6 @@ int tclcommand_inter_parse_non_bonded(Tcl_Interp * interp,
     argc -= change;
     argv += change;
   }
-
   return TCL_OK;
 }
 
