@@ -48,7 +48,7 @@ int poiseuille_force_set_params(int part_type_a, int part_type_b,
 
 double poiseuille_profile_velocity(double v_max, double z, double cw)
 {
-  return v_max*(1.0-4.0*z*z/(cw*cw));
+  return 0.36*v_max*(1.0-4.0*z*z/(cw*cw));
 }
 
 
