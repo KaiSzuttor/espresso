@@ -539,7 +539,7 @@ int tclprint_to_result_NonbondedIA(Tcl_Interp *interp, int i, int j)
 #endif
 
 #ifdef POISEUILLE_FORCE
-  if (data->POISEUILLE_FORCE_diameter > 0.0) tclprint_to_result_poiseuille_forceIA(interp,i,j);
+  if (data->POISEUILLE_FORCE_gamma > 0.0) tclprint_to_result_poiseuille_forceIA(interp,i,j);
 #endif
 
 #ifdef SHANCHEN
