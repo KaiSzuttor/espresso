@@ -2344,6 +2344,12 @@ void add_constraints_forces(Particle *p1)
 		  add_tunable_slip_pair_force(p1, &constraints[n].part_rep,ia_params,vec,dist,force);
 	  }
 #endif
+#ifdef POISEUILLE_FORCE
+	  if ((constraints[n].c.wal.only_positive != 1) && (constraints[n].c.wal.poiseuille_force ==1)) {
+		  add_poiseuille_force_pair_force(p1, &constraints[n].part_rep,
+				  	  	  	  	  	  	  ia_params, dist, force);
+	  }
+#endif
 	}
 	else if ( dist <= 0 && constraints[n].c.wal.penetrable == 1 ) {
 	  if ( (constraints[n].c.wal.only_positive != 1) && ( dist < 0 ) ) {
@@ -2351,6 +2357,12 @@ void add_constraints_forces(Particle *p1)
 				       ia_params,vec,-1.0*dist,dist*dist, force,
 				       torque1, torque2);
 	  }
+#ifdef POISEUILLE_FORCE
+	  if ((constraints[n].c.wal.only_positive != 1) && (constraints[n].c.wal.poiseuille_force ==1)) {
+		  add_poiseuille_force_pair_force(p1, &constraints[n].part_rep,
+				  	  	  	  	  	  	  ia_params, -1.0*dist, force);
+	  }
+#endif
 	}
 	else {
 	  if(constraints[n].c.wal.reflecting){

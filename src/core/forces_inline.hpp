@@ -418,9 +418,6 @@ calc_non_bonded_pair_force_parts(Particle *p1, Particle *p2, IA_parameters *ia_p
 #ifdef INTER_RF
   add_interrf_pair_force(p1,p2,ia_params,d,dist,force);
 #endif
-#ifdef POISEUILLE_FORCE
-  add_poiseuille_force_pair_force(p1,p2,ia_params,dist,force);
-#endif
 }
 
 inline void
