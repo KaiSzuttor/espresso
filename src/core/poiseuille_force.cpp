@@ -27,15 +27,14 @@
 #ifdef POISEUILLE_FORCE
 
 int poiseuille_force_set_params(int part_type_a, int part_type_b,
-			    double diameter, double viscosity, double v_max,
+			    double gamma, double v_max,
 			    double cw)
 {
   IA_parameters *data = get_ia_param_safe(part_type_a, part_type_b);
   
   if (!data) return ES_ERROR;
 
-  data->POISEUILLE_FORCE_diameter = diameter;
-  data->POISEUILLE_FORCE_viscosity = viscosity;
+  data->POISEUILLE_FORCE_gamma = gamma;
   data->POISEUILLE_FORCE_v_max = v_max;
   data->POISEUILLE_FORCE_cw = cw;
 
@@ -48,7 +47,7 @@ int poiseuille_force_set_params(int part_type_a, int part_type_b,
 
 double poiseuille_profile_velocity(double v_max, double z, double cw)
 {
-  return 0.36*v_max*(1.0-4.0*z*z/(cw*cw));
+  return 0.31*v_max*(1.0-4.0*z*z/(cw*cw));
 }
 
 
@@ -56,10 +55,9 @@ void add_poiseuille_force_pair_force(Particle *p1, Particle *p2, IA_parameters *
 {
   if (dist < 0.5*ia_params->POISEUILLE_FORCE_cw) {
 	printf("dist: %f\n", dist);
-    force[0] += ia_params->POISEUILLE_FORCE_diameter*\
+    force[0] += ia_params->POISEUILLE_FORCE_gamma*\
                 ia_params->POISEUILLE_FORCE_viscosity*\
                 poiseuille_profile_velocity(ia_params->POISEUILLE_FORCE_v_max, dist, ia_params->POISEUILLE_FORCE_cw);
-                //time_step*time_step;
   }
 }
 

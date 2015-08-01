@@ -507,8 +507,7 @@ typedef struct {
 #endif
 
 #ifdef POISEUILLE_FORCE
-  double POISEUILLE_FORCE_diameter;
-  double POISEUILLE_FORCE_viscosity;
+  double POISEUILLE_FORCE_gamma;
   double POISEUILLE_FORCE_v_max;
   double POISEUILLE_FORCE_cw;
 #endif

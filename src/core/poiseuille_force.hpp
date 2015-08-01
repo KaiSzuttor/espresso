@@ -31,7 +31,7 @@
 #ifdef POISEUILLE_FORCE
 
 int poiseuille_force_set_params(int part_type_a, int part_type_b,
-    double diameter, double viscosity, double v_max,
+    double gamma, double v_max,
     double cw);
 
 void add_poiseuille_force_pair_force(Particle *p1, Particle *p2, IA_parameters *ia_params, double dist, double force[3]);

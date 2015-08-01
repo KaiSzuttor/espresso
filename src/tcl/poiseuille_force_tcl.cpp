@@ -35,10 +35,8 @@ int tclprint_to_result_poiseuille_forceIA(Tcl_Interp *interp, int i, int j)
   char buffer[TCL_DOUBLE_SPACE];
   IA_parameters *data = get_ia_param(i, j);
 
-  Tcl_PrintDouble(interp, data->POISEUILLE_FORCE_diameter, buffer);
+  Tcl_PrintDouble(interp, data->POISEUILLE_FORCE_gamma, buffer);
   Tcl_AppendResult(interp, "poiseuille_force ", buffer, " ", (char *) NULL);
-  Tcl_AppendResult(interp, buffer, " ", (char *) NULL);
-  Tcl_PrintDouble(interp, data->POISEUILLE_FORCE_viscosity, buffer);
   Tcl_AppendResult(interp, buffer, " ", (char *) NULL);
   Tcl_PrintDouble(interp, data->POISEUILLE_FORCE_v_max, buffer);
   Tcl_AppendResult(interp, buffer, " ", (char *) NULL);
@@ -52,28 +50,27 @@ int tclcommand_inter_parse_poiseuille_force(Tcl_Interp * interp,
 					int part_type_a, int part_type_b,
 					int argc, char ** argv)
 {
-  double diameter, viscosity, v_max, cw;
+  double gamma, v_max, cw;
   int change;
 
-  if (argc < 5) {
-    Tcl_AppendResult(interp, "poiseuille_force needs 4 parameters: "
-		     "diameter, viscosity, v_max, cw",
+  if (argc < 4) {
+    Tcl_AppendResult(interp, "poiseuille_force needs 3 parameters: "
+		     "gamma, v_max, cw",
 		     (char *) NULL);
     return 0;
   }
 
-  if ((! ARG_IS_D(1, diameter))    ||
-      (! ARG_IS_D(2, viscosity))   ||
-      (! ARG_IS_D(3, v_max))   ||
-      (! ARG_IS_D(4, cw))  ) {
-    Tcl_AppendResult(interp, "poiseuille_force needs 4 DOUBLE parameters: "
-		     "<diameter> <viscosity> <v_max> <cw>",
+  if ((! ARG_IS_D(1, gamma))    ||
+      (! ARG_IS_D(2, v_max))   ||
+      (! ARG_IS_D(3, cw)) ) {
+    Tcl_AppendResult(interp, "poiseuille_force needs 3 DOUBLE parameters: "
+		     "<gamma> <v_max> <cw>",
 		     (char *) NULL);
     return 0;
   }
-  change = 5;
+  change = 4;
 
-  if (poiseuille_force_set_params(part_type_a, part_type_b, diameter, viscosity, v_max, cw) == ES_ERROR) {
+  if (poiseuille_force_set_params(part_type_a, part_type_b, gamma, v_max, cw) == ES_ERROR) {
     Tcl_AppendResult(interp, "particle types must be non-negative", (char *) NULL);
     return 0;
   }
