@@ -54,7 +54,6 @@ double poiseuille_profile_velocity(double v_max, double z, double cw)
 void add_poiseuille_force_pair_force(Particle *p1, Particle *p2, IA_parameters *ia_params, double dist, double force[3])
 {
   if (dist < 0.5*ia_params->POISEUILLE_FORCE_cw) {
-	printf("dist: %f\n", dist);
     force[0] += ia_params->POISEUILLE_FORCE_gamma*\
                 poiseuille_profile_velocity(ia_params->POISEUILLE_FORCE_v_max, dist, ia_params->POISEUILLE_FORCE_cw);
   }
