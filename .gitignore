@@ -12,6 +12,13 @@ autom4te.cache
 .deps/
 myconfig.h
 build/
+.autotools
+.pydevproject
+config/myconfig-sample-header.hpp
+libtool
+src/acconfig.hpp
+src/python/pypresso
+.cproject
 
 *.*~
 
