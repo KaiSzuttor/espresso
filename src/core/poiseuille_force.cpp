@@ -23,6 +23,7 @@
 #include "communication.hpp"
 #include "utils.hpp" // for the PI variable
 #include "integrate.hpp" //for the time_step variable
+#include <math.h>
 
 #ifdef POISEUILLE_FORCE
 
@@ -47,7 +48,8 @@ int poiseuille_force_set_params(int part_type_a, int part_type_b,
 
 double poiseuille_profile_velocity(double v_max, double z, double cw)
 {
-  return 0.31*v_max*(1.0-4.0*z*z/(cw*cw));
+  //return (0.36*exp(-z*z/(2*pow(0.21*cw,2.0))))*v_max*(1.0-4.0*z*z/(cw*cw));
+	return 0.35*v_max*(1.0-4.0*z*z/(cw*cw));
 }
 
 
