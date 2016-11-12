@@ -19,9 +19,7 @@
 
 #include "initialize.hpp"
 #include "ParallelScriptInterface.hpp"
-#include "io/writer/h5md/h5md_core.hpp"
 #include "h5md.hpp"
-
 
 namespace ScriptInterface {
 namespace Writer {
