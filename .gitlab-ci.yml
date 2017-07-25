@@ -1,0 +1,4 @@
+image: kaiszuttor/ubuntu1604_cuda7_5:latest
+job1:
+  script:
+    - bash maintainer/cuda_build.sh
