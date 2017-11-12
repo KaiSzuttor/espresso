@@ -1,3 +1,4 @@
+set(CMAKE_MACOSX_RPATH 1)
 file(GLOB EspressoCore_SRC
           "*.cpp"
           )

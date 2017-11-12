@@ -44,10 +44,7 @@ public:
 
 private:
   virtual int actual_calculate(PartCfg & partCfg) = 0;
-
-  int n;
   double last_update;
-
   virtual void do_write();
   std::ofstream m_ofile;
   std::string m_filename;

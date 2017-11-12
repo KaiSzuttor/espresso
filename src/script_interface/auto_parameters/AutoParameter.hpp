@@ -56,9 +56,9 @@ struct AutoParameter {
   AutoParameter(std::string const &name, T &binding,
                 VariantType type = infer_type<T>(),
                 size_t length = infer_length<T>())
-      : name(name), type(type), length(length),
+      : name(name), 
         set([&binding](Variant const &v) { binding = get_value<T>(v); }),
-        get([&binding]() { return binding; }) {}
+        get([&binding]() { return binding; }), type(type), length(length) {}
 
   /**
    * @brief read-only parameter that is bound to a const referece.

@@ -30,7 +30,7 @@ class Cylinder : public Shape {
 public:
   Cylinder()
       : m_pos({0.0, 0.0, 0.0}), m_axis({0.0, 0.0, 0.0}), m_length(0.0),
-        m_direction(1.0), m_rad(0), m_open(false) {}
+        m_rad(0), m_direction(1.0), m_open(false) {}
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;
 

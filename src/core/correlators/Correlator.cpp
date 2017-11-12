@@ -75,6 +75,7 @@ int correlations_autoupdate=0;
 
 int correlation_update(unsigned int no) {
 //    return correlations.at(no)->get_data();
+  return 1;
 }
 
 int correlation_update_from_file(unsigned int no) {
@@ -83,6 +84,7 @@ int correlation_update_from_file(unsigned int no) {
 //  while ( ! correlations.at(no)->get_data()) {
 //  }
 //  return 0;
+  return 1;
 }
 
 
@@ -125,7 +127,7 @@ int Correlator::get_correlation_time(double* correlation_time) {
 
 
 Correlator::Correlator() :
-			    t(0), finalized(0), autoupdate(0),autocorrelation(1),initialized(0),correlation_args{}
+			    autocorrelation(1), correlation_args{}, finalized(0), t(0), autoupdate(0), initialized(0)
            {}
 
 void Correlator::initialize() {

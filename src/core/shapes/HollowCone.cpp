@@ -188,6 +188,7 @@ int HollowCone::calculate_dist(const double *ppos, double *dist, double *vec) co
   distance = -1.0;
   normal_x = -1.0;
   normal_y = -1.0;
+  direction = -1.0;
 
   if (number == 0) {
     normal_x = x_2D - r0 + 0.5 * w * cos(alpha) - r1 * time1 * sin(alpha);

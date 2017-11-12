@@ -285,8 +285,6 @@ class Correlator {
     unsigned int dim_A;              // dimensionality of A
     unsigned int dim_B;
     // Functions producing observables A and B from the input data
-    int A_obs_id;
-    int B_obs_id;
     
     int (*corr_operation)  ( double* A, unsigned int dim_A, double* B, unsigned int dim_B, double* C, unsigned int dim_corr, Vector3d );
     

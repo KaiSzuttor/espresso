@@ -26,7 +26,7 @@
 namespace Observables {
 
 Observable::Observable()
-    : last_value(n_values()), n(), last_update(0), m_ofile(), m_filename(),
+    : last_value(n_values()), last_update(0), m_ofile(), m_filename(),
       m_binary(false) {}
 
   int Observable::calculate() {

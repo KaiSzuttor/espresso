@@ -264,7 +264,7 @@ add_definitions(-DH5XX_USE_MPI)
 #######################################################################
 
 find_package(Boost REQUIRED mpi serialization filesystem system)
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 list(APPEND LIBRARIES ${Boost_LIBRARIES})
 
 #######################################################################

@@ -576,7 +576,7 @@ void File::WriteScript(std::string const &filename) {
   buffer.assign(std::istreambuf_iterator<char>(scriptfile),
                 std::istreambuf_iterator<char>());
 
-  hid_t filetype, dtype, space, dset, file_id;
+  hid_t dtype, space, dset, file_id;
   file_id =
       H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
