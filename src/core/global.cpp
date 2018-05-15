@@ -255,6 +255,7 @@ std::size_t hash_value(Datafield const &field) {
 }
 
 void common_bcast_parameter(int i) {
+  printf("Broadcasting field %s\n", fields.at(i).name);
   switch (fields.at(i).type) {
   case Datafield::Type::INT:
     MPI_Bcast((int *)fields.at(i).data, fields.at(i).dimension, MPI_INT, 0,

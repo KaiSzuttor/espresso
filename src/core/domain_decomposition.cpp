@@ -719,7 +719,7 @@ void dd_on_geometry_change(int flags) {
   /* check that the CPU domains are still sufficiently large. */
   for (int i = 0; i < 3; i++)
     if (local_box_l[i] < max_range) {
-      runtimeErrorMsg() << "box_l in direction " << i << " is too small";
+      runtimeErrorMsg() << "box_l in direction " << i << " is too small: " << local_box_l[i];
     }
 
   /* A full resorting is necessary if the grid has changed. We simply

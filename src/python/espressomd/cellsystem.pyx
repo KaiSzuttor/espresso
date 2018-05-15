@@ -17,10 +17,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 from __future__ import print_function, absolute_import
+
+import collections
+import numpy as np
+import traceback
+
 from . cimport cellsystem
 from . cimport integrate
 from globals cimport *
-import numpy as np
 from espressomd.utils cimport handle_errors
 from espressomd.utils import is_valid_type
 
@@ -110,65 +114,65 @@ cdef class CellSystem(object):
         return True
 
     def get_state(self):
-        s = {"use_verlet_list" : cell_structure.use_verlet_list}
-
+        state = collections.OrderedDict()
+        state["use_verlet_list"] = cell_structure.use_verlet_list
         if cell_structure.type == CELL_STRUCTURE_LAYERED:
-            s["type"] = "layered"
-            s["n_layers"] = n_layers
+            state["type"] = "layered"
+            state["n_layers"] = n_layers
         if cell_structure.type == CELL_STRUCTURE_DOMDEC:
-            s["type"] = "domain_decomposition"
+            state["type"] = "domain_decomposition"
         if cell_structure.type == CELL_STRUCTURE_NSQUARE:
-            s["type"] = "nsquare"
-
-        s["skin"] = skin
-        s["local_box_l"] = np.array([local_box_l[0], local_box_l[1], local_box_l[2]])
-        s["max_cut"] = max_cut
-        s["max_range"] = max_range
-        s["max_skin"] = max_skin
-        s["n_layers"] = n_layers_
-        s["verlet_reuse"] = verlet_reuse
-        s["n_nodes"] = n_nodes
-        s["node_grid"] = np.array([node_grid[0], node_grid[1], node_grid[2]])
-        s["cell_grid"] = np.array([dd.cell_grid[0], dd.cell_grid[1], dd.cell_grid[2]])
-        s["cell_size"] = np.array([dd.cell_size[0], dd.cell_size[1], dd.cell_size[2]])
-        s["max_num_cells"] = max_num_cells
-        s["min_num_cells"] = min_num_cells
-
-        return s
+            state["type"] = "nsquare"
+        state["skin"] = skin
+        state["local_box_l"] = np.array([local_box_l[0], local_box_l[1], local_box_l[2]])
+        state["max_cut"] = max_cut
+        state["max_range"] = max_range
+        state["max_skin"] = max_skin
+        state["n_layers"] = n_layers_
+        state["verlet_reuse"] = verlet_reuse
+        state["n_nodes"] = n_nodes
+        state["node_grid"] = np.array([node_grid[0], node_grid[1], node_grid[2]])
+        state["cell_grid"] = np.array([dd.cell_grid[0], dd.cell_grid[1], dd.cell_grid[2]])
+        state["cell_size"] = np.array([dd.cell_size[0], dd.cell_size[1], dd.cell_size[2]])
+        state["max_num_cells"] = self.max_num_cells
+        state["min_num_cells"] = self.min_num_cells
+        return state
 
     def __getstate__(self):
-        s = {"use_verlet_list" : cell_structure.use_verlet_list}
-
+        state = collections.OrderedDict()
+        state["use_verlet_list"] = cell_structure.use_verlet_list
         if cell_structure.type == CELL_STRUCTURE_LAYERED:
-            s["type"] = "layered"
-            s["n_layers"] = n_layers
+            state["type"] = "layered"
+            state["n_layers"] = n_layers
         if cell_structure.type == CELL_STRUCTURE_DOMDEC:
-            s["type"] = "domain_decomposition"
+            state["type"] = "domain_decomposition"
         if cell_structure.type == CELL_STRUCTURE_NSQUARE:
-            s["type"] = "nsquare"
+            state["type"] = "nsquare"
+        state["skin"] = skin
+        state["node_grid"] = np.array([node_grid[0], node_grid[1], node_grid[2]])
+        state["max_num_cells"] = self.max_num_cells
+        state["min_num_cells"] = self.min_num_cells
+        return state
 
-        s["skin"] = skin
-        s["node_grid"] = np.array([node_grid[0], node_grid[1], node_grid[2]])
-        s["max_num_cells"] = max_num_cells
-        s["min_num_cells"] = min_num_cells
-        return s
-
-    def __setstate__(self, d):
+    def __setstate__(self, state):
+        print("setstate of cellsystem")
+        for line in traceback.format_stack():
+            print(line.strip())
+        CellSystem.__setattr__(self, "skin", state['skin'])
+        CellSystem.__setattr__(self, "min_num_cells", state['min_num_cells'])
+        CellSystem.__setattr__(self, "max_num_cells", state['max_num_cells'])
+        CellSystem.__setattr__(self, "node_grid", state['node_grid'])
         use_verlet_lists = None
-        for key in d:
+        for key in state:
             if key == "use_verlet_list":
-                use_verlet_lists = d[key]
+                use_verlet_lists = state[key]
             elif key == "type":
-                if d[key] == "layered":
-                    self.set_layered(n_layers=d['n_layers'], use_verlet_lists=use_verlet_lists)
-                elif d[key] == "domain_decomposition":
+                if state[key] == "layered":
+                    self.set_layered(n_layers=state['n_layers'], use_verlet_lists=use_verlet_lists)
+                elif state[key] == "domain_decomposition":
                     self.set_domain_decomposition(use_verlet_lists=use_verlet_lists)
-                elif d[key] == "nsquare":
+                elif state[key] == "nsquare":
                     self.set_n_square(use_verlet_lists=use_verlet_lists)
-        self.skin = d['skin']
-        self.node_grid = d['node_grid']
-        self.max_num_cells = d['max_num_cells']
-        self.min_num_cells = d['min_num_cells']
 
     def get_pairs_(self, distance):
         return mpi_get_pairs(distance)

@@ -20,10 +20,12 @@ from __future__ import print_function, absolute_import
 from libcpp cimport bool
 include "myconfig.pxi"
 
-from globals cimport *
 import numpy as np
+import sys
+import random  # for true random numbers from os.urandom()
 import collections
 
+from globals cimport *
 from . cimport integrate
 from . import interactions
 from . import integrate
@@ -53,8 +55,6 @@ from espressomd.virtual_sites import ActiveVirtualSitesHandle, VirtualSitesOff
 IF COLLISION_DETECTION == 1:
     from .collision_detection import CollisionDetection
 
-import sys
-import random  # for true random numbers from os.urandom()
 cimport tuning
 
 
@@ -146,13 +146,11 @@ cdef class System(object):
         odict = collections.OrderedDict()
         for property_ in setable_properties:
             odict[property_] = System.__getattribute__(self, property_)
-        IF VIRTUAL_SITES:
-            odict['_active_virtual_sites_handle'] = System.__getattribute__(self, "_active_virtual_sites_handle")
+        odict['cell_system'] = System.__getattribute__(self, "cell_system")
         odict['actors'] = System.__getattribute__(self, "actors")
         odict['analysis'] = System.__getattribute__(self, "analysis")
         odict['auto_update_accumulators'] = System.__getattribute__(self, "auto_update_accumulators")
         odict['bonded_inter'] = System.__getattribute__(self, "bonded_inter")
-        odict['cell_system'] = System.__getattribute__(self, "cell_system")
         odict['comfixed'] = System.__getattribute__(self, "comfixed")
         IF CONSTRAINTS:
             odict['constraints'] = System.__getattribute__(self, "constraints")
@@ -167,14 +165,18 @@ cdef class System(object):
         return odict
 
     def __setstate__(self, params):
+        print("###########")
         for property_ in params.keys():
+            print("setting property: {}".format(property_))
             System.__setattr__(self, property_, params[property_])
+
     property box_l:
         """
         Array like, list of three floats
         """
 
         def __set__(self, _box_l):
+            print("Setting box_l")
             if len(_box_l) != 3:
                 raise ValueError("Box length must be of length 3")
             for i in range(3):
@@ -182,7 +184,6 @@ cdef class System(object):
                     raise ValueError(
                         "Box length must be > 0 in all directions")
                 box_l[i] = _box_l[i]
-
             mpi_bcast_parameter(FIELD_BOXL)
 
         def __get__(self):
