@@ -22,6 +22,7 @@ cmake_minimum_required(VERSION 3.0)
 include(FeatureSummary)
 project(ESPResSo)
 include(cmake/FindPythonModule.cmake)
+include(cmake/conan.cmake)
 
 enable_language(CXX)
 
@@ -234,27 +235,20 @@ if (WITH_HDF5)
     list(APPEND LIBRARIES ${HDF5_LIBRARIES})
     include_directories(SYSTEM ${HDF5_INCLUDE_DIRS})
     add_feature_info(HDF5 ON "parallel")
+    #get h5xx from conan
+    conan_check(VERSION 1.7.2 REQUIRED)
+    conan_add_remote(NAME origin INDEX 1
+            URL https://api.bintray.com/conan/kaiszuttor/espresso_dependencies)
+    conan_cmake_run(CONANFILE conanfile.txt
+                    BASIC_SETUP CMAKE_TARGETS
+                    BASIC_SETUP KEEP_RPATHS
+                    BUILD missing)
   else()
     unset(H5MD)
     unset(HDF5_FOUND)
   endif(HDF5_IS_PARALLEL)
 endif(WITH_HDF5)
 
-# Check for the h5xx submodule
-# and try to check it out if not found or update it if found.
-if(WITH_HDF5 AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-  # Try to find git
-  find_package(Git)
-  if(GIT_FOUND)
-    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/libs/h5xx/.git")
-      execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init -- libs/h5xx
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-    else()
-      execute_process(COMMAND ${GIT_EXECUTABLE} submodule update -- libs/h5xx
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-    endif()
-  endif()
-endif()
 
 if(WITH_SCAFACOS)
   find_package(PkgConfig)
