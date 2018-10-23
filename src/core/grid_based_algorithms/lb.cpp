@@ -1179,9 +1179,7 @@ bool lb_lbnode_is_index_valid(const Vector3dInt &ind) {
 #endif
   } else if (lattice_switch & LATTICE_LB) {
 #ifdef LB
-    return within_bounds(ind,
-                         {lblattice.global_grid[0], lblattice.global_grid[1],
-                          lblattice.global_grid[2]});
+    return within_bounds(ind, lblattice.global_grid);
 #endif
   }
   return false;
