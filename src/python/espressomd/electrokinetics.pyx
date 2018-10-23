@@ -1,7 +1,8 @@
 from __future__ import print_function, absolute_import
 include "myconfig.pxi"
 from .lb cimport HydrodynamicInteraction
-from .lb cimport lb_lbnode_is_index_valid
+IF LB:
+    from .lb cimport lb_lbnode_is_index_valid
 from . import utils
 import numpy as np
 from espressomd.utils import is_valid_type
