@@ -312,7 +312,7 @@ IF ELECTROKINETICS:
             raise Exception("This method is not implemented yet.")
 
     cdef class ElectrokineticsRoutines(object):
-        cdef Vector3dint node
+        cdef Vector3dInt node
 
         def __init__(self, key):
             self.node[0] = key[0]
@@ -465,7 +465,7 @@ IF ELECTROKINETICS:
             ek_print_vtk_flux(self.id, utils.to_char_pointer(path))
 
     cdef class SpecieRoutines(object):
-        cdef Vector3dint node
+        cdef Vector3dInt node
         cdef int id
 
         def __init__(self, key, id):

@@ -92,7 +92,7 @@ cdef extern from "<limits>" namespace "std" nogil:
         T max()
 
 cdef extern from "Vector.hpp":
-    cppclass Vector3dint "Vector<3, int>":
+    cppclass Vector3dInt:
         int& operator[](int i)
         int* data()
 

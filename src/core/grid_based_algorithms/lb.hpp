@@ -518,19 +518,19 @@ int lb_lbfluid_print_velocity(char *filename);
 int lb_lbfluid_save_checkpoint(char *filename, int binary);
 int lb_lbfluid_load_checkpoint(char *filename, int binary);
 
-bool lb_lbnode_is_index_valid(const Vector<3, int> &ind);
-int lb_lbnode_get_rho(const Vector<3, int> &ind, double *p_rho);
-int lb_lbnode_get_u(const Vector<3, int> &ind, double *u);
-int lb_lbnode_get_pi(const Vector<3, int> &ind, double *pi);
-int lb_lbnode_get_pi_neq(const Vector<3, int> &ind, double *pi_neq);
-int lb_lbnode_get_boundary(const Vector<3, int> &ind, int *p_boundary);
-int lb_lbnode_get_pop(const Vector<3, int> &ind, double *pop);
+bool lb_lbnode_is_index_valid(const Vector3dInt &ind);
+int lb_lbnode_get_rho(const Vector3dInt &ind, double *p_rho);
+int lb_lbnode_get_u(const Vector3dInt &ind, double *u);
+int lb_lbnode_get_pi(const Vector3dInt &ind, double *pi);
+int lb_lbnode_get_pi_neq(const Vector3dInt &ind, double *pi_neq);
+int lb_lbnode_get_boundary(const Vector3dInt &ind, int *p_boundary);
+int lb_lbnode_get_pop(const Vector3dInt &ind, double *pop);
 
-int lb_lbnode_set_rho(const Vector<3, int> &ind, double *rho);
-int lb_lbnode_set_u(const Vector<3, int> &ind, double *u);
-int lb_lbnode_set_pi(const Vector<3, int> &ind, double *pi);
-int lb_lbnode_set_pi_neq(const Vector<3, int> &ind, double *pi_neq);
-int lb_lbnode_set_pop(const Vector<3, int> &ind, double *pop);
+int lb_lbnode_set_rho(const Vector3dInt &ind, double *rho);
+int lb_lbnode_set_u(const Vector3dInt &ind, double *u);
+int lb_lbnode_set_pi(const Vector3dInt &ind, double *pi);
+int lb_lbnode_set_pi_neq(const Vector3dInt &ind, double *pi_neq);
+int lb_lbnode_set_pop(const Vector3dInt &ind, double *pop);
 
 /** calculates the fluid velocity at a given position of the
  * lattice. Note that it can lead to undefined behaviour if the

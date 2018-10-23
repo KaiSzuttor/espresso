@@ -4704,7 +4704,7 @@ __global__ void lb_lbfluid_set_population_kernel(LB_nodes_gpu n_a,
  * @param population_host     Pointer to population (Input)
  * @param c              LB component (for SHANCHEN) (Input)
  */
-void lb_lbfluid_set_population(const Vector<3, int> &xyz,
+void lb_lbfluid_set_population(const Vector3dInt &xyz,
                                float population_host[LBQ], int c) {
   float *population_device;
   cuda_safe_mem(cudaMalloc((void **)&population_device, LBQ * sizeof(float)));
@@ -4742,7 +4742,7 @@ __global__ void lb_lbfluid_get_population_kernel(LB_nodes_gpu n_a,
  * @param population_host     Pointer to population (Output)
  * @param c              LB component (for SHANCHEN) (Input)
  */
-void lb_lbfluid_get_population(const Vector<3, int> &xyz,
+void lb_lbfluid_get_population(const Vector3dInt &xyz,
                                float population_host[LBQ], int c) {
   float *population_device;
   cuda_safe_mem(cudaMalloc((void **)&population_device, LBQ * sizeof(float)));
