@@ -477,8 +477,6 @@ inline void lb_set_populations(Lattice::index_t index, double *pop) {
 }
 #endif
 
-#include "grid_based_algorithms/lbgpu.hpp"
-
 #if defined(LB) || defined(LB_GPU)
 /* A C level interface to the LB fluid */
 int lb_lbfluid_set_density(double *p_dens);

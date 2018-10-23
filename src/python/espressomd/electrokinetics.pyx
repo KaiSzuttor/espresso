@@ -1,6 +1,7 @@
 from __future__ import print_function, absolute_import
 include "myconfig.pxi"
 from .lb cimport HydrodynamicInteraction
+from .lb cimport lb_lbnode_check_index
 from . import utils
 import numpy as np
 from espressomd.utils import is_valid_type
@@ -311,12 +312,14 @@ IF ELECTROKINETICS:
             raise Exception("This method is not implemented yet.")
 
     cdef class ElectrokineticsRoutines(object):
-        cdef int node[3]
+        cdef Vector3dint node
 
         def __init__(self, key):
             self.node[0] = key[0]
             self.node[1] = key[1]
             self.node[2] = key[2]
+            if not lb_lbnode_check_index(self.node):
+                raise ValueError("LB node index out of bounds")
 
         property potential:
             def __get__(self):
@@ -462,12 +465,16 @@ IF ELECTROKINETICS:
             ek_print_vtk_flux(self.id, utils.to_char_pointer(path))
 
     cdef class SpecieRoutines(object):
-        cdef int node[3]
+        cdef Vector3dint node
         cdef int id
 
         def __init__(self, key, id):
-            self.node = key
+            self.node[0] = key[0]
+            self.node[1] = key[1]
+            self.node[2] = key[2]
             self.id = id
+            if not lb_lbnode_check_index(self.node):
+                raise ValueError("LB node index out of bounds")
 
         property density:
             def __set__(self, value):

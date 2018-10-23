@@ -28,6 +28,7 @@
  */
 
 #include "grid_based_algorithms/lb.hpp"
+#include "grid_based_algorithms/lbgpu.hpp"
 #include "nonbonded_interactions/nonbonded_interaction_data.hpp"
 
 #ifdef LB
@@ -36,7 +37,6 @@
 #include "communication.hpp"
 #include "global.hpp"
 #include "grid.hpp"
-#include "grid_based_algorithms/lb.hpp"
 #include "grid_based_algorithms/lbboundaries.hpp"
 #include "halo.hpp"
 #include "lb-d3q19.hpp"
@@ -1169,16 +1169,13 @@ int lb_lbfluid_load_checkpoint(char *filename, int binary) {
 
 bool lb_lbnode_check_index(const Vector<3, int> &ind) {
   auto within_bounds = [](const Vector<3, int> &ind,
-                          const Vector<3, int> &limits) -> bool {
-    bool res = true;
-    if (ind[0] >= limits[0] || ind[1] >= limits[1] || ind[2] >= limits[2])
-      res = false;
-    return res;
+                          const Vector<3, int> &limits) {
+    return !(ind[0] >= limits[0] || ind[1] >= limits[1] || ind[2] >= limits[2]);
   };
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
     return within_bounds(ind,
-                         {lbpar_gpu.dim_x, lbpar_gpu.dim_y, lbpar_gpu.dim_z});
+                         {static_cast<int>(lbpar_gpu.dim_x), static_cast<int>(lbpar_gpu.dim_y), static_cast<int>(lbpar_gpu.dim_z)});
 #endif
   } else if (lattice_switch & LATTICE_LB) {
 #ifdef LB
