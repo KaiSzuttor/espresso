@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <vector>
 
+#include "Vector.hpp"
 #include "cuda_interface.hpp"
 #include "cuda_utils.hpp"
 #include "debug.hpp"
@@ -39,7 +40,6 @@
 #include "grid_based_algorithms/electrokinetics.hpp"
 #include "grid_based_algorithms/electrokinetics_pdb_parse.hpp"
 #include "grid_based_algorithms/lbgpu.hpp"
-#include "Vector.hpp"
 
 #include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>
@@ -4704,7 +4704,8 @@ __global__ void lb_lbfluid_set_population_kernel(LB_nodes_gpu n_a,
  * @param population_host     Pointer to population (Input)
  * @param c              LB component (for SHANCHEN) (Input)
  */
-void lb_lbfluid_set_population(const Vector<3, int>& xyz, float population_host[LBQ], int c) {
+void lb_lbfluid_set_population(const Vector<3, int> &xyz,
+                               float population_host[LBQ], int c) {
   float *population_device;
   cuda_safe_mem(cudaMalloc((void **)&population_device, LBQ * sizeof(float)));
   cuda_safe_mem(cudaMemcpy(population_device, population_host,
@@ -4741,7 +4742,8 @@ __global__ void lb_lbfluid_get_population_kernel(LB_nodes_gpu n_a,
  * @param population_host     Pointer to population (Output)
  * @param c              LB component (for SHANCHEN) (Input)
  */
-void lb_lbfluid_get_population(const Vector<3, int>& xyz, float population_host[LBQ], int c) {
+void lb_lbfluid_get_population(const Vector<3, int> &xyz,
+                               float population_host[LBQ], int c) {
   float *population_device;
   cuda_safe_mem(cudaMalloc((void **)&population_device, LBQ * sizeof(float)));
 

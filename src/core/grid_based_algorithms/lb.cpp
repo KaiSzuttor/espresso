@@ -1174,8 +1174,9 @@ bool lb_lbnode_is_index_valid(const Vector<3, int> &ind) {
   };
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
-    return within_bounds(ind,
-                         {static_cast<int>(lbpar_gpu.dim_x), static_cast<int>(lbpar_gpu.dim_y), static_cast<int>(lbpar_gpu.dim_z)});
+    return within_bounds(ind, {static_cast<int>(lbpar_gpu.dim_x),
+                               static_cast<int>(lbpar_gpu.dim_y),
+                               static_cast<int>(lbpar_gpu.dim_z)});
 #endif
   } else if (lattice_switch & LATTICE_LB) {
 #ifdef LB
