@@ -317,7 +317,7 @@ IF LB_GPU:
 
 IF LB or LB_GPU:
     cdef class LBFluidRoutines(object):
-        cdef Vector3dInt node
+        cdef Vector3i node
 
         def __init__(self, key):
             utils.check_type_or_throw_except(

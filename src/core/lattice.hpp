@@ -48,19 +48,19 @@ class Lattice {
 public:
   using index_t = int;
 
-  Vector3dInt grid; /** number of local lattice sites in each direction
+  Vector3i grid; /** number of local lattice sites in each direction
                   (excluding halo) */
-  Vector3dInt global_grid;
+  Vector3i global_grid;
   Vector3d agrid; /** lattice constant */
 
-  Vector3dInt
+  Vector3i
       halo_grid; /** number of lattice sites in each direction including halo
                   */
   int halo_size; /** halo size in all directions */
 
   Vector3d offset; /** global offset */
   Vector3d local_offset;
-  Vector3dInt local_index_offset;
+  Vector3i local_index_offset;
 
   index_t halo_grid_volume; /** total number (volume) of lattice sites
                                (including halo) */
@@ -130,7 +130,7 @@ public:
    *                   elementary cell, 6 directions (Output)
    * \param tmp_agrid  lattice mesh distance
    */
-  static void map_position_to_lattice_global(Vector3d &pos, Vector3dInt &ind,
+  static void map_position_to_lattice_global(Vector3d &pos, Vector3i &ind,
                                              double delta[6], double tmp_agrid);
 };
 

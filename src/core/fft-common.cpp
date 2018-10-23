@@ -178,7 +178,7 @@ void fft_unpack_block(double *in, double *out, int start[3], int size[3],
  * private functions
  ************************************************/
 
-int fft_find_comm_groups(const Vector3dInt &grid1, const Vector3dInt &grid2,
+int fft_find_comm_groups(const Vector3i &grid1, const Vector3i &grid2,
                          int *node_list1, int *node_list2, int *group, int *pos,
                          int *my_pos) {
   int i;

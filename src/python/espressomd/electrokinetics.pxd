@@ -1,7 +1,7 @@
 include "myconfig.pxi"
 from libcpp cimport bool
 
-from .utils cimport Vector3dInt
+from .utils cimport Vector3i
 
 IF ELECTROKINETICS and CUDA:
     cdef extern from "grid_based_algorithms/electrokinetics.hpp":
@@ -113,4 +113,4 @@ IF ELECTROKINETICS and CUDA:
 
     cdef extern from "grid_based_algorithms/lb.hpp":
         int lb_lbfluid_print_vtk_boundary(char * filename)
-        int lb_lbnode_get_pi(const Vector3dInt& ind, double * p_pi)
+        int lb_lbnode_get_pi(const Vector3i& ind, double * p_pi)

@@ -678,7 +678,7 @@ int lb_lbfluid_print_vtk_boundary(char *filename) {
 #endif // LB_GPU
   } else {
 #ifdef LB
-    Vector3dInt pos;
+    Vector3i pos;
     int boundary;
     int gridsize[3];
 
@@ -792,7 +792,7 @@ int lb_lbfluid_print_vtk_velocity(char *filename, std::vector<int> bb1,
     bb_high.push_back(std::max(*val1, *val2));
   }
 
-  Vector3dInt pos;
+  Vector3i pos;
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
     size_t size_of_values = lbpar_gpu.number_of_nodes * sizeof(LB_rho_v_pi_gpu);
@@ -881,7 +881,7 @@ int lb_lbfluid_print_boundary(char *filename) {
 #endif // LB_GPU
   } else {
 #ifdef LB
-    Vector3dInt pos;
+    Vector3i pos;
     int boundary;
     int gridsize[3];
 
@@ -941,7 +941,7 @@ int lb_lbfluid_print_velocity(char *filename) {
 #endif // LB_GPU
   } else {
 #ifdef LB
-    Vector3dInt pos;
+    Vector3i pos;
     double u[3];
     int gridsize[3];
 
@@ -1027,7 +1027,7 @@ int lb_lbfluid_save_checkpoint(char *filename, int binary) {
       return ES_ERROR;
     }
     double pop[19];
-    Vector3dInt ind;
+    Vector3i ind;
 
     int gridsize[3];
 
@@ -1122,7 +1122,7 @@ int lb_lbfluid_load_checkpoint(char *filename, int binary) {
       return ES_ERROR;
     }
     double pop[19];
-    Vector3dInt ind;
+    Vector3i ind;
 
     int gridsize[3];
     lbpar.resend_halo = 1;
@@ -1167,8 +1167,8 @@ int lb_lbfluid_load_checkpoint(char *filename, int binary) {
   return ES_OK;
 }
 
-bool lb_lbnode_is_index_valid(const Vector3dInt &ind) {
-  auto within_bounds = [](const Vector3dInt &ind, const Vector3dInt &limits) {
+bool lb_lbnode_is_index_valid(const Vector3i &ind) {
+  auto within_bounds = [](const Vector3i &ind, const Vector3i &limits) {
     return ind < limits;
   };
   if (lattice_switch & LATTICE_LB_GPU) {
@@ -1185,7 +1185,7 @@ bool lb_lbnode_is_index_valid(const Vector3dInt &ind) {
   return false;
 }
 
-int lb_lbnode_get_rho(const Vector3dInt &ind, double *p_rho) {
+int lb_lbnode_get_rho(const Vector3i &ind, double *p_rho) {
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
     int single_nodeindex = ind[0] + ind[1] * lbpar_gpu.dim_x +
@@ -1224,7 +1224,7 @@ int lb_lbnode_get_rho(const Vector3dInt &ind, double *p_rho) {
   return 0;
 }
 
-int lb_lbnode_get_u(const Vector3dInt &ind, double *p_u) {
+int lb_lbnode_get_u(const Vector3i &ind, double *p_u) {
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
     static LB_rho_v_pi_gpu *host_print_values = nullptr;
@@ -1276,7 +1276,7 @@ int lb_lbnode_get_u(const Vector3dInt &ind, double *p_u) {
 int lb_lbfluid_get_interpolated_velocity_global(Vector3d &p, double *v) {
   double local_v[3] = {0, 0, 0},
          delta[6]{}; // velocity field, relative positions to surrounding nodes
-  Vector3dInt ind = {0, 0, 0}, tmpind; // node indices
+  Vector3i ind = {0, 0, 0}, tmpind; // node indices
   int x, y, z;                         // counters
 
   // convert the position into lower left grid point
@@ -1338,7 +1338,7 @@ int lb_lbfluid_get_interpolated_velocity_global(Vector3d &p, double *v) {
   return 0;
 }
 
-int lb_lbnode_get_pi(const Vector3dInt &ind, double *p_pi) {
+int lb_lbnode_get_pi(const Vector3i &ind, double *p_pi) {
   double p0 = 0;
 
   lb_lbnode_get_pi_neq(ind, p_pi);
@@ -1363,7 +1363,7 @@ int lb_lbnode_get_pi(const Vector3dInt &ind, double *p_pi) {
   return 0;
 }
 
-int lb_lbnode_get_pi_neq(const Vector3dInt &ind, double *p_pi) {
+int lb_lbnode_get_pi_neq(const Vector3i &ind, double *p_pi) {
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
     static LB_rho_v_pi_gpu *host_print_values = nullptr;
@@ -1407,7 +1407,7 @@ int lb_lbnode_get_pi_neq(const Vector3dInt &ind, double *p_pi) {
   return 0;
 }
 
-int lb_lbnode_get_boundary(const Vector3dInt &ind, int *p_boundary) {
+int lb_lbnode_get_boundary(const Vector3i &ind, int *p_boundary) {
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
     unsigned int host_flag;
@@ -1436,7 +1436,7 @@ int lb_lbnode_get_boundary(const Vector3dInt &ind, int *p_boundary) {
 
 #endif // defined (LB) || defined (LB_GPU)
 
-int lb_lbnode_get_pop(const Vector3dInt &ind, double *p_pop) {
+int lb_lbnode_get_pop(const Vector3i &ind, double *p_pop) {
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
     float population[19];
@@ -1465,7 +1465,7 @@ int lb_lbnode_get_pop(const Vector3dInt &ind, double *p_pop) {
   return 0;
 }
 
-int lb_lbnode_set_rho(const Vector3dInt &ind, double *p_rho) {
+int lb_lbnode_set_rho(const Vector3i &ind, double *p_rho) {
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
     float host_rho[LB_COMPONENTS];
@@ -1503,7 +1503,7 @@ int lb_lbnode_set_rho(const Vector3dInt &ind, double *p_rho) {
   return 0;
 }
 
-int lb_lbnode_set_u(const Vector3dInt &ind, double *u) {
+int lb_lbnode_set_u(const Vector3i &ind, double *u) {
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
     float host_velocity[3];
@@ -1541,13 +1541,13 @@ int lb_lbnode_set_u(const Vector3dInt &ind, double *u) {
   return 0;
 }
 
-int lb_lbnode_set_pi(const Vector3dInt ind, double *pi) { return -100; }
+int lb_lbnode_set_pi(const Vector3i ind, double *pi) { return -100; }
 
-int lb_lbnode_set_pi_neq(const Vector3dInt &ind, double *pi_neq) {
+int lb_lbnode_set_pi_neq(const Vector3i &ind, double *pi_neq) {
   return -100;
 }
 
-int lb_lbnode_set_pop(const Vector3dInt &ind, double *p_pop) {
+int lb_lbnode_set_pop(const Vector3i &ind, double *p_pop) {
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
     float population[19];
@@ -1576,7 +1576,7 @@ int lb_lbnode_set_pop(const Vector3dInt &ind, double *p_pop) {
   return 0;
 }
 
-int lb_lbnode_set_extforce_density(const Vector3dInt &ind, double *f) {
+int lb_lbnode_set_extforce_density(const Vector3i &ind, double *f) {
   return -100;
 }
 

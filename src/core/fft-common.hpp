@@ -159,7 +159,7 @@ void fft_common_pre_init(fft_data_struct *fft);
  * node  (Output). \param pos        positions of the nodes in in grid2
  * (Output). \param my_pos      position of this_node in  grid2.
  * \return Size of the communication group (Output of course!).  */
-int fft_find_comm_groups(const Vector3dInt &grid1, const Vector3dInt &grid2,
+int fft_find_comm_groups(const Vector3i &grid1, const Vector3i &grid2,
                          int *node_list1, int *node_list2, int *group, int *pos,
                          int *my_pos);
 
