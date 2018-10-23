@@ -1541,12 +1541,6 @@ int lb_lbnode_set_u(const Vector3i &ind, double *u) {
   return 0;
 }
 
-int lb_lbnode_set_pi(const Vector3i ind, double *pi) { return -100; }
-
-int lb_lbnode_set_pi_neq(const Vector3i &ind, double *pi_neq) {
-  return -100;
-}
-
 int lb_lbnode_set_pop(const Vector3i &ind, double *p_pop) {
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
@@ -1574,10 +1568,6 @@ int lb_lbnode_set_pop(const Vector3i &ind, double *p_pop) {
 #endif // LB
   }
   return 0;
-}
-
-int lb_lbnode_set_extforce_density(const Vector3i &ind, double *f) {
-  return -100;
 }
 
 #ifdef LB

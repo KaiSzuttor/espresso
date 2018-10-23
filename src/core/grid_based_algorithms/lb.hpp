@@ -528,8 +528,6 @@ int lb_lbnode_get_pop(const Vector3i &ind, double *pop);
 
 int lb_lbnode_set_rho(const Vector3i &ind, double *rho);
 int lb_lbnode_set_u(const Vector3i &ind, double *u);
-int lb_lbnode_set_pi(const Vector3i &ind, double *pi);
-int lb_lbnode_set_pi_neq(const Vector3i &ind, double *pi_neq);
 int lb_lbnode_set_pop(const Vector3i &ind, double *pop);
 
 /** calculates the fluid velocity at a given position of the
