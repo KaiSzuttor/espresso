@@ -1169,7 +1169,7 @@ int lb_lbfluid_load_checkpoint(char *filename, int binary) {
 
 bool lb_lbnode_is_index_valid(const Vector3i &ind) {
   auto within_bounds = [](const Vector3i &ind, const Vector3i &limits) {
-    return ind < limits;
+    return ind < limits && ind >= Vector3i{};
   };
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
