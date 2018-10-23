@@ -1,7 +1,7 @@
 from __future__ import print_function, absolute_import
 include "myconfig.pxi"
 from .lb cimport HydrodynamicInteraction
-from .lb cimport lb_lbnode_check_index
+from .lb cimport lb_lbnode_is_index_valid
 from . import utils
 import numpy as np
 from espressomd.utils import is_valid_type
@@ -318,7 +318,7 @@ IF ELECTROKINETICS:
             self.node[0] = key[0]
             self.node[1] = key[1]
             self.node[2] = key[2]
-            if not lb_lbnode_check_index(self.node):
+            if not lb_lbnode_is_index_valid(self.node):
                 raise ValueError("LB node index out of bounds")
 
         property potential:
@@ -473,7 +473,7 @@ IF ELECTROKINETICS:
             self.node[1] = key[1]
             self.node[2] = key[2]
             self.id = id
-            if not lb_lbnode_check_index(self.node):
+            if not lb_lbnode_is_index_valid(self.node):
                 raise ValueError("LB node index out of bounds")
 
         property density:

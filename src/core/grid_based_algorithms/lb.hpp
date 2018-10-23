@@ -518,7 +518,7 @@ int lb_lbfluid_print_velocity(char *filename);
 int lb_lbfluid_save_checkpoint(char *filename, int binary);
 int lb_lbfluid_load_checkpoint(char *filename, int binary);
 
-bool lb_lbnode_check_index(const Vector<3, int> &ind);
+bool lb_lbnode_is_index_valid(const Vector<3, int> &ind);
 int lb_lbnode_get_rho(const Vector<3, int> &ind, double *p_rho);
 int lb_lbnode_get_u(const Vector<3, int> &ind, double *u);
 int lb_lbnode_get_pi(const Vector<3, int> &ind, double *pi);

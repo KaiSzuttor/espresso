@@ -325,7 +325,7 @@ IF LB or LB_GPU:
             self.node[0] = key[0]
             self.node[1] = key[1]
             self.node[2] = key[2]
-            if not lb_lbnode_check_index(self.node):
+            if not lb_lbnode_is_index_valid(self.node):
                 raise ValueError("LB node index out of bounds")
 
         property velocity:

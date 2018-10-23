@@ -1167,7 +1167,7 @@ int lb_lbfluid_load_checkpoint(char *filename, int binary) {
   return ES_OK;
 }
 
-bool lb_lbnode_check_index(const Vector<3, int> &ind) {
+bool lb_lbnode_is_index_valid(const Vector<3, int> &ind) {
   auto within_bounds = [](const Vector<3, int> &ind,
                           const Vector<3, int> &limits) {
     return !(ind[0] >= limits[0] || ind[1] >= limits[1] || ind[2] >= limits[2]);

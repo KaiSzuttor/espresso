@@ -94,7 +94,7 @@ IF LB_GPU or LB:
         int lb_lbfluid_load_checkpoint(char * filename, int binary)
         int lb_set_lattice_switch(int py_switch)
         int lb_get_lattice_switch(int * py_switch)
-        bool lb_lbnode_check_index(const Vector3dint& ind)
+        bool lb_lbnode_is_index_valid(const Vector3dint& ind)
         int lb_lbnode_get_u(const Vector3dint& ind, double * double_return)
         int lb_lbnode_set_u(const Vector3dint& ind, double * u);
         int lb_lbnode_get_rho(const Vector3dint& ind, double * double_return)
