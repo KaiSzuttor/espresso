@@ -32,14 +32,14 @@
 typedef struct {
 
   // center and source velocity of the md part
-  float v_cs[6];
+  double v_cs[6];
 
 } CUDA_v_cs;
 #endif
 
 typedef struct {
   /** fluid composition at the particle given to md part */
-  float weight[LB_COMPONENTS];
+  double weight[LB_COMPONENTS];
 
 } CUDA_fluid_composition;
 
@@ -47,12 +47,12 @@ typedef struct {
 #ifdef ENGINE
 typedef struct {
   // v_cs has to stay in the front for memmove reasons
-  float v_cs[6];
-  float v_swim;
-  float f_swim;
-  float director[3];
+  double v_cs[6];
+  double v_swim;
+  double f_swim;
+  double director[3];
   int push_pull;
-  float dipole_length;
+  double dipole_length;
   bool swimming;
 } CUDA_ParticleParametersSwimming;
 #endif
@@ -67,31 +67,31 @@ struct CUDA_particle_data {
 #endif
 
   /** particle position given from md part*/
-  float p[3];
+  double p[3];
 
 #if defined(LB_GPU)
   /** particle momentum struct velocity p.m->v*/
-  float v[3];
+  double v[3];
 #endif
 
 #ifdef ROTATION
-  float director[3];
+  double director[3];
 #endif
 
 #ifdef SHANCHEN
-  float solvation[2 * LB_COMPONENTS];
+  double solvation[2 * LB_COMPONENTS];
 #endif
 
 #if defined(LB_ELECTROHYDRODYNAMICS) && defined(LB_GPU)
-  float mu_E[3];
+  double mu_E[3];
 #endif
 
 #ifdef ELECTROSTATICS
-  float q;
+  double q;
 #endif
 
 #ifdef MASS
-  float mass;
+  double mass;
 #endif
 
 #ifdef VIRTUAL_SITES
@@ -99,13 +99,13 @@ struct CUDA_particle_data {
 #endif
 
 #ifdef DIPOLES
-  float dip[3];
+  double dip[3];
 #endif
 };
 
 /** data structure for the different kinds of energies */
 typedef struct {
-  float bonded, non_bonded, coulomb, dipolar;
+  double bonded, non_bonded, coulomb, dipolar;
 } CUDA_energy;
 
 /** Note the particle's seed gets its own struct since it doesn't get copied
@@ -140,13 +140,13 @@ void copy_composition_from_GPU();
 CUDA_global_part_vars *gpu_get_global_particle_vars_pointer_host();
 CUDA_global_part_vars *gpu_get_global_particle_vars_pointer();
 CUDA_particle_data *gpu_get_particle_pointer();
-float *gpu_get_particle_force_pointer();
+double *gpu_get_particle_force_pointer();
 #ifdef ROTATION
-float *gpu_get_particle_torque_pointer();
+double *gpu_get_particle_torque_pointer();
 #endif
 
 CUDA_energy *gpu_get_energy_pointer();
-float *gpu_get_particle_torque_pointer();
+double *gpu_get_particle_torque_pointer();
 CUDA_fluid_composition *gpu_get_fluid_composition_pointer();
 CUDA_particle_seed *gpu_get_particle_seed_pointer();
 void gpu_change_number_of_part_to_comm();
@@ -168,8 +168,8 @@ void copy_part_data_to_gpu(ParticleRange particles);
  *
  * This is a collective call.
  */
-void cuda_mpi_send_forces(ParticleRange particles, float *host_forces,
-                          float *host_torques);
+void cuda_mpi_send_forces(ParticleRange particles, double *host_forces,
+                          double *host_torques);
 void cuda_bcast_global_part_params();
 void cuda_copy_to_device(void *host_data, void *device_data, size_t n);
 void cuda_copy_to_host(void *host_device, void *device_host, size_t n);

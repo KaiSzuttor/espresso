@@ -63,6 +63,19 @@ extern EK_parameters *lb_ek_parameters_gpu;
 #define EK_LINK_D00_pressure 3
 #define EK_LINK_0D0_pressure 4
 #define EK_LINK_00D_pressure 5
+__device__ double atomicAdd(double* address, double val)
+{
+    unsigned long long int* address_as_ull =
+                             (unsigned long long int*)address;
+    unsigned long long int old = *address_as_ull, assumed;
+    do {
+        assumed = old;
+old = atomicCAS(address_as_ull, assumed,
+                        __double_as_longlong(val +
+                               __longlong_as_double(assumed)));
+    } while (assumed != old);
+    return __longlong_as_double(old);
+}
 
 #ifdef EK_BOUNDARIES
 void LBBoundaries::lb_init_boundaries();

@@ -177,7 +177,7 @@ static int max_ran = 1000000;
 static int fluidstep = 0;
 
 /** c_sound_square in LB units*/
-static float c_sound_sq = 1.0f / 3.0f;
+static double c_sound_sq = 1.0f / 3.0f;
 
 // clock_t start, end;
 int i;
@@ -272,7 +272,7 @@ void lb_release_gpu() {
 void lb_reinit_parameters_gpu() {
   int ii;
 
-  lbpar_gpu.time_step = (float)time_step;
+  lbpar_gpu.time_step = (double)time_step;
   for (ii = 0; ii < LB_COMPONENTS; ++ii) {
     lbpar_gpu.mu[ii] = 0.0;
 
@@ -337,7 +337,7 @@ void lb_reinit_parameters_gpu() {
       LB_TRACE(fprintf(stderr, "fluct on \n"));
       /* Eq. (51) Duenweg, Schiller, Ladd, PRE 76(3):036704 (2007).*/
       /* Note that the modes are not normalized as in the paper here! */
-      lbpar_gpu.mu[ii] = (float)temperature * lbpar_gpu.tau * lbpar_gpu.tau /
+      lbpar_gpu.mu[ii] = (double)temperature * lbpar_gpu.tau * lbpar_gpu.tau /
                          c_sound_sq / (lbpar_gpu.agrid * lbpar_gpu.agrid);
 
       /* lb_coupl_pref is stored in MD units (force)
@@ -348,10 +348,10 @@ void lb_reinit_parameters_gpu() {
        */
 
       lbpar_gpu.lb_coupl_pref[ii] =
-          sqrtf(12.f * 2.f * lbpar_gpu.friction[ii] * (float)temperature /
+          sqrtf(12.f * 2.f * lbpar_gpu.friction[ii] * (double)temperature /
                 lbpar_gpu.time_step);
       lbpar_gpu.lb_coupl_pref2[ii] =
-          sqrtf(2.f * lbpar_gpu.friction[ii] * (float)temperature /
+          sqrtf(2.f * lbpar_gpu.friction[ii] * (double)temperature /
                 lbpar_gpu.time_step);
 
     } else {
@@ -390,7 +390,7 @@ void lb_reinit_parameters_gpu() {
 
     lbpar_gpu.number_of_nodes =
         lbpar_gpu.dim_x * lbpar_gpu.dim_y * lbpar_gpu.dim_z;
-    lbpar_gpu.tau = (float)time_step; // TODO code duplication with lb.c end
+    lbpar_gpu.tau = (double)time_step; // TODO code duplication with lb.c end
   }
 #endif
 
@@ -436,11 +436,11 @@ int lb_lbnode_set_extforce_density_GPU(int ind[3], double f[3]) {
           host_extern_node_force_densities, size_of_extforces);
 
   host_extern_node_force_densities[n_extern_node_force_densities]
-      .force_density[0] = (float)f[0];
+      .force_density[0] = (double)f[0];
   host_extern_node_force_densities[n_extern_node_force_densities]
-      .force_density[1] = (float)f[1];
+      .force_density[1] = (double)f[1];
   host_extern_node_force_densities[n_extern_node_force_densities]
-      .force_density[2] = (float)f[2];
+      .force_density[2] = (double)f[2];
 
   host_extern_node_force_densities[n_extern_node_force_densities].index = index;
   n_extern_node_force_densities++;
@@ -482,7 +482,7 @@ int lb_lbfluid_load_checkpoint_wrapper(char *filename, int binary) {
   return lb_lbfluid_load_checkpoint(filename, binary);
 }
 
-void lb_lbfluid_particles_add_momentum(float momentum[3]) {
+void lb_lbfluid_particles_add_momentum(double momentum[3]) {
   auto &parts = partCfg();
   auto const n_part = parts.size();
 
@@ -504,7 +504,7 @@ void lb_lbfluid_particles_add_momentum(float momentum[3]) {
   }
 }
 
-void lb_lbfluid_calc_linear_momentum(float momentum[3], int include_particles,
+void lb_lbfluid_calc_linear_momentum(double momentum[3], int include_particles,
                                      int include_lbfluid) {
   auto linear_momentum =
       calc_linear_momentum(include_particles, include_lbfluid);

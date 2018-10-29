@@ -48,8 +48,8 @@ public:
   void update() override;
 
 #ifdef CUDA
-  float *rGpuBegin() override { return m_r_gpu_begin; };
-  float *rGpuEnd() override { return m_r_gpu_end; };
+  double *rGpuBegin() override { return m_r_gpu_begin; };
+  double *rGpuEnd() override { return m_r_gpu_end; };
   bool hasRGpu() override { return true; };
   bool requestRGpu() override {
     m_needsRGpu = hasRGpu();
@@ -60,8 +60,8 @@ public:
     return m_needsRGpu;
   };
 #ifdef DIPOLES
-  float *dipGpuBegin() override { return m_dip_gpu_begin; };
-  float *dipGpuEnd() override { return m_dip_gpu_end; };
+  double *dipGpuBegin() override { return m_dip_gpu_begin; };
+  double *dipGpuEnd() override { return m_dip_gpu_end; };
   bool hasDipGpu() override { return true; };
   bool requestDipGpu() override {
     m_needsDipGpu = hasDipGpu();
@@ -72,8 +72,8 @@ public:
     return m_needsDipGpu;
   };
 #endif
-  float *vGpuBegin() override { return m_v_gpu_begin; };
-  float *vGpuEnd() override { return m_v_gpu_end; };
+  double *vGpuBegin() override { return m_v_gpu_begin; };
+  double *vGpuEnd() override { return m_v_gpu_end; };
   bool hasVGpu() override { return true; };
   bool requestVGpu() override {
     m_needsVGpu = hasVGpu();
@@ -84,8 +84,8 @@ public:
     return m_needsVGpu;
   };
 
-  float *qGpuBegin() override { return m_q_gpu_begin; };
-  float *qGpuEnd() override { return m_q_gpu_end; };
+  double *qGpuBegin() override { return m_q_gpu_begin; };
+  double *qGpuEnd() override { return m_q_gpu_end; };
   bool hasQGpu() override { return true; };
   bool requestQGpu() override {
     m_needsQGpu = hasQGpu();
@@ -96,8 +96,8 @@ public:
     return m_needsQGpu;
   };
 
-  float *directorGpuBegin() override { return m_director_gpu_begin; };
-  float *directorGpuEnd() override { return m_director_gpu_end; };
+  double *directorGpuBegin() override { return m_director_gpu_begin; };
+  double *directorGpuEnd() override { return m_director_gpu_end; };
   bool hasDirectorGpu() override { return true; };
   bool requestDirectorGpu() override {
     m_needsDirectorGpu = hasDirectorGpu();
@@ -116,16 +116,16 @@ public:
     return true;
   };
 
-  float *fGpuBegin() override { return gpu_get_particle_force_pointer(); };
-  float *fGpuEnd() override {
+  double *fGpuBegin() override { return gpu_get_particle_force_pointer(); };
+  double *fGpuEnd() override {
     return gpu_get_particle_force_pointer() + 3 * m_gpu_npart;
   };
-  float *eGpu() override { return (float *)gpu_get_energy_pointer(); };
-  float *torqueGpuBegin() override {
-    return (float *)gpu_get_particle_torque_pointer();
+  double *eGpu() override { return (double *)gpu_get_energy_pointer(); };
+  double *torqueGpuBegin() override {
+    return (double *)gpu_get_particle_torque_pointer();
   };
-  float *torqueGpuEnd() override {
-    return (float *)(gpu_get_particle_torque_pointer()) + 3 * m_gpu_npart;
+  double *torqueGpuEnd() override {
+    return (double *)(gpu_get_particle_torque_pointer()) + 3 * m_gpu_npart;
   };
   bool hasFGpu() override { return true; };
   bool requestFGpu() override {
@@ -188,20 +188,20 @@ protected:
   int m_gpu_npart;
   bool m_gpu;
 
-  float *m_r_gpu_begin;
-  float *m_r_gpu_end;
+  double *m_r_gpu_begin;
+  double *m_r_gpu_end;
 
-  float *m_dip_gpu_begin;
-  float *m_dip_gpu_end;
+  double *m_dip_gpu_begin;
+  double *m_dip_gpu_end;
 
-  float *m_v_gpu_begin;
-  float *m_v_gpu_end;
+  double *m_v_gpu_begin;
+  double *m_v_gpu_end;
 
-  float *m_q_gpu_begin;
-  float *m_q_gpu_end;
+  double *m_q_gpu_begin;
+  double *m_q_gpu_end;
 
-  float *m_director_gpu_begin;
-  float *m_director_gpu_end;
+  double *m_director_gpu_begin;
+  double *m_director_gpu_end;
 
   bool m_needsParticleStructGpu;
   bool m_splitParticleStructGpu;

@@ -20,6 +20,20 @@
 // To avoid include of communication.hpp in cuda file
 extern int this_node;
 
+__device__ double atomicAdd(double* address, double val)
+{
+    unsigned long long int* address_as_ull =
+                             (unsigned long long int*)address;
+    unsigned long long int old = *address_as_ull, assumed;
+    do {
+        assumed = old;
+old = atomicCAS(address_as_ull, assumed,
+                        __double_as_longlong(val +
+                               __longlong_as_double(assumed)));
+    } while (assumed != old);
+    return __longlong_as_double(old);
+}
+
 // ****** Kernel functions for internal use ********
 __global__ void ResetLBForces_Kernel(LB_node_force_density_gpu node_f,
                                      const LB_parameters_gpu *const paraP);

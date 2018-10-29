@@ -58,14 +58,14 @@ static void pack_particles(ParticleRange particles,
   for (auto const &part : particles) {
     auto const pos = folded_position(part);
 
-    buffer[i].p[0] = static_cast<float>(pos[0]);
-    buffer[i].p[1] = static_cast<float>(pos[1]);
-    buffer[i].p[2] = static_cast<float>(pos[2]);
+    buffer[i].p[0] = static_cast<double>(pos[0]);
+    buffer[i].p[1] = static_cast<double>(pos[1]);
+    buffer[i].p[2] = static_cast<double>(pos[2]);
 
 #ifdef LB_GPU
-    buffer[i].v[0] = static_cast<float>(part.m.v[0]);
-    buffer[i].v[1] = static_cast<float>(part.m.v[1]);
-    buffer[i].v[2] = static_cast<float>(part.m.v[2]);
+    buffer[i].v[0] = static_cast<double>(part.m.v[0]);
+    buffer[i].v[1] = static_cast<double>(part.m.v[1]);
+    buffer[i].v[2] = static_cast<double>(part.m.v[2]);
 #ifdef VIRTUAL_SITES
     buffer[i].is_virtual = part.p.is_virtual;
 
@@ -74,48 +74,48 @@ static void pack_particles(ParticleRange particles,
 
 #ifdef DIPOLES
     const Vector3d dip = part.calc_dip();
-    buffer[i].dip[0] = static_cast<float>(dip[0]);
-    buffer[i].dip[1] = static_cast<float>(dip[1]);
-    buffer[i].dip[2] = static_cast<float>(dip[2]);
+    buffer[i].dip[0] = static_cast<double>(dip[0]);
+    buffer[i].dip[1] = static_cast<double>(dip[1]);
+    buffer[i].dip[2] = static_cast<double>(dip[2]);
 #endif
 
 #ifdef SHANCHEN
     // SAW TODO: does this really need to be copied every time?
     for (int ii = 0; ii < 2 * LB_COMPONENTS; ii++) {
-      buffer[i].solvation[ii] = static_cast<float>(part.p.solvation[ii]);
+      buffer[i].solvation[ii] = static_cast<double>(part.p.solvation[ii]);
     }
 #endif
 
 #ifdef LB_ELECTROHYDRODYNAMICS
-    buffer[i].mu_E[0] = static_cast<float>(part.p.mu_E[0]);
-    buffer[i].mu_E[1] = static_cast<float>(part.p.mu_E[1]);
-    buffer[i].mu_E[2] = static_cast<float>(part.p.mu_E[2]);
+    buffer[i].mu_E[0] = static_cast<double>(part.p.mu_E[0]);
+    buffer[i].mu_E[1] = static_cast<double>(part.p.mu_E[1]);
+    buffer[i].mu_E[2] = static_cast<double>(part.p.mu_E[2]);
 #endif
 
 #ifdef ELECTROSTATICS
-    buffer[i].q = static_cast<float>(part.p.q);
+    buffer[i].q = static_cast<double>(part.p.q);
 #endif
 
 #ifdef MASS
-    buffer[i].mass = static_cast<float>(part.p.mass);
+    buffer[i].mass = static_cast<double>(part.p.mass);
 #endif
 
 #ifdef ROTATION
     const Vector3d director = part.r.calc_director();
-    buffer[i].director[0] = static_cast<float>(director[0]);
-    buffer[i].director[1] = static_cast<float>(director[1]);
-    buffer[i].director[2] = static_cast<float>(director[2]);
+    buffer[i].director[0] = static_cast<double>(director[0]);
+    buffer[i].director[1] = static_cast<double>(director[1]);
+    buffer[i].director[2] = static_cast<double>(director[2]);
 #endif
 
 #ifdef ENGINE
-    buffer[i].swim.v_swim = static_cast<float>(part.swim.v_swim);
-    buffer[i].swim.f_swim = static_cast<float>(part.swim.f_swim);
-    buffer[i].swim.director[0] = static_cast<float>(director[0]);
-    buffer[i].swim.director[1] = static_cast<float>(director[1]);
-    buffer[i].swim.director[2] = static_cast<float>(director[2]);
+    buffer[i].swim.v_swim = static_cast<double>(part.swim.v_swim);
+    buffer[i].swim.f_swim = static_cast<double>(part.swim.f_swim);
+    buffer[i].swim.director[0] = static_cast<double>(director[0]);
+    buffer[i].swim.director[1] = static_cast<double>(director[1]);
+    buffer[i].swim.director[2] = static_cast<double>(director[2]);
 #if defined(LB) || defined(LB_GPU)
     buffer[i].swim.push_pull = part.swim.push_pull;
-    buffer[i].swim.dipole_length = static_cast<float>(part.swim.dipole_length);
+    buffer[i].swim.dipole_length = static_cast<double>(part.swim.dipole_length);
 #endif
     buffer[i].swim.swimming = part.swim.swimming;
 #endif
@@ -154,8 +154,8 @@ void cuda_mpi_get_particles(ParticleRange particles,
  * @param torques The torques as flat array of size 3 * particles.size(),
  *                this is only touched if ROTATION is active.
  */
-static void add_forces_and_torques(ParticleRange particles, float *forces,
-                                   float *torques) {
+static void add_forces_and_torques(ParticleRange particles, double *forces,
+                                   double *torques) {
   int i = 0;
   for (auto &part : particles) {
     for (int j = 0; j < 3; j++) {
@@ -168,13 +168,13 @@ static void add_forces_and_torques(ParticleRange particles, float *forces,
   }
 }
 
-void cuda_mpi_send_forces(ParticleRange particles, float *host_forces,
-                          float *host_torques = nullptr) {
+void cuda_mpi_send_forces(ParticleRange particles, double *host_forces,
+                          double *host_torques = nullptr) {
   auto const n_elements = 3 * particles.size();
 
   if (this_node > 0) {
-    static std::vector<float> buffer_forces;
-    static std::vector<float> buffer_torques;
+    static std::vector<double> buffer_forces;
+    static std::vector<double> buffer_torques;
     /* Alloc buffer */
     buffer_forces.resize(n_elements);
 

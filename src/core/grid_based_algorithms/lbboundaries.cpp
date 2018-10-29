@@ -231,8 +231,8 @@ void lb_init_boundaries() {
     }
 
     /**call of cuda fkt*/
-    float *boundary_velocity =
-        (float *)Utils::malloc(3 * (lbboundaries.size() + 1) * sizeof(float));
+    double *boundary_velocity =
+        (double *)Utils::malloc(3 * (lbboundaries.size() + 1) * sizeof(double));
     int n = 0;
     for (auto lbb = lbboundaries.begin(); lbb != lbboundaries.end();
          ++lbb, n++) {

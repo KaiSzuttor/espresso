@@ -27,12 +27,12 @@
 #include "SystemInterface.hpp"
 #include <iostream>
 
-void HarmonicWell_kernel_wrapper(float x, float y, float z, float k, int n,
-                                 float *pos, float *f);
+void HarmonicWell_kernel_wrapper(double x, double y, double z, double k, int n,
+                                 double *pos, double *f);
 
 class HarmonicWell : public Actor {
 public:
-  HarmonicWell(float x1, float x2, float x3, float _k, SystemInterface &s);
+  HarmonicWell(double x1, double x2, double x3, double _k, SystemInterface &s);
 
   virtual void computeForces(SystemInterface &s) {
     HarmonicWell_kernel_wrapper(x, y, z, k, s.npart_gpu(), s.rGpuBegin(),
@@ -47,8 +47,8 @@ public:
   virtual ~HarmonicWell() {}
 
 protected:
-  float x, y, z;
-  float k;
+  double x, y, z;
+  double k;
 };
 
 #endif
