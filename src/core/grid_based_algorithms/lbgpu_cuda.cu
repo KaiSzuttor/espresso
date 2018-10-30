@@ -237,7 +237,7 @@ __device__ void gaussian_random(LB_randomnr_gpu *rn) {
 /* wrapper */
 __device__ double random_wrapper_philox(curandStatePhilox4_32_10_t *state) {
   constexpr double sqrt12 = 3.46410161514;
-  return (curand_uniform(state) - 0.5) * sqrt12;
+  return (curand_uniform_double(state) - 0.5) * sqrt12;
 }
 
 __device__ void random_wrapper(LB_randomnr_gpu *rn) {
