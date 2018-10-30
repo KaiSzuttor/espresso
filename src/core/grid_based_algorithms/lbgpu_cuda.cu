@@ -55,6 +55,9 @@
 #if (!defined(FLATNOISE) && !defined(GAUSSRANDOMCUT) && !defined(GAUSSRANDOM))
 #define FLATNOISE
 #endif
+
+#if __CUDA_ARCH__ < 600
+// No library version of atomicAdd for double (due to no hardware support) if compute capability < 6.0
 __device__ double atomicAdd(double* address, double val)
 {
     unsigned long long int* address_as_ull =
@@ -68,6 +71,7 @@ old = atomicCAS(address_as_ull, assumed,
     } while (assumed != old);
     return __longlong_as_double(old);
 }
+#endif
 
 int extended_values_flag = 0; /* TODO: this has to be set to one by
                                  appropriate functions if there is
@@ -180,7 +184,7 @@ __device__ void gaussian_random_cut(LB_randomnr_gpu *rn) {
   /** perform Box-Muller transformation and cutoff the ends and replace with
    * flat noise */
   /*
-  fac = sqrtf(-2.0*__logf(r2)/r2)*1.118591404;
+  fac = sqrt(-2.0*log(r2)/r2)*1.118591404;
   rn->randomnr[0] = x2*fac;
   rn->randomnr[1] = x1*fac;
   random_01(rn);
@@ -192,7 +196,7 @@ __device__ void gaussian_random_cut(LB_randomnr_gpu *rn) {
   }
   */
 
-  fac = sqrtf(-2.0 * __logf(r2) / r2) * 1.042267973;
+  fac = sqrt(-2.0 * log(r2) / r2) * 1.042267973;
   rn->randomnr[0] = x2 * fac;
   rn->randomnr[1] = x1 * fac;
   if (fabs(rn->randomnr[0]) > 2.0 * 1.042267973) {
@@ -226,7 +230,7 @@ __device__ void gaussian_random(LB_randomnr_gpu *rn) {
   } while (r2 >= 1.0 || r2 == 0.0);
 
   /** perform Box-Muller transformation */
-  fac = sqrtf(-2.0 * __logf(r2) / r2);
+  fac = sqrt(-2.0 * log(r2) / r2);
   rn->randomnr[0] = x2 * fac;
   rn->randomnr[1] = x1 * fac;
 }
@@ -839,19 +843,19 @@ __device__ void thermalize_modes(double *mode, unsigned int index,
       Rho_tot;
   for (int ii = 0; ii < LB_COMPONENTS; ++ii) {
     mode[1 + ii * LBQ] +=
-        sqrtf(c * (1 - c) * Rho_tot *
+        sqrt(c * (1 - c) * Rho_tot *
               (para->mu[ii] * (2.0 / 3.0) *
                (1.0 - (para->gamma_mobility[0] * para->gamma_mobility[0])))) *
         (2 * ii - 1) * random_wrapper_philox(&n_a.philox_state[index]);
     mode[2 + ii * LBQ] +=
-        sqrtf(c * (1 - c) * Rho_tot *
+        sqrt(c * (1 - c) * Rho_tot *
               (para->mu[ii] * (2.0 / 3.0) *
                (1.0 - (para->gamma_mobility[0] * para->gamma_mobility[0])))) *
         (2 * ii - 1) * random_wrapper_philox(&n_a.philox_state[index]);
   }
   for (int ii = 0; ii < LB_COMPONENTS; ++ii)
     mode[3 + ii * LBQ] +=
-        sqrtf(c * (1 - c) * Rho_tot *
+        sqrt(c * (1 - c) * Rho_tot *
               (para->mu[ii] * (2.0 / 3.0) *
                (1.0 - (para->gamma_mobility[0] * para->gamma_mobility[0])))) *
         (2 * ii - 1) * random_wrapper_philox(&n_a.philox_state[index]);
@@ -866,76 +870,76 @@ __device__ void thermalize_modes(double *mode, unsigned int index,
 
     /** stress modes */
     mode[4 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 3.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0 / 3.0) *
                      (1.0 - (para->gamma_bulk[ii] * para->gamma_bulk[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
     mode[5 + ii * LBQ] +=
-        sqrtf(Rho *
+        sqrt(Rho *
               (para->mu[ii] * (4.0 / 9.0) *
                (1.0 - (para->gamma_shear[ii] * para->gamma_shear[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
 
     mode[6 + ii * LBQ] +=
-        sqrtf(Rho *
+        sqrt(Rho *
               (para->mu[ii] * (4.0 / 3.0) *
                (1.0 - (para->gamma_shear[ii] * para->gamma_shear[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
     mode[7 + ii * LBQ] +=
-        sqrtf(Rho *
+        sqrt(Rho *
               (para->mu[ii] * (1.0 / 9.0) *
                (1.0 - (para->gamma_shear[ii] * para->gamma_shear[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
 
     mode[8 + ii * LBQ] +=
-        sqrtf(Rho *
+        sqrt(Rho *
               (para->mu[ii] * (1.0 / 9.0) *
                (1.0 - (para->gamma_shear[ii] * para->gamma_shear[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
     mode[9 + ii * LBQ] +=
-        sqrtf(Rho *
+        sqrt(Rho *
               (para->mu[ii] * (1.0 / 9.0) *
                (1.0 - (para->gamma_shear[ii] * para->gamma_shear[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
 
     /** ghost modes */
     mode[10 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0/ 3.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0/ 3.0) *
                      (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
     mode[11 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 3.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0 / 3.0) *
                      (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
 
     mode[12 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 3.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0 / 3.0) *
                      (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
     mode[13 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 9.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0 / 9.0) *
                      (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
 
     mode[14 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 9.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0 / 9.0) *
                      (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
     mode[15 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 9.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0 / 9.0) *
                      (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
 
     mode[16 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0) *
                      (1.0 - (para->gamma_even[ii] * para->gamma_even[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
     mode[17 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (4.0 / 9.0) *
+        sqrt(Rho * (para->mu[ii] * (4.0 / 9.0) *
                      (1.0 - (para->gamma_even[ii] * para->gamma_even[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
 
     mode[18 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (4.0 / 3.0) *
+        sqrt(Rho * (para->mu[ii] * (4.0 / 3.0) *
                      (1.0 - (para->gamma_even[ii] * para->gamma_even[ii])))) *
         random_wrapper_philox(&n_a.philox_state[index]);
   }
@@ -1630,7 +1634,7 @@ calc_values_in_MD_units(LB_nodes_gpu n_a, double *mode, LB_rho_v_pi_gpu *d_p_v,
           modes_from_pi_eq[4] + (0.5 + 0.5 * para->gamma_shear[ii]) *
                                     (mode[8 + ii * LBQ] - modes_from_pi_eq[4]);
       mode[9 + ii * LBQ] =
-          modes_from_pi_eq[5] + (0.5 + 0.5 * para->gamma_shear[ii]) *
+          modes_from_pi_eq[5] + (0.5 + -1.5 * para->gamma_shear[ii]) *
                                     (mode[9 + ii * LBQ] - modes_from_pi_eq[5]);
 
       // Transform the stress tensor components according to the modes that
@@ -1958,13 +1962,13 @@ interpolation_three_point_coupling(LB_nodes_gpu n_a, double *particle_position,
     my_center[i] = (int)(floorf(scaledpos + 0.5));
     scaledpos = scaledpos - 1.0 * my_center[i];
     temp_delta[0 + 3 * i] = (5.0 - 3.0 * abs(scaledpos + 1.0) -
-                             sqrtf(-2.0 + 6.0 * abs(scaledpos + 1.0) -
+                             sqrt(-2.0 + 6.0 * abs(scaledpos + 1.0) -
                                    3.0 * powf(scaledpos + 1.0, 2))) /
                             6.0;
     temp_delta[1 + 3 * i] =
-        (1.0 + sqrtf(1.0 - 3.0 * powf(scaledpos, 2))) / 3.0;
+        (1.0 + sqrt(1.0 - 3.0 * powf(scaledpos, 2))) / 3.0;
     temp_delta[2 + 3 * i] = (5.0 - 3.0 * abs(scaledpos - 1.0) -
-                             sqrtf(-2.0 + 6.0 * abs(scaledpos - 1.0) -
+                             sqrt(-2.0 + 6.0 * abs(scaledpos - 1.0) -
                                    3.0 * powf(scaledpos - 1.0, 2))) /
                             6.0;
   }
