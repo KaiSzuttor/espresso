@@ -53,7 +53,9 @@ class TestLB(object):
               'temp': 1.5,
               'gamma': 1.5,
               'skin': 0.2,
-              'temp_confidence': 10}
+              'temp_confidence': 10,
+              'mom_prec': 1E-9,
+              'mass_prec_per_node': 5E-8}
     if espressomd.has_features("SHANCHEN"):
         params.update({"dens": 2 * [params["dens"]]})
 
@@ -129,8 +131,10 @@ class TestLB(object):
             fluid_temp *= self.system.volume() / (3. * len(lb_nodes)**2)
 
             # check mass conversation
-            self.assertAlmostEqual(fluid_mass, self.params[
-                                   "dens"], delta=self.params["mass_prec_per_node"])
+            self.assertAlmostEqual(
+                fluid_mass,
+                self.params["dens"],
+                delta=self.params["mass_prec_per_node"])
 
             # check momentum conservation
             np.testing.assert_allclose(
@@ -154,9 +158,13 @@ class TestLB(object):
         temp_prec_fluid = 0.05 * self.params["temp"]
 
         self.assertAlmostEqual(
-            np.mean(all_temp_fluid), self.params["temp"], delta=temp_prec_fluid)
+            np.mean(all_temp_fluid),
+            self.params["temp"],
+            delta=temp_prec_fluid)
         self.assertAlmostEqual(
-            np.mean(all_temp_particle), self.params["temp"], delta=temp_prec_particle)
+            np.mean(all_temp_particle),
+            self.params["temp"],
+            delta=temp_prec_particle)
 
     def test_set_get_u(self):
         self.system.actors.clear()
@@ -182,14 +190,14 @@ class TestLB(object):
             fric=self.params['friction'], ext_force_density=[0, 0, 0])
         self.system.actors.add(self.lbf)
         with self.assertRaises(ValueError):
-            v = self.lbf[
-                int(self.params['box_l'] / self.params['agrid']) + 1, 0, 0].velocity
+            v = self.lbf[int(self.params['box_l'] /
+                             self.params['agrid']) + 1, 0, 0].velocity
         with self.assertRaises(ValueError):
-            v = self.lbf[
-                0, int(self.params['box_l'] / self.params['agrid']) + 1, 0].velocity
+            v = self.lbf[0, int(self.params['box_l'] /
+                                self.params['agrid']) + 1, 0].velocity
         with self.assertRaises(ValueError):
-            v = self.lbf[
-                0, 0, int(self.params['box_l'] / self.params['agrid']) + 1].velocity
+            v = self.lbf[0, 0, int(
+                self.params['box_l'] / self.params['agrid']) + 1].velocity
 
     @ut.skipIf(not espressomd.has_features("EXTERNAL_FORCES"),
                "Features not available, skipping test!")
@@ -210,8 +218,8 @@ class TestLB(object):
             pos=[0.5 * self.params['agrid']] * 3, v=v_part, fix=[1, 1, 1])
         self.lbf[0, 0, 0].velocity = v_fluid
         self.system.integrator.run(1)
-        np.testing.assert_allclose(
-            np.copy(self.system.part[0].f), -self.params['friction'] * (v_part - v_fluid), atol=1E-6)
+        np.testing.assert_allclose(np.copy(
+            self.system.part[0].f), -self.params['friction'] * (v_part - v_fluid), atol=1E-6)
 
     @ut.skipIf(not espressomd.has_features("EXTERNAL_FORCES"),
                "Features not available, skipping test!")
@@ -233,7 +241,8 @@ class TestLB(object):
         # (force is applied only to the second half of the first integration step)
         fluid_velocity = np.array(ext_force_density) * self.system.time_step * (
             n_time_steps - 0.5) / self.params['dens']
-        for n in list(itertools.combinations(range(int(self.system.box_l[0] / self.params['agrid'])), 3)):
+        for n in list(itertools.combinations(
+                range(int(self.system.box_l[0] / self.params['agrid'])), 3)):
             np.testing.assert_allclose(
                 np.copy(self.lbf[n].velocity), fluid_velocity, atol=1E-6)
 
@@ -244,18 +253,16 @@ class TestLBCPU(TestLB, ut.TestCase):
 
     def setUp(self):
         self.lb_class = espressomd.lb.LBFluid
-        self.params.update({"mom_prec": 1E-9, "mass_prec_per_node": 5E-8})
 
 
 @ut.skipIf(
     not espressomd.has_features(
         ["LB_GPU"]) or espressomd.has_features('SHANCHEN'),
-           "Features not available, skipping test!")
+    "Features not available, skipping test!")
 class TestLBGPU(TestLB, ut.TestCase):
 
     def setUp(self):
         self.lb_class = espressomd.lb.LBFluidGPU
-        self.params.update({"mom_prec": 1E-3, "mass_prec_per_node": 1E-5})
 
 
 if __name__ == "__main__":
