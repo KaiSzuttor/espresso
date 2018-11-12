@@ -21,7 +21,7 @@
 #include "forces.hpp"
 
 #ifdef CUDA
-HarmonicWell::HarmonicWell(float x1, float x2, float x3, float _k,
+HarmonicWell::HarmonicWell(double x1, double x2, double x3, double _k,
                            SystemInterface &s) {
   x = x1;
   y = x2;

@@ -42,6 +42,7 @@
 #include "grid_based_algorithms/electrokinetics_pdb_parse.hpp"
 #include "grid_based_algorithms/lbgpu.cuh"
 #include "grid_based_algorithms/lbgpu.hpp"
+#include "cuda_common.cuh"
 
 #include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>
@@ -134,7 +135,7 @@ static const double c_sound_sq = 1.0 / 3.0;
 
 static constexpr double sqrt12 = 3.4641016151377544;
 static uint64_t philox_counter = 0;
-__device__ double4 random_wrapper_philox(unsigned int index, unsigned int mode,
+__device__ double2 random_wrapper_philox(unsigned int index, unsigned int mode,
                                         uint64_t philox_counter) {
   // Split the 64 bit counter into two 32 bit ints.
   uint32_t philox_counter_hi = static_cast<uint32_t>(philox_counter >> 32);
@@ -142,11 +143,11 @@ __device__ double4 random_wrapper_philox(unsigned int index, unsigned int mode,
   uint4 rnd_ints =
       curand_Philox4x32_10(make_uint4(index, philox_counter_hi, 0, mode),
                            make_uint2(philox_counter_low, para->your_seed));
-  double4 rnd_doubles;
-  rnd_doubles.w = rnd_ints.w * CURAND_2POW32_INV + (CURAND_2POW32_INV / 2.0);
-  rnd_doubles.x = rnd_ints.x * CURAND_2POW32_INV + (CURAND_2POW32_INV / 2.0);
-  rnd_doubles.y = rnd_ints.y * CURAND_2POW32_INV + (CURAND_2POW32_INV / 2.0);
-  rnd_doubles.z = rnd_ints.z * CURAND_2POW32_INV + (CURAND_2POW32_INV / 2.0);
+  double2 rnd_doubles;
+  unsigned long long a = (unsigned long long)rnd_ints.w ^ ((unsigned long long)rnd_ints.x << (53-32));
+  unsigned long long b = (unsigned long long)rnd_ints.y ^ ((unsigned long long)rnd_ints.z << (53-32));
+  rnd_doubles.x = a * CURAND_2POW53_INV_DOUBLE + (CURAND_2POW53_INV_DOUBLE/2.0);
+  rnd_doubles.y = b * CURAND_2POW53_INV_DOUBLE + (CURAND_2POW53_INV_DOUBLE/2.0);
   return rnd_doubles;
 }
 
@@ -526,7 +527,7 @@ __device__ void calc_m_from_n(LB_nodes_gpu n_a, unsigned int index,
 __device__ void reset_LB_force_densities(unsigned int index,
                                          LB_node_force_density_gpu node_f,
                                          bool buffer = true) {
-  double force_factor = powf(para->agrid, 2) * para->tau * para->tau;
+  double force_factor = pow(para->agrid, 2) * para->tau * para->tau;
   for (int ii = 0; ii < LB_COMPONENTS; ++ii) {
 #if defined(VIRTUAL_SITES_INERTIALESS_TRACERS) || defined(EK_DEBUG)
     // Store backup of the node forces
@@ -724,7 +725,7 @@ __device__ void relax_modes(double *mode, unsigned int index,
 __device__ void thermalize_modes(double *mode, unsigned int index,
                                  uint64_t philox_counter) {
   double Rho;
-  double4 random_doubles;
+  double2 random_doubles;
 #ifdef SHANCHEN
   double Rho_tot = 0.0, c;
 #pragma unroll
@@ -738,22 +739,24 @@ __device__ void thermalize_modes(double *mode, unsigned int index,
   for (int ii = 0; ii < LB_COMPONENTS; ++ii) {
     random_doubles = random_wrapper_philox(index, 1 * ii * LBQ, philox_counter);
     mode[1 + ii * LBQ] +=
-        sqrtf(c * (1 - c) * Rho_tot *
+        sqrt(c * (1 - c) * Rho_tot *
               (para->mu[ii] * (2.0 / 3.0) *
                (1.0 - (para->gamma_mobility[0] * para->gamma_mobility[0])))) *
-        (2 * ii - 1) * (random_doubles.w - 0.5) * sqrt12;
+        (2 * ii - 1) * (random_doubles.x - 0.5) * sqrt12;
     mode[2 + ii * LBQ] +=
-        sqrtf(c * (1 - c) * Rho_tot *
+        sqrt(c * (1 - c) * Rho_tot *
+              (para->mu[ii] * (2.0 / 3.0) *
+               (1.0 - (para->gamma_mobility[0] * para->gamma_mobility[0])))) *
+        (2 * ii - 1) * (random_doubles.y - 0.5) * sqrt12;
+  }
+  for (int ii = 0; ii < LB_COMPONENTS; ++ii) {
+    random_doubles = random_wrapper_philox(index, 2 * ii * LBQ, philox_counter);
+    mode[3 + ii * LBQ] +=
+        sqrt(c * (1 - c) * Rho_tot *
               (para->mu[ii] * (2.0 / 3.0) *
                (1.0 - (para->gamma_mobility[0] * para->gamma_mobility[0])))) *
         (2 * ii - 1) * (random_doubles.x - 0.5) * sqrt12;
   }
-  for (int ii = 0; ii < LB_COMPONENTS; ++ii)
-    mode[3 + ii * LBQ] +=
-        sqrtf(c * (1 - c) * Rho_tot *
-              (para->mu[ii] * (2.0 / 3.0) *
-               (1.0 - (para->gamma_mobility[0] * para->gamma_mobility[0])))) *
-        (2 * ii - 1) * (random_doubles.y - 0.5) * sqrt12;
 #endif
 
   for (int ii = 0; ii < LB_COMPONENTS; ++ii) {
@@ -764,83 +767,87 @@ __device__ void thermalize_modes(double *mode, unsigned int index,
     /** momentum modes */
 
     /** stress modes */
-    random_doubles = random_wrapper_philox(index, 4 * ii * LBQ, philox_counter);
+    random_doubles = random_wrapper_philox(index, 3 * ii * LBQ, philox_counter);
     mode[4 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 3.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0 / 3.0) *
                      (1.0 - (para->gamma_bulk[ii] * para->gamma_bulk[ii])))) *
-        (random_doubles.w - 0.5) * sqrt12;
+        (random_doubles.x - 0.5) * sqrt12;
     mode[5 + ii * LBQ] +=
-        sqrtf(Rho *
+        sqrt(Rho *
               (para->mu[ii] * (4.0 / 9.0) *
                (1.0 - (para->gamma_shear[ii] * para->gamma_shear[ii])))) *
-        (random_doubles.x - 0.5) * sqrt12;
+        (random_doubles.y - 0.5) * sqrt12;
 
+    random_doubles = random_wrapper_philox(index, 4 * ii * LBQ, philox_counter);
     mode[6 + ii * LBQ] +=
-        sqrtf(Rho *
+        sqrt(Rho *
               (para->mu[ii] * (4.0 / 3.0) *
                (1.0 - (para->gamma_shear[ii] * para->gamma_shear[ii])))) *
-        (random_doubles.y - 0.5) * sqrt12;
+        (random_doubles.x - 0.5) * sqrt12;
     mode[7 + ii * LBQ] +=
-        sqrtf(Rho *
+        sqrt(Rho *
               (para->mu[ii] * (1.0 / 9.0) *
                (1.0 - (para->gamma_shear[ii] * para->gamma_shear[ii])))) *
-        (random_doubles.z - 0.5) * sqrt12;
+        (random_doubles.y - 0.5) * sqrt12;
 
-    random_doubles = random_wrapper_philox(index, 8 * ii * LBQ, philox_counter);
+    random_doubles = random_wrapper_philox(index, 5 * ii * LBQ, philox_counter);
     mode[8 + ii * LBQ] +=
-        sqrtf(Rho *
-              (para->mu[ii] * (1.0 / 9.0) *
-               (1.0 - (para->gamma_shear[ii] * para->gamma_shear[ii])))) *
-        (random_doubles.w - 0.5) * sqrt12;
-    mode[9 + ii * LBQ] +=
-        sqrtf(Rho *
+        sqrt(Rho *
               (para->mu[ii] * (1.0 / 9.0) *
                (1.0 - (para->gamma_shear[ii] * para->gamma_shear[ii])))) *
         (random_doubles.x - 0.5) * sqrt12;
+    mode[9 + ii * LBQ] +=
+        sqrt(Rho *
+              (para->mu[ii] * (1.0 / 9.0) *
+               (1.0 - (para->gamma_shear[ii] * para->gamma_shear[ii])))) *
+        (random_doubles.y - 0.5) * sqrt12;
 
     /** ghost modes */
+    random_doubles = random_wrapper_philox(index, 6 * ii * LBQ, philox_counter);
     mode[10 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 3.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0 / 3.0) *
                      (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
-        (random_doubles.y - 0.5) * sqrt12;
+        (random_doubles.x - 0.5) * sqrt12;
     mode[11 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 3.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0 / 3.0) *
                      (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
-        (random_doubles.z - 0.5) * sqrt12;
+        (random_doubles.y - 0.5) * sqrt12;
 
-    random_doubles = random_wrapper_philox(index, 12 * ii * LBQ, philox_counter);
+    random_doubles = random_wrapper_philox(index, 7 * ii * LBQ, philox_counter);
     mode[12 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 3.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0 / 3.0) *
                      (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
-        (random_doubles.w - 0.5) * sqrt12;
+        (random_doubles.x - 0.5) * sqrt12;
     mode[13 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 9.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0 / 9.0) *
                      (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
-        (random_doubles.x - 0.5) * sqrt12;
+        (random_doubles.y - 0.5) * sqrt12;
 
+    random_doubles = random_wrapper_philox(index, 8 * ii * LBQ, philox_counter);
     mode[14 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 9.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0 / 9.0) *
+                     (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
+        (random_doubles.x - 0.5) * sqrt12;
+    mode[15 + ii * LBQ] +=
+        sqrt(Rho * (para->mu[ii] * (2.0 / 9.0) *
                      (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
         (random_doubles.y - 0.5) * sqrt12;
-    mode[15 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0 / 9.0) *
-                     (1.0 - (para->gamma_odd[ii] * para->gamma_odd[ii])))) *
-        (random_doubles.z - 0.5) * sqrt12;
 
-    random_doubles = random_wrapper_philox(index, 16 * ii * LBQ, philox_counter);
+    random_doubles = random_wrapper_philox(index, 9 * ii * LBQ, philox_counter);
     mode[16 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (2.0) *
-                     (1.0 - (para->gamma_even[ii] * para->gamma_even[ii])))) *
-        (random_doubles.w - 0.5) * sqrt12;
-    mode[17 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (4.0 / 9.0) *
+        sqrt(Rho * (para->mu[ii] * (2.0) *
                      (1.0 - (para->gamma_even[ii] * para->gamma_even[ii])))) *
         (random_doubles.x - 0.5) * sqrt12;
-
-    mode[18 + ii * LBQ] +=
-        sqrtf(Rho * (para->mu[ii] * (4.0 / 3.0) *
+    mode[17 + ii * LBQ] +=
+        sqrt(Rho * (para->mu[ii] * (4.0 / 9.0) *
                      (1.0 - (para->gamma_even[ii] * para->gamma_even[ii])))) *
         (random_doubles.y - 0.5) * sqrt12;
+
+    random_doubles = random_wrapper_philox(index, 10 * ii * LBQ, philox_counter);
+    mode[18 + ii * LBQ] +=
+        sqrt(Rho * (para->mu[ii] * (4.0 / 3.0) *
+                     (1.0 - (para->gamma_even[ii] * para->gamma_even[ii])))) *
+        (random_doubles.x - 0.5) * sqrt12;
   }
 }
 
@@ -1861,14 +1868,14 @@ interpolation_three_point_coupling(LB_nodes_gpu n_a, double *particle_position,
     my_center[i] = (int)(floorf(scaledpos + 0.5));
     scaledpos = scaledpos - 1.0 * my_center[i];
     temp_delta[0 + 3 * i] = (5.0 - 3.0 * abs(scaledpos + 1.0) -
-                             sqrtf(-2.0 + 6.0 * abs(scaledpos + 1.0) -
-                                   3.0 * powf(scaledpos + 1.0, 2))) /
+                             sqrt(-2.0 + 6.0 * abs(scaledpos + 1.0) -
+                                   3.0 * pow(scaledpos + 1.0, 2))) /
                             6.0;
     temp_delta[1 + 3 * i] =
-        (1.0 + sqrtf(1.0 - 3.0 * powf(scaledpos, 2))) / 3.0;
+        (1.0 + sqrt(1.0 - 3.0 * pow(scaledpos, 2))) / 3.0;
     temp_delta[2 + 3 * i] = (5.0 - 3.0 * abs(scaledpos - 1.0) -
-                             sqrtf(-2.0 + 6.0 * abs(scaledpos - 1.0) -
-                                   3.0 * powf(scaledpos - 1.0, 2))) /
+                             sqrt(-2.0 + 6.0 * abs(scaledpos - 1.0) -
+                                   3.0 * pow(scaledpos - 1.0, 2))) /
                             6.0;
   }
 
@@ -2053,15 +2060,18 @@ __device__ void calc_viscous_force_three_point_couple(
 #endif
 
     /** add stochastic force of zero mean (Ahlrichs, Duenweg equ. 15)*/
-    double4 random_doubles =
+    double2 random_doubles =
         random_wrapper_philox(particle_data[part_index].identity,
                               ii + LB_COMPONENTS * LBQ * 32, philox_counter);
     viscforce_density[0 + ii * 3] +=
-        para->lb_coupl_pref[ii] * (random_doubles.w - 0.5);
-    viscforce_density[1 + ii * 3] +=
         para->lb_coupl_pref[ii] * (random_doubles.x - 0.5);
-    viscforce_density[2 + ii * 3] +=
+    viscforce_density[1 + ii * 3] +=
         para->lb_coupl_pref[ii] * (random_doubles.y - 0.5);
+    random_doubles =
+        random_wrapper_philox(particle_data[part_index].identity,
+                              ii + LB_COMPONENTS * LBQ * 33, philox_counter);
+    viscforce_density[2 + ii * 3] +=
+        para->lb_coupl_pref[ii] * (random_doubles.x - 0.5);
     /** delta_j for transform momentum transfer to lattice units which is done
       in calc_node_force (Eq. (12) Ahlrichs and Duenweg, JCP 111(17):8225
       (1999)) */
@@ -2524,15 +2534,18 @@ __device__ void calc_viscous_force(
 #endif
 
     /** add stochastic force of zero mean (Ahlrichs, Duenweg equ. 15)*/
-    double4 random_doubles =
+    double2 random_doubles =
         random_wrapper_philox(particle_data[part_index].identity,
                               ii + LB_COMPONENTS * LBQ * 32, philox_counter);
     viscforce_density[0 + ii * 3] +=
-        para->lb_coupl_pref[ii] * (random_doubles.w - 0.5);
-    viscforce_density[1 + ii * 3] +=
         para->lb_coupl_pref[ii] * (random_doubles.x - 0.5);
-    viscforce_density[2 + ii * 3] +=
+    viscforce_density[1 + ii * 3] +=
         para->lb_coupl_pref[ii] * (random_doubles.y - 0.5);
+    random_doubles =
+        random_wrapper_philox(particle_data[part_index].identity,
+                              ii + LB_COMPONENTS * LBQ * 33, philox_counter);
+    viscforce_density[2 + ii * 3] +=
+        para->lb_coupl_pref[ii] * (random_doubles.x - 0.5);
 
     /** delta_j for transform momentum transfer to lattice units which is done
       in calc_node_force (Eq. (12) Ahlrichs and Duenweg, JCP 111(17):8225
@@ -3049,7 +3062,7 @@ __global__ void init_extern_node_force_densities(
     LB_node_force_density_gpu node_f) {
   unsigned int index = blockIdx.y * gridDim.x * blockDim.x +
                        blockDim.x * blockIdx.x + threadIdx.x;
-  double factor = powf(para->agrid, 2) * para->tau * para->tau;
+  double factor = pow(para->agrid, 2) * para->tau * para->tau;
   if (index < n_extern_node_force_densities) {
 #pragma unroll
     for (int ii = 0; ii < LB_COMPONENTS; ++ii) {
@@ -3779,11 +3792,11 @@ void lb_init_GPU(LB_parameters_gpu *lbpar_gpu) {
                                          LB_COMPONENTS * sizeof(double));
   free_realloc_and_clear(node_f.force_density, lbpar_gpu->number_of_nodes * 3 *
                                                    LB_COMPONENTS *
-                                                   sizeof(lbForceDouble));
+                                                   sizeof(double));
 #if defined(VIRTUAL_SITES_INERTIALESS_TRACERS) || defined(EK_DEBUG)
   free_realloc_and_clear(node_f.force_density_buf, lbpar_gpu->number_of_nodes *
                                                        3 * LB_COMPONENTS *
-                                                       sizeof(lbForceDouble));
+                                                       sizeof(double));
 #endif
 #ifdef SHANCHEN
   free_realloc_and_clear(node_f.scforce_density, lbpar_gpu->number_of_nodes *
@@ -4261,7 +4274,7 @@ void lb_calc_shanchen_GPU() {
  */
 void lb_save_checkpoint_GPU(double *host_checkpoint_vd,
                             unsigned int *host_checkpoint_boundary,
-                            lbForceDouble *host_checkpoint_force,
+                            double *host_checkpoint_force,
                             uint64_t *host_checkpoint_philox_counter) {
   cuda_safe_mem(cudaMemcpy(host_checkpoint_vd, current_nodes->vd,
                            lbpar_gpu.number_of_nodes * 19 * sizeof(double),
@@ -4270,7 +4283,7 @@ void lb_save_checkpoint_GPU(double *host_checkpoint_vd,
                            lbpar_gpu.number_of_nodes * sizeof(unsigned int),
                            cudaMemcpyDeviceToHost));
   cuda_safe_mem(cudaMemcpy(host_checkpoint_force, node_f.force_density,
-                           lbpar_gpu.number_of_nodes * 3 * sizeof(lbForceDouble),
+                           lbpar_gpu.number_of_nodes * 3 * sizeof(double),
                            cudaMemcpyDeviceToHost));
   host_checkpoint_philox_counter = &philox_counter;
 }
@@ -4282,7 +4295,7 @@ void lb_save_checkpoint_GPU(double *host_checkpoint_vd,
  */
 void lb_load_checkpoint_GPU(double *host_checkpoint_vd,
                             unsigned int *host_checkpoint_boundary,
-                            lbForceDouble *host_checkpoint_force,
+                            double *host_checkpoint_force,
                             uint64_t *host_checkpoint_philox_counter) {
   current_nodes = &nodes_a;
   intflag = 1;
@@ -4295,7 +4308,7 @@ void lb_load_checkpoint_GPU(double *host_checkpoint_vd,
                            lbpar_gpu.number_of_nodes * sizeof(unsigned int),
                            cudaMemcpyHostToDevice));
   cuda_safe_mem(cudaMemcpy(node_f.force_density, host_checkpoint_force,
-                           lbpar_gpu.number_of_nodes * 3 * sizeof(lbForceDouble),
+                           lbpar_gpu.number_of_nodes * 3 * sizeof(double),
                            cudaMemcpyHostToDevice));
   philox_counter = *host_checkpoint_philox_counter;
 }
@@ -4487,17 +4500,17 @@ lb_lbfluid_fluid_add_momentum_kernel(double momentum[3], LB_nodes_gpu n_a,
 #endif
   if (index < para->number_of_nodes) {
     if (n_a.boundary[index] == 0) {
-      double force_factor = powf(para->agrid, 2) * para->tau * para->tau;
+      double force_factor = pow(para->agrid, 2) * para->tau * para->tau;
       for (int i = 0; i < LB_COMPONENTS; ++i) {
         // add force density onto each node (momentum / time_step / Volume)
         node_f.force_density[(0 + i * 3) * para->number_of_nodes + index] +=
-            momentum[0] / para->tau / (number_of_nodes * powf(para->agrid, 3)) *
+            momentum[0] / para->tau / (number_of_nodes * pow(para->agrid, 3)) *
             force_factor;
         node_f.force_density[(1 + i * 3) * para->number_of_nodes + index] +=
-            momentum[1] / para->tau / (number_of_nodes * powf(para->agrid, 3)) *
+            momentum[1] / para->tau / (number_of_nodes * pow(para->agrid, 3)) *
             force_factor;
         node_f.force_density[(2 + i * 3) * para->number_of_nodes + index] +=
-            momentum[2] / para->tau / (number_of_nodes * powf(para->agrid, 3)) *
+            momentum[2] / para->tau / (number_of_nodes * pow(para->agrid, 3)) *
             force_factor;
       }
     }

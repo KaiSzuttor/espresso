@@ -96,8 +96,8 @@ void lb_init_boundaries() {
         -1; // the number the boundary will actually belong to.
 
 #ifdef EK_BOUNDARIES
-    ekfloat *host_wallcharge_species_density = nullptr;
-    float node_wallcharge = 0.0f;
+    double *host_wallcharge_species_density = nullptr;
+    double node_wallcharge = 0.0;
     int wallcharge_species = -1, charged_boundaries = 0;
     int node_charged = 0;
 
@@ -106,8 +106,8 @@ void lb_init_boundaries() {
     }
 
     if (ek_initialized) {
-      host_wallcharge_species_density = (ekfloat *)Utils::malloc(
-          ek_parameters.number_of_nodes * sizeof(ekfloat));
+      host_wallcharge_species_density = (double *)Utils::malloc(
+          ek_parameters.number_of_nodes * sizeof(double));
       for (auto lbb = lbboundaries.begin(); lbb != lbboundaries.end(); ++lbb) {
         if ((**lbb).charge_density() != 0.0) {
           charged_boundaries = 1;
@@ -147,7 +147,7 @@ void lb_init_boundaries() {
 #ifdef EK_BOUNDARIES
           if (ek_initialized) {
             node_charged = 0;
-            node_wallcharge = 0.0f;
+            node_wallcharge = 0.0;
           }
 #endif
 
@@ -162,7 +162,7 @@ void lb_init_boundaries() {
             }
 #ifdef EK_BOUNDARIES
             if (ek_initialized) {
-              if (dist_tmp <= 0 && (**lbb).charge_density() != 0.0f) {
+              if (dist_tmp <= 0 && (**lbb).charge_density() != 0.0) {
                 node_charged = 1;
                 node_wallcharge += (**lbb).charge_density() *
                                    ek_parameters.agrid * ek_parameters.agrid *
@@ -211,7 +211,7 @@ void lb_init_boundaries() {
               if (pdb_charge_lattice &&
                   pdb_charge_lattice[ek_parameters.dim_y * ek_parameters.dim_x *
                                          z +
-                                     ek_parameters.dim_x * y + x] != 0.0f) {
+                                     ek_parameters.dim_x * y + x] != 0.0) {
                 node_charged = 1;
                 node_wallcharge +=
                     pdb_charge_lattice[ek_parameters.dim_y *
@@ -231,8 +231,8 @@ void lb_init_boundaries() {
     }
 
     /**call of cuda fkt*/
-    float *boundary_velocity =
-        (float *)Utils::malloc(3 * (lbboundaries.size() + 1) * sizeof(float));
+    double *boundary_velocity =
+        (double *)Utils::malloc(3 * (lbboundaries.size() + 1) * sizeof(double));
     int n = 0;
     for (auto lbb = lbboundaries.begin(); lbb != lbboundaries.end();
          ++lbb, n++) {
@@ -241,9 +241,9 @@ void lb_init_boundaries() {
       boundary_velocity[3 * n + 2] = (**lbb).velocity()[2];
     }
 
-    boundary_velocity[3 * lbboundaries.size() + 0] = 0.0f;
-    boundary_velocity[3 * lbboundaries.size() + 1] = 0.0f;
-    boundary_velocity[3 * lbboundaries.size() + 2] = 0.0f;
+    boundary_velocity[3 * lbboundaries.size() + 0] = 0.0;
+    boundary_velocity[3 * lbboundaries.size() + 1] = 0.0;
+    boundary_velocity[3 * lbboundaries.size() + 2] = 0.0;
 
     lb_init_boundaries_GPU(lbboundaries.size(), number_of_boundnodes,
                            host_boundary_node_list, host_boundary_index_list,

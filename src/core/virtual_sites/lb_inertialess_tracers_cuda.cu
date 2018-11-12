@@ -339,10 +339,10 @@ ForcesIntoFluid_Kernel(const IBM_CUDA_ParticleDataInput *const particle_input,
     int my_left[3];
     int node_index[8];
     for (int i = 0; i < 3; ++i) {
-      const float scaledpos = pos[i] / para.agrid - 0.5f;
+      const float scaledpos = pos[i] / para.agrid - 0.5;
       my_left[i] = (int)(floorf(scaledpos));
       temp_delta[3 + i] = scaledpos - my_left[i];
-      temp_delta[i] = 1.f - temp_delta[3 + i];
+      temp_delta[i] = 1. - temp_delta[3 + i];
     }
 
     delta[0] = temp_delta[0] * temp_delta[1] * temp_delta[2];

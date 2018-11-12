@@ -63,29 +63,24 @@
 #endif
 /*@}*/
 
-#if defined(LB_DOUBLE_PREC) || defined(EK_DOUBLE_PREC)
-typedef double lbForceFloat;
-#else
-typedef float lbForceFloat;
-#endif
 
 /**-------------------------------------------------------------------------*/
 /** Data structure holding the parameters for the Lattice Boltzmann system for
  * gpu. */
 typedef struct {
   /** number density (LJ units) */
-  float rho[LB_COMPONENTS];
+  double rho[LB_COMPONENTS];
   /** mu (LJ units) */
-  float mu[LB_COMPONENTS];
+  double mu[LB_COMPONENTS];
   /** viscosity (LJ) units */
-  float viscosity[LB_COMPONENTS];
+  double viscosity[LB_COMPONENTS];
   /** relaxation rate of shear modes */
-  float gamma_shear[LB_COMPONENTS];
+  double gamma_shear[LB_COMPONENTS];
   /** relaxation rate of bulk modes */
-  float gamma_bulk[LB_COMPONENTS];
+  double gamma_bulk[LB_COMPONENTS];
   /**      */
-  float gamma_odd[LB_COMPONENTS];
-  float gamma_even[LB_COMPONENTS];
+  double gamma_odd[LB_COMPONENTS];
+  double gamma_even[LB_COMPONENTS];
   /** flag determining whether gamma_shear, gamma_odd, and gamma_even are
    * calculated from gamma_shear in such a way to yield a TRT LB with minimized
    * slip at bounce-back boundaries */
@@ -93,25 +88,25 @@ typedef struct {
   /** friction coefficient for viscous coupling (LJ units)
    * Note that the friction coefficient is quite high and may
    * lead to numerical artifacts with low order integrators */
-  float friction[LB_COMPONENTS];
+  double friction[LB_COMPONENTS];
   /** amplitude of the fluctuations in the viscous coupling */
   /** Switch indicating what type of coupling is used, can either
   use nearest neighbors or next nearest neighbors. */
   int lb_couple_switch;
 
-  float lb_coupl_pref[LB_COMPONENTS];
-  float lb_coupl_pref2[LB_COMPONENTS];
-  float bulk_viscosity[LB_COMPONENTS];
+  double lb_coupl_pref[LB_COMPONENTS];
+  double lb_coupl_pref2[LB_COMPONENTS];
+  double bulk_viscosity[LB_COMPONENTS];
 
   /** lattice spacing (LJ units) */
-  float agrid;
+  double agrid;
 
   /** time step for fluid propagation (LJ units)
    *  Note: Has to be larger than MD time step! */
-  float tau;
+  double tau;
 
   /** MD timestep */
-  float time_step;
+  double time_step;
 
   unsigned int dim_x;
   unsigned int dim_y;
@@ -129,7 +124,7 @@ typedef struct {
 
   int external_force_density;
 
-  float ext_force_density[3 * LB_COMPONENTS];
+  double ext_force_density[3 * LB_COMPONENTS];
 
   unsigned int your_seed;
 
@@ -138,9 +133,9 @@ typedef struct {
 #ifdef SHANCHEN
   /** mobility. They are actually LB_COMPONENTS-1 in number, we leave
    * LB_COMPONENTS here for practical reasons*/
-  float gamma_mobility[LB_COMPONENTS];
-  float mobility[LB_COMPONENTS];
-  float coupling[LB_COMPONENTS * LB_COMPONENTS];
+  double gamma_mobility[LB_COMPONENTS];
+  double mobility[LB_COMPONENTS];
+  double coupling[LB_COMPONENTS * LB_COMPONENTS];
   int remove_momentum;
 #endif // SHANCHEN
 
@@ -151,10 +146,10 @@ typedef struct {
 typedef struct {
 
   /** density of the node */
-  float rho[LB_COMPONENTS];
+  double rho[LB_COMPONENTS];
   /** velocity of the node */
 
-  float v[3];
+  double v[3];
 
 } LB_rho_v_gpu;
 /* this structure is almost duplicated for memory efficiency. When the stress
@@ -162,30 +157,30 @@ typedef struct {
    explicitly switched on */
 typedef struct {
   /** density of the node */
-  float rho[LB_COMPONENTS];
+  double rho[LB_COMPONENTS];
   /** velocity of the node */
-  float v[3];
+  double v[3];
   /** pressure tensor */
-  float pi[6];
+  double pi[6];
 } LB_rho_v_pi_gpu;
 
 typedef struct {
 
-  lbForceFloat *force_density;
-  float *scforce_density;
+  double *force_density;
+  double *scforce_density;
 #if defined(VIRTUAL_SITES_INERTIALESS_TRACERS) || defined(EK_DEBUG)
 
   // We need the node forces for the velocity interpolation at the virtual
   // particles' position However, LBM wants to reset them immediately after the
   // LBM update This variable keeps a backup
-  lbForceFloat *force_density_buf;
+  double *force_density_buf;
 #endif
 
 } LB_node_force_density_gpu;
 
 typedef struct {
 
-  float force_density[3];
+  double force_density[3];
 
   unsigned int index;
 
@@ -221,7 +216,7 @@ extern bool ek_initialized;
 void lb_GPU_sanity_checks();
 
 void lb_get_device_values_pointer(LB_rho_v_gpu **pointeradress);
-void lb_get_boundary_force_pointer(float **pointeradress);
+void lb_get_boundary_force_pointer(double **pointeradress);
 void lb_get_lbpar_pointer(LB_parameters_gpu **pointeradress);
 void lb_get_para_pointer(LB_parameters_gpu **pointeradress);
 void lattice_boltzmann_update_gpu();
@@ -263,7 +258,7 @@ void lb_print_node_GPU(int single_nodeindex,
 void lb_init_boundaries_GPU(int n_lb_boundaries, int number_of_boundnodes,
                             int *host_boundary_node_list,
                             int *host_boundary_index_list,
-                            float *lb_bounday_velocity);
+                            double *lb_bounday_velocity);
 #endif
 void lb_init_extern_nodeforcedensities_GPU(
     int n_extern_node_force_densities,
@@ -279,33 +274,33 @@ void lb_calc_fluid_temperature_GPU(double *host_temp);
 void lb_get_boundary_flag_GPU(int single_nodeindex, unsigned int *host_flag);
 void lb_get_boundary_flags_GPU(unsigned int *host_bound_array);
 
-void lb_set_node_velocity_GPU(int single_nodeindex, float *host_velocity);
-void lb_set_node_rho_GPU(int single_nodeindex, float *host_rho);
+void lb_set_node_velocity_GPU(int single_nodeindex, double *host_velocity);
+void lb_set_node_rho_GPU(int single_nodeindex, double *host_rho);
 
 void reinit_parameters_GPU(LB_parameters_gpu *lbpar_gpu);
 void lb_reinit_extern_nodeforce_GPU(LB_parameters_gpu *lbpar_gpu);
 void lb_reinit_GPU(LB_parameters_gpu *lbpar_gpu);
 int lb_lbnode_set_extforce_density_GPU(int ind[3], double f[3]);
 void lb_gpu_get_boundary_forces(double *forces);
-void lb_save_checkpoint_GPU(float *host_checkpoint_vd,
+void lb_save_checkpoint_GPU(double *host_checkpoint_vd,
                             unsigned int *host_checkpoint_boundary,
-                            lbForceFloat *host_checkpoint_force,
+                            double *host_checkpoint_force,
                             uint64_t *philox_counter);
-void lb_load_checkpoint_GPU(float *host_checkpoint_vd,
+void lb_load_checkpoint_GPU(double *host_checkpoint_vd,
                             unsigned int *host_checkpoint_boundary,
-                            lbForceFloat *host_checkpoint_force,
+                            double *host_checkpoint_force,
                             uint64_t *philox_counter);
 int lb_lbfluid_save_checkpoint_wrapper(char *filename, int binary);
 int lb_lbfluid_load_checkpoint_wrapper(char *filename, int binary);
 
 void lb_lbfluid_remove_total_momentum();
-void lb_lbfluid_fluid_add_momentum(float momentum[3]);
-void lb_lbfluid_calc_linear_momentum(float momentum[3], int include_particles,
+void lb_lbfluid_fluid_add_momentum(double momentum[3]);
+void lb_lbfluid_calc_linear_momentum(double momentum[3], int include_particles,
                                      int include_lbfluid);
-void lb_lbfluid_particles_add_momentum(float velocity[3]);
+void lb_lbfluid_particles_add_momentum(double velocity[3]);
 
-void lb_lbfluid_set_population(const Vector3i &, float[LBQ], int);
-void lb_lbfluid_get_population(const Vector3i &, float[LBQ], int);
+void lb_lbfluid_set_population(const Vector3i &, double[LBQ], int);
+void lb_lbfluid_get_population(const Vector3i &, double[LBQ], int);
 
 void lb_lbfluid_get_interpolated_velocity_at_positions(double const *positions,
                                                        double *velocities,

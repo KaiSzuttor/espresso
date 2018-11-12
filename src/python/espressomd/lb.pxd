@@ -125,7 +125,7 @@ IF LB_GPU or LB:
 
         # get pointers
         if isinstance(p_dens, float) or isinstance(p_dens, int):
-            c_dens[0] = <float > p_dens
+            c_dens[0] = <double > p_dens
         else:
             c_dens = p_dens
         # call c-function
@@ -157,7 +157,7 @@ IF LB_GPU or LB:
             cdef double c_visc[1]
         # get pointers
         if isinstance(p_visc, float) or isinstance(p_visc, int):
-            c_visc[0] = <float > p_visc
+            c_visc[0] = <double > p_visc
         else:
             c_visc = p_visc
         # call c-function
@@ -189,7 +189,7 @@ IF LB_GPU or LB:
             cdef double c_bvisc[1]
         # get pointers
         if isinstance(p_bvisc, float) or isinstance(p_bvisc, int):
-            c_bvisc[0] = <float > p_bvisc
+            c_bvisc[0] = <double > p_bvisc
         else:
             c_bvisc = p_bvisc
         # call c-function
@@ -209,7 +209,7 @@ IF LB_GPU or LB:
             cdef double c_friction[1]
         # get pointers
         if isinstance(p_friction, float) or isinstance(p_friction, int):
-            c_friction[0] = <float > p_friction
+            c_friction[0] = <double > p_friction
         else:
             c_friction = p_friction
         # call c-function
@@ -225,7 +225,7 @@ IF LB_GPU or LB:
             cdef double c_gamma_odd[1]
         # get pointers
         if isinstance(gamma_odd, float) or isinstance(gamma_odd, int):
-            c_gamma_odd[0] = <float > gamma_odd
+            c_gamma_odd[0] = <double > gamma_odd
         else:
             c_gamma_odd = gamma_odd
         # call c-function
@@ -242,7 +242,7 @@ IF LB_GPU or LB:
             cdef double c_gamma_even[1]
         # get pointers
         if isinstance(gamma_even, float) or isinstance(gamma_even, int):
-            c_gamma_even[0] = <float > gamma_even
+            c_gamma_even[0] = <double > gamma_even
         else:
             c_gamma_even = gamma_even
         # call c-function

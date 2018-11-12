@@ -75,13 +75,13 @@ public:
 #ifdef EK_BOUNDARIES // TODO: ugly. Better would be a class EKBoundaries,
                      // deriving from LBBoundaries, but that requires completely
                      // different initialization infrastructure.
-  void set_charge_density(float charge_density) {
+  void set_charge_density(double charge_density) {
     m_charge_density = charge_density;
   }
-  void set_net_charge(float net_charge) { m_net_charge = net_charge; }
+  void set_net_charge(double net_charge) { m_net_charge = net_charge; }
 
-  float &charge_density() { return m_charge_density; }
-  float &net_charge() { return m_net_charge; }
+  double &charge_density() { return m_charge_density; }
+  double &net_charge() { return m_net_charge; }
 #endif
 
 private:
@@ -100,8 +100,8 @@ private:
 #ifdef EK_BOUNDARIES // TODO: ugly. Better would be a class EKBoundaries,
                      // deriving from LBBoundaries, but that requires completely
                      // different initialization infrastructure.
-  float m_charge_density;
-  float m_net_charge;
+  double m_charge_density;
+  double m_net_charge;
 #endif
 };
 
