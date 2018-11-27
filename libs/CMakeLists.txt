@@ -6,4 +6,6 @@ target_include_directories(Random123 SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR
 if(WITH_BENCHMARKS)
   set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Suppressing benchmark's tests" FORCE)
   add_subdirectory(benchmark)
+  add_subdirectory(blaze)
 endif(WITH_BENCHMARKS)
+

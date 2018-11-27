@@ -8,6 +8,11 @@
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/operation.hpp>
+#include <blaze/math/StaticMatrix.h>
+#include <blaze/math/StaticVector.h>
+#include <blaze/math/CompressedMatrix.h>
+
+#define BOOST_UBLAS_NDEBUG
 
 std::array<double, 19> lb_calc_m_from_n(const std::array<double, 19> &n) {
   std::array<double, 19> m;
@@ -82,8 +87,12 @@ void lb_calc_m_from_n_old(const std::array<double, 19>& populations, double *mod
   mode[18] = -n1p - n2p - n6p - n7p - n8p - n9p + 2. * (n3p + n4p + n5p);
 }
 
-boost::numeric::ublas::vector<double> lb_calc_m_from_n_boost(const boost::numeric::ublas::compressed_matrix<double>& m, const boost::numeric::ublas::vector<double> &n) {
-  return boost::numeric::ublas::prod(m, n);
+void lb_calc_m_from_n_boost(const boost::numeric::ublas::compressed_matrix<double>& m, const boost::numeric::ublas::vector<double> &n, boost::numeric::ublas::vector<double>& v) {
+  boost::numeric::ublas::axpy_prod(m, n, v, false);
+}
+
+void lb_calc_m_from_n_blaze(const blaze::StaticMatrix<double,19UL,19UL>& m, const blaze::StaticVector<double, 19UL>& n, blaze::StaticVector<double, 19UL>& v) {
+  v=m*n;
 }
 
 std::mt19937 mt(10);
@@ -137,13 +146,34 @@ static void BM_LB_Modes_Calculation_Boost(benchmark::State& state) {
       }
     }
     boost::numeric::ublas::vector<double> n(19);
+    boost::numeric::ublas::vector<double> res(19);
     std::generate(n.begin(), n.end(), [](){return dist(mt);});
     state.ResumeTiming();
-    lb_calc_m_from_n_boost(m, n);
+    lb_calc_m_from_n_boost(m, n, res);
   }
 }
 
 BENCHMARK(BM_LB_Modes_Calculation_Boost);
+
+static void BM_LB_Modes_Calculation_blaze(benchmark::State& state) {
+  blaze::StaticMatrix<double, 19UL, 19UL> m;
+  for (auto _ : state) {
+    state.PauseTiming();
+    for (unsigned i=0; i<19; i++) {
+      for (unsigned j=0; j<19; j++) {
+        if (std::abs(::D3Q19::e_ki[i][j]) > std::numeric_limits<double>::epsilon())
+          m(i, j) = ::D3Q19::e_ki[i][j];
+      }
+    }
+    blaze::StaticVector<double, 19UL> n;
+    std::generate(n.begin(), n.end(), [](){return dist(mt);});
+    blaze::StaticVector<double, 19UL> res;
+    state.ResumeTiming();
+    lb_calc_m_from_n_blaze(m, n, res);
+  }
+}
+
+BENCHMARK(BM_LB_Modes_Calculation_blaze);
 
 BENCHMARK_MAIN();
      

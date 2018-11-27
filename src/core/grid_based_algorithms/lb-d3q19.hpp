@@ -27,10 +27,6 @@
 #ifndef D3Q19_H
 #define D3Q19_H
 
-#include "config.hpp"
-
-#ifdef LB
-
 namespace D3Q19 {
 
 /** Velocity sub-lattice of the D3Q19 model */
@@ -133,7 +129,6 @@ static constexpr const std::array<double, 19> w_k = {
 static constexpr const double c_sound_sq = 1. / 3.;
 
 } // namespace D3Q19
-#endif /* LB */
 
 #endif /* D3Q19_H */
 
