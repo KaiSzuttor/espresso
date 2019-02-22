@@ -41,23 +41,14 @@ uint64_t lb_lbfluid_get_rng_state();
  */
 void lb_lbfluid_set_rng_state(uint64_t counter);
 
-/**
- * @brief Calculates the fluid velocity at a given position of the
- * lattice.
- * @note It can lead to undefined behaviour if the
- * position is not within the local lattice. */
-const Vector3d lb_lbfluid_get_interpolated_velocity(const Vector3d &p);
-
-/**
- * @brief Add a force density to the fluid at the given position.
- */
-void lb_lbfluid_add_force_density(const Vector3d &p,
-                                  const Vector3d &force_density);
-
+#ifdef LB
 /**
  * @brief Return the instance of the Lattice within the LB method.
  */
 const Lattice &lb_lbfluid_get_lattice();
+void lb_lbnode_add_force_density(std::size_t index,
+                                  const Vector3d &force_density);
+#endif
 
 /**
  * @brief Get the global variable lattice_switch which defines wether NONE, CPU
@@ -148,6 +139,11 @@ double lb_lbfluid_get_tau();
 double lb_lbfluid_get_agrid();
 
 /**
+ * @brief Get the lattice speed (agrid / tau).
+ */
+double lb_lbfluid_get_lattice_velocity();
+
+/**
  * @brief Get the global LB relaxation parameter for even modes.
  */
 double lb_lbfluid_get_gamma_even();
@@ -185,7 +181,7 @@ double lb_lbnode_get_density(const Vector3i &ind);
 /**
  * @brief Get the LB fluid velocity for a single node.
  */
-const Vector3d lb_lbnode_get_u(const Vector3i &ind);
+const Vector3d lb_lbnode_get_u(const Vector3i &ind, bool global);
 const Vector<6, double> lb_lbnode_get_pi(const Vector3i &ind);
 const Vector<6, double> lb_lbnode_get_pi_neq(const Vector3i &ind);
 

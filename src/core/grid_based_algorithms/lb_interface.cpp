@@ -344,6 +344,10 @@ double lb_lbfluid_get_agrid() {
   return {};
 }
 
+double lb_lbfluid_get_lattice_velocity() {
+  return lb_lbfluid_get_agrid() / lb_lbfluid_get_tau();
+}
+
 void lb_lbfluid_set_ext_force_density(int component,
                                       const Vector3d &force_density) {
   if (lattice_switch & LATTICE_LB_GPU) {
@@ -604,7 +608,7 @@ void lb_lbfluid_print_vtk_velocity(const std::string &filename,
     for (pos[2] = bb_low[2]; pos[2] <= bb_high[2]; pos[2]++)
       for (pos[1] = bb_low[1]; pos[1] <= bb_high[1]; pos[1]++)
         for (pos[0] = bb_low[0]; pos[0] <= bb_high[0]; pos[0]++) {
-          auto u = lb_lbnode_get_u(pos);
+          auto u = lb_lbnode_get_u(pos, true);
           fprintf(fp, "%f %f %f\n", u[0], u[1], u[2]);
         }
 #endif // LB
@@ -706,7 +710,7 @@ void lb_lbfluid_print_velocity(const std::string &filename) {
     for (pos[2] = 0; pos[2] < gridsize[2]; pos[2]++) {
       for (pos[1] = 0; pos[1] < gridsize[1]; pos[1]++) {
         for (pos[0] = 0; pos[0] < gridsize[0]; pos[0]++) {
-          auto u = lb_lbnode_get_u(pos);
+          auto u = lb_lbnode_get_u(pos, true);
           fprintf(fp, "%f %f %f %f %f %f\n",
                   (pos[0] + 0.5) * lblattice.agrid[0],
                   (pos[1] + 0.5) * lblattice.agrid[1],
@@ -936,8 +940,8 @@ double lb_lbnode_get_density(const Vector3i &ind) {
     double j[3];
     double pi[6];
 
-    auto ind_shifted = ind;
-    node = lblattice.map_lattice_to_node(ind_shifted);
+    Vector3i ind_shifted;
+    std::tie(node, ind_shifted) = lblattice.map_lattice_to_node(ind);
     index = get_linear_index(ind_shifted[0], ind_shifted[1], ind_shifted[2],
                              lblattice.halo_grid);
 
@@ -953,7 +957,7 @@ double lb_lbnode_get_density(const Vector3i &ind) {
   }
 }
 
-const Vector3d lb_lbnode_get_u(const Vector3i &ind) {
+const Vector3d lb_lbnode_get_u(const Vector3i &ind, bool global=false) {
   if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
     static LB_rho_v_pi_gpu *host_print_values = nullptr;
@@ -973,18 +977,28 @@ const Vector3d lb_lbnode_get_u(const Vector3i &ind) {
 #ifdef LB
     Lattice::index_t index;
     int node;
-    auto ind_shifted = ind;
-    double rho;
-    Vector3d j;
-    Vector<6, double> pi;
+    Vector3i ind_shifted;
 
-    node = lblattice.map_lattice_to_node(ind_shifted);
+    std::tie(node, ind_shifted) = lblattice.map_lattice_to_node(ind);
     index = get_linear_index(ind_shifted[0], ind_shifted[1], ind_shifted[2],
                              lblattice.halo_grid);
-
-    mpi_recv_fluid(node, index, &rho, j.data(), pi.data());
-    // unit conversion
-    return j / rho * lbpar.agrid / lbpar.tau;
+    if (global) {
+      double rho;
+      Vector3d j{};
+      Vector6d pi{};
+      mpi_recv_fluid(node, index, &rho, j.data(), pi.data());
+      // unit conversion
+      return j / rho * lbpar.agrid / lbpar.tau;
+    } else {
+#ifdef LB_BOUNDARIES
+      if (lbfields[index].boundary) {
+        return lbfields[index].slip_velocity * lbpar.agrid / lbpar.tau;
+      }
+#endif // LB_BOUNDARIES
+      auto const modes = lb_calc_modes(index);
+      auto const local_rho = lbpar.rho + modes[0];
+      return Vector3d{modes[1], modes[2], modes[3]} / local_rho * lbpar.agrid / lbpar.tau;
+    }
 #else
     return {};
 #endif // LB
@@ -1038,8 +1052,8 @@ const Vector<6, double> lb_lbnode_get_pi_neq(const Vector3i &ind) {
     double j[3];
     Vector<6, double> pi{};
 
-    auto ind_shifted = ind;
-    node = lblattice.map_lattice_to_node(ind_shifted);
+    Vector3i ind_shifted;
+    std::tie(node, ind_shifted) = lblattice.map_lattice_to_node(ind);
     index = get_linear_index(ind_shifted[0], ind_shifted[1], ind_shifted[2],
                              lblattice.halo_grid);
 
@@ -1066,9 +1080,9 @@ int lb_lbnode_get_boundary(const Vector3i &ind) {
 #ifdef LB
     Lattice::index_t index;
     int node;
-    auto ind_shifted = ind;
+    Vector3i ind_shifted;
 
-    node = lblattice.map_lattice_to_node(ind_shifted);
+    std::tie(node, ind_shifted) = lblattice.map_lattice_to_node(ind);
     index = get_linear_index(ind_shifted[0], ind_shifted[1], ind_shifted[2],
                              lblattice.halo_grid);
     int p_boundary;
@@ -1099,9 +1113,9 @@ const Vector<19, double> lb_lbnode_get_pop(const Vector3i &ind) {
 #ifdef LB
     Lattice::index_t index;
     int node;
-    auto ind_shifted = ind;
+    Vector3i ind_shifted;
 
-    node = lblattice.map_lattice_to_node(ind_shifted);
+    std::tie(node, ind_shifted) = lblattice.map_lattice_to_node(ind);
     index = get_linear_index(ind_shifted[0], ind_shifted[1], ind_shifted[2],
                              lblattice.halo_grid);
     Vector<19, double> p_pop;
@@ -1132,8 +1146,8 @@ void lb_lbnode_set_rho(const Vector3i &ind, double p_rho) {
     Vector3d j;
     Vector<6, double> pi;
 
-    auto ind_shifted = ind;
-    node = lblattice.map_lattice_to_node(ind_shifted);
+    Vector3i ind_shifted;
+    std::tie(node, ind_shifted) = lblattice.map_lattice_to_node(ind);
     index = get_linear_index(ind_shifted[0], ind_shifted[1], ind_shifted[2],
                              lblattice.halo_grid);
 
@@ -1167,8 +1181,8 @@ void lb_lbnode_set_u(const Vector3i &ind, const Vector3d &u) {
     Vector3d j;
     Vector<6, double> pi;
 
-    auto ind_shifted = ind;
-    node = lblattice.map_lattice_to_node(ind_shifted);
+    Vector3i ind_shifted;
+    std::tie(node, ind_shifted) = lblattice.map_lattice_to_node(ind);
     index = get_linear_index(ind_shifted[0], ind_shifted[1], ind_shifted[2],
                              lblattice.halo_grid);
 
@@ -1198,8 +1212,8 @@ void lb_lbnode_set_pop(const Vector3i &ind, const Vector<19, double> &p_pop) {
     Lattice::index_t index;
     int node;
 
-    auto ind_shifted = ind;
-    node = lblattice.map_lattice_to_node(ind_shifted);
+    Vector3i ind_shifted;
+    std::tie(node, ind_shifted) = lblattice.map_lattice_to_node(ind);
     index = get_linear_index(ind_shifted[0], ind_shifted[1], ind_shifted[2],
                              lblattice.halo_grid);
     mpi_send_fluid_populations(node, index, p_pop);
@@ -1209,166 +1223,17 @@ void lb_lbnode_set_pop(const Vector3i &ind, const Vector<19, double> &p_pop) {
   }
 }
 
-namespace {
-template <typename Op>
-void lattice_interpolation(Lattice const &lattice, Vector3d const &pos,
-                           Op &&op) {
-  Lattice::index_t node_index[8];
-  double delta[6];
-
-  /* determine elementary lattice cell surrounding the particle
-     and the relative position of the particle in this cell */
-  lattice.map_position_to_lattice(pos, node_index, delta);
-
-  for (int z = 0; z < 2; z++) {
-    for (int y = 0; y < 2; y++) {
-      for (int x = 0; x < 2; x++) {
-        auto &index = node_index[(z * 2 + y) * 2 + x];
-        auto const w = delta[3 * x + 0] * delta[3 * y + 1] * delta[3 * z + 2];
-
-        op(index, w);
-      }
-    }
-  }
-}
-} // namespace
-
-namespace {
-#ifdef LB
-Vector3d node_u(Lattice::index_t index) {
-#ifdef LB_BOUNDARIES
-  if (lbfields[index].boundary) {
-    return lbfields[index].slip_velocity;
-  }
-#endif // LB_BOUNDARIES
-  auto const modes = lb_calc_modes(index);
-  auto const local_rho = lbpar.rho + modes[0];
-  return Vector3d{modes[1], modes[2], modes[3]} / local_rho;
-}
-#endif
-} // namespace
-
-/*
- * @brief Interpolate the fluid velocity.
- *
- * @param pos Position
- * @param v Interpolated velocity in MD units.
- */
-const Vector3d lb_lbfluid_get_interpolated_velocity(const Vector3d &pos) {
-  if (lattice_switch & LATTICE_LB_GPU) {
-#ifdef LB_GPU
-    Vector3d interpolated_u{};
-    lb_get_interpolated_velocity_gpu(pos.data(), interpolated_u.data(), 1);
-    return interpolated_u;
-#endif
-  } else if (lattice_switch & LATTICE_LB) {
-#ifdef LB
-    Vector3d interpolated_u{};
-
-    /* calculate fluid velocity at particle's position
-       this is done by linear interpolation
-       (Eq. (11) Ahlrichs and Duenweg, JCP 111(17):8225 (1999)) */
-    lattice_interpolation(lblattice, pos,
-                          [&interpolated_u](Lattice::index_t index, double w) {
-                            interpolated_u += w * node_u(index);
-                          });
-
-    return (lbpar.agrid / lbpar.tau) * interpolated_u;
-  }
-#endif
-  return {};
-}
-
-/** Calculate the fluid velocity at a given position of the lattice.
- *  Note that it can lead to undefined behavior if the position is not
- *  within the local lattice. This version of the function can be called
- *  without the position needing to be on the local processor. Note that this
- *  gives a slightly different version than the values used to couple to MD
- *  beads when near a wall, see lb_lbfluid_get_interpolated_velocity.
- */
-int lb_lbfluid_get_interpolated_velocity_global(Vector3d &p, double *v) {
-  Vector<6, double>
-      delta{}; // velocity field, relative positions to surrounding nodes
-  Vector3i ind{}, tmpind{}; // node indices
-  int x, y, z;              // counters
-
-  // convert the position into lower left grid point
-  if (lattice_switch & LATTICE_LB_GPU) {
-#ifdef LB_GPU
-    Lattice::map_position_to_lattice_global(p, ind, delta.data(),
-                                            lbpar_gpu.agrid);
-#endif // LB_GPU
-  } else {
-#ifdef LB
-    Lattice::map_position_to_lattice_global(p, ind, delta.data(), lbpar.agrid);
-#endif // LB
-  }
-
-  // set the initial velocity to zero in all directions
-  v[0] = 0;
-  v[1] = 0;
-  v[2] = 0;
-
-  for (z = 0; z < 2; z++) {
-    for (y = 0; y < 2; y++) {
-      for (x = 0; x < 2; x++) {
-        // give the index of the neighbouring nodes
-        tmpind[0] = ind[0] + x;
-        tmpind[1] = ind[1] + y;
-        tmpind[2] = ind[2] + z;
-
-        if (lattice_switch & LATTICE_LB_GPU) {
-#ifdef LB_GPU
-          if (tmpind[0] == int(lbpar_gpu.dim_x))
-            tmpind[0] = 0;
-          if (tmpind[1] == int(lbpar_gpu.dim_y))
-            tmpind[1] = 0;
-          if (tmpind[2] == int(lbpar_gpu.dim_z))
-            tmpind[2] = 0;
-#endif // LB_GPU
-        } else {
-#ifdef LB
-          if (tmpind[0] == box_l[0] / lbpar.agrid)
-            tmpind[0] = 0;
-          if (tmpind[1] == box_l[1] / lbpar.agrid)
-            tmpind[1] = 0;
-          if (tmpind[2] == box_l[2] / lbpar.agrid)
-            tmpind[2] = 0;
-#endif // LB
-        }
-
-        const auto local_v = lb_lbnode_get_u(tmpind);
-
-        v[0] +=
-            delta[3 * x + 0] * delta[3 * y + 1] * delta[3 * z + 2] * local_v[0];
-        v[1] +=
-            delta[3 * x + 0] * delta[3 * y + 1] * delta[3 * z + 2] * local_v[1];
-        v[2] +=
-            delta[3 * x + 0] * delta[3 * y + 1] * delta[3 * z + 2] * local_v[2];
-      }
-    }
-  }
-
-  return 0;
-}
-
-
-#ifdef LB
-void lb_lbfluid_add_force_density(const Vector3d &pos,
-                                  const Vector3d &force_density) {
-  lattice_interpolation(lblattice, pos,
-                        [&force_density](Lattice::index_t index, double w) {
-                          auto &node = lbfields[index];
-
-                          node.force_density[0] += w * force_density[0];
-                          node.force_density[1] += w * force_density[1];
-                          node.force_density[2] += w * force_density[2];
-                        });
-}
-#endif
-
 #ifdef LB
 const Lattice &lb_lbfluid_get_lattice() { return lblattice; }
+
+void lb_lbnode_add_force_density(std::size_t index,
+                                  const Vector3d &force_density) {
+  if (lattice_switch & LATTICE_LB) {
+    lbfields[index].force_density += force_density;
+  } else {
+   throw std::runtime_error("LB not activated.");
+  }
+}
 #endif
 
 int lb_lbfluid_get_lattice_switch() { return lattice_switch; }

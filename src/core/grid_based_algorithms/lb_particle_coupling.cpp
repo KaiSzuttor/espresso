@@ -10,6 +10,7 @@
 #include "integrate.hpp"
 #include "lattice.hpp"
 #include "lb_interface.hpp"
+#include "lb_interpolation.hpp"
 #include "lb_particle_coupling.hpp"
 #include "lbgpu.hpp"
 #include "thermostat.hpp"
@@ -83,9 +84,9 @@ void add_md_force(Vector3d const &pos, Vector3d const &force) {
   /* transform momentum transfer to lattice units
      (Eq. (12) Ahlrichs and Duenweg, JCP 111(17):8225 (1999)) */
 
-  const auto agrid = lb_lbfluid_get_agrid();
-  auto const delta_j = -(time_step * lb_lbfluid_get_tau() / agrid) * force;
-  lb_lbfluid_add_force_density(pos, delta_j);
+  auto const delta_j =
+      -(time_step * lb_lbfluid_get_tau() / lb_lbfluid_get_agrid()) * force;
+  lb_lbinterpolation_add_force_density(pos, delta_j);
 }
 } // namespace
 
@@ -103,7 +104,8 @@ Vector3d lb_viscous_coupling(Particle *p, Vector3d const &f_random) {
   /* calculate fluid velocity at particle's position
      this is done by linear interpolation
      (Eq. (11) Ahlrichs and Duenweg, JCP 111(17):8225 (1999)) */
-  auto const interpolated_u = lb_lbfluid_get_interpolated_velocity(p->r.p);
+  auto const interpolated_u =
+      lb_lbinterpolation_get_interpolated_velocity(p->r.p, false);
 
   Vector3d v_drift = interpolated_u;
 #ifdef ENGINE
@@ -154,7 +156,8 @@ void add_swimmer_force(Particle &p) {
       return;
     }
 
-    p.swim.v_source = lb_lbfluid_get_interpolated_velocity(source_position);
+    p.swim.v_source =
+        lb_lbinterpolation_get_interpolated_velocity(source_position, false);
 
     add_md_force(source_position, p.swim.f_swim * director);
   }

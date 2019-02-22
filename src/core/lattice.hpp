@@ -92,8 +92,7 @@ public:
    * \param delta      distance fraction of pos from the surrounding
    *                   elementary cell, 6 directions (Output)
    */
-  void map_position_to_lattice(const Vector3d &pos, index_t node_index[8],
-                               double delta[6]) const;
+  std::tuple<Vector<8, std::size_t>, Vector6d> map_position_to_lattice(const Vector3d &pos) const;
   /********************** Inline Functions **********************/
 
   /** Map a global lattice site to the node grid.
@@ -105,7 +104,7 @@ public:
    * \param  ind     global coordinates of the lattice site
    * \return         index of the node for the lattice site
    */
-  int map_lattice_to_node(Vector3i &ind) const;
+  std::tuple<int, Vector3i> map_lattice_to_node(const Vector3i &ind) const;
 
   /********************** static Functions **********************/
 
@@ -126,8 +125,8 @@ public:
    *                   elementary cell, 6 directions (Output)
    * \param tmp_agrid  lattice mesh distance
    */
-  static void map_position_to_lattice_global(Vector3d &pos, Vector3i &ind,
-                                             double delta[6], double tmp_agrid);
+  static std::tuple<Vector3i, Vector<6, double>>
+  map_position_to_lattice_global(const Vector3d &pos, double agrid);
 };
 
 #endif /* LATTICE_HPP */

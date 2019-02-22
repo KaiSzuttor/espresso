@@ -194,13 +194,12 @@ IF LB_GPU or LB:
 
             """
             cdef Vector3d p
-            cdef double[3] v
 
             for i in range(3):
                 p[i] = pos[i]
 
-            lb_lbfluid_get_interpolated_velocity_global(p, v)
-            return v
+            cdef Vector3d v = lb_lbinterpolation_get_interpolated_velocity(p, True)
+            return make_array_locked(v)
 
         # input/output function wrappers for whole LB fields
         ####################################################
@@ -314,7 +313,7 @@ IF LB or LB_GPU:
         property velocity:
             def __get__(self):
                 cdef Vector3d double_return
-                double_return = lb_lbnode_get_u(self.node)
+                double_return = lb_lbnode_get_u(self.node, True)
                 return make_array_locked(double_return)
 
             def __set__(self, value):

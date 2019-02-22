@@ -70,7 +70,7 @@ IF LB_GPU or LB:
         void lb_lbfluid_set_lattice_switch(int local_lattice_switch) except +
         int lb_lbfluid_get_lattice_switch() except +
         bool lb_lbnode_is_index_valid(const Vector3i & ind) except +
-        const Vector3d lb_lbnode_get_u(const Vector3i & ind) except +
+        const Vector3d lb_lbnode_get_u(const Vector3i & ind, bool global_flag) except +
         void lb_lbnode_set_u(const Vector3i & ind, const Vector3d & u) except +
         double lb_lbnode_get_density(const Vector3i & ind) except +
         const Vector6d lb_lbnode_get_pi(const Vector3i & ind) except +
@@ -78,7 +78,6 @@ IF LB_GPU or LB:
         const Vector19d lb_lbnode_get_pop(const Vector3i & ind) except +
         void lb_lbnode_set_pop(const Vector3i & ind, const Vector19d & populations) except +
         int lb_lbnode_get_boundary(const Vector3i & ind) except +
-        int lb_lbfluid_get_interpolated_velocity_global(Vector3d & p, double * v) except +
         stdint.uint64_t lb_lbfluid_get_rng_state() except +
         void lb_lbfluid_set_rng_state(stdint.uint64_t) except +
         void lb_lbfluid_set_kT(double) except +
@@ -89,6 +88,9 @@ IF LB_GPU or LB:
         stdint.uint64_t lb_lbcoupling_get_rng_state() except +
         void lb_lbcoupling_set_friction(double)
         double lb_lbcoupling_get_friction() except +
+
+    cdef extern from "grid_based_algorithms/lb_interpolation.hpp":
+        const Vector3d lb_lbinterpolation_get_interpolated_velocity(const Vector3d& pos, bool global_flag)
 
     cdef extern from "grid_based_algorithms/lbgpu.hpp":
         int lb_lbfluid_remove_total_momentum()
