@@ -26,7 +26,7 @@ namespace Observables {
 class CylindricalVelocityProfile : public CylindricalPidProfileObservable {
 public:
   using CylindricalPidProfileObservable::CylindricalPidProfileObservable;
-  std::vector<double> evaluate(PartCfg &partCfg) const override {
+  Utils::Tensor<double> evaluate(PartCfg &partCfg) const override {
     std::array<size_t, 3> n_bins{{static_cast<size_t>(n_r_bins),
                                   static_cast<size_t>(n_phi_bins),
                                   static_cast<size_t>(n_z_bins)}};
@@ -36,12 +36,13 @@ public:
     Utils::CylindricalHistogram<double, 3> histogram(n_bins, 3, limits);
     std::vector<::Utils::Vector3d> folded_positions;
     std::transform(ids().begin(), ids().end(),
-                   std::back_inserter(folded_positions), [&partCfg](int id) {
+                   std::back_inserter(folded_positions),
+                   [&partCfg](std::size_t id) {
                      return ::Utils::Vector3d(folded_position(partCfg[id]));
                    });
     std::vector<::Utils::Vector3d> velocities;
     std::transform(ids().begin(), ids().end(), std::back_inserter(velocities),
-                   [&partCfg](int id) {
+                   [&partCfg](std::size_t id) {
                      return ::Utils::Vector3d{{partCfg[id].m.v[0],
                                                partCfg[id].m.v[1],
                                                partCfg[id].m.v[2]}};
@@ -59,12 +60,14 @@ public:
     auto tot_count = histogram.get_tot_count();
     for (size_t ind = 0; ind < hist_tmp.size(); ++ind) {
       if (tot_count[ind] > 0) {
-        hist_tmp[ind] /= tot_count[ind];
+        hist_tmp({ind}) /= tot_count[ind];
       }
     }
     return hist_tmp;
   }
-  int n_values() const override { return 3 * n_r_bins * n_phi_bins * n_z_bins; }
+  std::size_t n_values() const override {
+    return 3 * n_r_bins * n_phi_bins * n_z_bins;
+  }
 };
 
 } // Namespace Observables

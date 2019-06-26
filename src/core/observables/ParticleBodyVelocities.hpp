@@ -30,24 +30,24 @@ namespace Observables {
 class ParticleBodyVelocities : public PidObservable {
 public:
   using PidObservable::PidObservable;
-  std::vector<double> evaluate(PartCfg &partCfg) const override {
-    std::vector<double> res(n_values());
-    for (int i = 0; i < ids().size(); i++) {
+  Utils::Tensor<double> evaluate(PartCfg &partCfg) const override {
+    Utils::Tensor<double> res({n_values()});
+    for (std::size_t i = 0; i < ids().size(); i++) {
 #ifdef ROTATION
 
       double RMat[9];
       const Utils::Vector3d vel_body =
           convert_vector_space_to_body(partCfg[i], partCfg[i].m.v);
 
-      res[3 * i + 0] = vel_body[0];
-      res[3 * i + 1] = vel_body[1];
-      res[3 * i + 2] = vel_body[2];
+      res({3 * i + 0}) = vel_body[0];
+      res({3 * i + 1}) = vel_body[1];
+      res({3 * i + 2}) = vel_body[2];
 
 #endif
     }
     return res;
   }
-  int n_values() const override { return 3 * ids().size(); }
+  std::size_t n_values() const override { return 3 * ids().size(); }
 };
 
 } // Namespace Observables

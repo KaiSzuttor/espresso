@@ -33,16 +33,16 @@ namespace Observables {
 class ParticleForces : public PidObservable {
 public:
   using PidObservable::PidObservable;
-  std::vector<double> evaluate(PartCfg &partCfg) const override {
-    std::vector<double> res(n_values());
-    for (int i = 0; i < ids().size(); i++) {
-      res[3 * i + 0] = partCfg[ids()[i]].f.f[0];
-      res[3 * i + 1] = partCfg[ids()[i]].f.f[1];
-      res[3 * i + 2] = partCfg[ids()[i]].f.f[2];
+  Utils::Tensor<double> evaluate(PartCfg &partCfg) const override {
+    Utils::Tensor<double> res({n_values()});
+    for (std::size_t i = 0; i < ids().size(); i++) {
+      res({3 * i + 0}) = partCfg[ids()[i]].f.f[0];
+      res({3 * i + 1}) = partCfg[ids()[i]].f.f[1];
+      res({3 * i + 2}) = partCfg[ids()[i]].f.f[2];
     }
     return res;
   };
-  int n_values() const override { return 3 * ids().size(); }
+  std::size_t n_values() const override { return 3 * ids().size(); }
 };
 
 } // Namespace Observables

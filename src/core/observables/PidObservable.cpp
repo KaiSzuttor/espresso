@@ -3,7 +3,7 @@
 #include "partCfg_global.hpp"
 
 namespace Observables {
-std::vector<double> PidObservable::operator()() const {
+Utils::Tensor<double> PidObservable::operator()() const {
   return this->evaluate(partCfg());
 }
 } // namespace Observables

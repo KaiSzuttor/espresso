@@ -102,9 +102,7 @@ BOOST_AUTO_TEST_CASE(one_dimensional) {
   BOOST_CHECK_EQUAL(*(test_tensor.begin() + 1), 1.6);
 }
 
-BOOST_AUTO_TEST_CASE(default_ctor) {
-  auto test_tensor = Tensor<double>();
-}
+BOOST_AUTO_TEST_CASE(default_ctor) { auto test_tensor = Tensor<double>(); }
 
 BOOST_AUTO_TEST_CASE(resize) {
   auto test_tensor = Tensor<double>();

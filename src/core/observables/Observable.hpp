@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "PartCfg.hpp"
+#include <utils/tensor.hpp>
 
 namespace Observables {
 
@@ -45,10 +45,10 @@ public:
   virtual ~Observable() = default;
   /** Calculate the set of values measured by the observable
    */
-  virtual std::vector<double> operator()() const = 0;
+  virtual Utils::Tensor<double> operator()() const = 0;
 
   /** Size of the array returned by the observable */
-  virtual int n_values() const = 0;
+  virtual std::size_t n_values() const = 0;
 };
 
 } // Namespace Observables

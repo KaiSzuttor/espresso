@@ -28,20 +28,20 @@ namespace Observables {
 class ComVelocity : public PidObservable {
 public:
   using PidObservable::PidObservable;
-  int n_values() const override { return 3; }
-  std::vector<double> evaluate(PartCfg &partCfg) const override {
-    std::vector<double> res(n_values());
+  std::size_t n_values() const override { return 3; }
+  Utils::Tensor<double> evaluate(PartCfg &partCfg) const override {
+    Utils::Tensor<double> res({n_values()});
     double total_mass = 0;
-    for (int i : ids()) {
+    for (auto i : ids()) {
       double mass = partCfg[i].p.mass;
-      res[0] += mass * partCfg[i].m.v[0];
-      res[1] += mass * partCfg[i].m.v[1];
-      res[2] += mass * partCfg[i].m.v[2];
+      res({0}) += mass * partCfg[i].m.v[0];
+      res({1}) += mass * partCfg[i].m.v[1];
+      res({2}) += mass * partCfg[i].m.v[2];
       total_mass += mass;
     }
-    res[0] /= total_mass;
-    res[1] /= total_mass;
-    res[2] /= total_mass;
+    res({0}) /= total_mass;
+    res({1}) /= total_mass;
+    res({2}) /= total_mass;
     return res;
   };
 };

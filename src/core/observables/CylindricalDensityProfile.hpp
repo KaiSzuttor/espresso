@@ -27,7 +27,7 @@ namespace Observables {
 class CylindricalDensityProfile : public CylindricalPidProfileObservable {
 public:
   using CylindricalPidProfileObservable::CylindricalPidProfileObservable;
-  std::vector<double> evaluate(PartCfg &partCfg) const override {
+  Utils::Tensor<double> evaluate(PartCfg &partCfg) const override {
 
     std::array<size_t, 3> n_bins{{static_cast<size_t>(n_r_bins),
                                   static_cast<size_t>(n_phi_bins),
@@ -38,7 +38,8 @@ public:
     Utils::CylindricalHistogram<double, 3> histogram(n_bins, 1, limits);
     std::vector<::Utils::Vector3d> folded_positions;
     std::transform(ids().begin(), ids().end(),
-                   std::back_inserter(folded_positions), [&partCfg](int id) {
+                   std::back_inserter(folded_positions),
+                   [&partCfg](std::size_t id) {
                      return ::Utils::Vector3d(folded_position(partCfg[id]));
                    });
     for (auto &p : folded_positions) {
@@ -49,7 +50,9 @@ public:
     histogram.normalize();
     return histogram.get_histogram();
   }
-  int n_values() const override { return n_r_bins * n_phi_bins * n_z_bins; }
+  std::size_t n_values() const override {
+    return n_r_bins * n_phi_bins * n_z_bins;
+  }
 };
 
 } // Namespace Observables

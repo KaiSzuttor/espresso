@@ -26,7 +26,7 @@
 
 namespace Observables {
 
-std::vector<double> CylindricalLBVelocityProfileAtParticlePositions::evaluate(
+Utils::Tensor<double> CylindricalLBVelocityProfileAtParticlePositions::evaluate(
     PartCfg &partCfg) const {
   std::array<size_t, 3> n_bins{{static_cast<size_t>(n_r_bins),
                                 static_cast<size_t>(n_phi_bins),
@@ -38,8 +38,9 @@ std::vector<double> CylindricalLBVelocityProfileAtParticlePositions::evaluate(
   // First collect all positions (since we want to call the LB function to
   // get the fluid velocities only once).
   std::vector<Utils::Vector3d> folded_positions(ids().size());
-  boost::transform(ids(), folded_positions.begin(),
-                   [&partCfg](int id) { return folded_position(partCfg[id]); });
+  boost::transform(ids(), folded_positions.begin(), [&partCfg](std::size_t id) {
+    return folded_position(partCfg[id]);
+  });
 
   std::vector<Utils::Vector3d> velocities(ids().size());
   boost::transform(
@@ -49,7 +50,7 @@ std::vector<double> CylindricalLBVelocityProfileAtParticlePositions::evaluate(
       });
   for (auto &p : folded_positions)
     p -= center;
-  for (int ind = 0; ind < ids().size(); ++ind) {
+  for (std::size_t ind = 0; ind < ids().size(); ++ind) {
     histogram.update(Utils::transform_coordinate_cartesian_to_cylinder(
                          folded_positions[ind], axis),
                      Utils::transform_vector_cartesian_to_cylinder(
@@ -59,7 +60,7 @@ std::vector<double> CylindricalLBVelocityProfileAtParticlePositions::evaluate(
   auto tot_count = histogram.get_tot_count();
   for (size_t ind = 0; ind < hist_tmp.size(); ++ind) {
     if (tot_count[ind] > 0) {
-      hist_tmp[ind] /= tot_count[ind];
+      hist_tmp({ind}) /= tot_count[ind];
     }
   }
   return hist_tmp;

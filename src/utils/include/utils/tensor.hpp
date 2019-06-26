@@ -9,6 +9,7 @@
 #include <boost/range/algorithm/mismatch.hpp>
 #include <boost/range/algorithm/transform.hpp>
 #include <boost/range/numeric.hpp>
+#include <boost/serialization/vector.hpp>
 
 namespace Utils {
 
@@ -158,6 +159,8 @@ public:
 
   auto rank() const noexcept { return m_extents.size(); }
 
+  auto size() const noexcept { return m_data.size(); }
+
   auto const &extents() const noexcept { return m_extents; }
 
 private:
@@ -196,9 +199,8 @@ private:
   std::size_t calc_linear_index(Container const &indices) {
     return boost::inner_product(m_strides, indices, 0);
   }
-  
-  template<typename Container>
-  void _resize(Container const &extents) {
+
+  template <typename Container> void _resize(Container const &extents) {
     m_extents.clear();
     m_extents.resize(extents.size());
     std::copy(extents.begin(), extents.end(), m_extents.begin());
@@ -206,6 +208,14 @@ private:
                                            std::multiplies<std::size_t>());
     m_data.clear();
     m_data.resize(data_size);
+  }
+
+  friend class boost::serialization::access;
+  template <class Archive>
+  void serialize(Archive &ar, const unsigned int version) {
+    ar &m_data;
+    ar &m_extents;
+    ar &m_strides;
   }
 
   std::vector<T> m_data;

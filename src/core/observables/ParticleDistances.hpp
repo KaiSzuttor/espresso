@@ -33,15 +33,15 @@ namespace Observables {
 class ParticleDistances : public PidObservable {
 public:
   using PidObservable::PidObservable;
-  std::vector<double> evaluate(PartCfg &partCfg) const override {
-    std::vector<double> res(n_values());
-    for (int i = 0, end = n_values(); i < end; i++) {
+  Utils::Tensor<double> evaluate(PartCfg &partCfg) const override {
+    Utils::Tensor<double> res({n_values()});
+    for (std::size_t i = 0, end = n_values(); i < end; i++) {
       auto v = get_mi_vector(partCfg[ids()[i]].r.p, partCfg[ids()[i + 1]].r.p);
-      res[i] = v.norm();
+      res({i}) = v.norm();
     }
     return res;
   }
-  int n_values() const override { return ids().size() - 1; }
+  std::size_t n_values() const override { return ids().size() - 1; }
 };
 
 } // Namespace Observables

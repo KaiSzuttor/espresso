@@ -20,6 +20,8 @@
 #ifndef _ACCUMULATORS_ACCUMULATOR_H
 #define _ACCUMULATORS_ACCUMULATOR_H
 
+#include <memory>
+
 #include "AccumulatorBase.hpp"
 #include "observables/Observable.hpp"
 #include <utils/Accumulator.hpp>

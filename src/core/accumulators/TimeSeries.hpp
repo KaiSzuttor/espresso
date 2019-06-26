@@ -1,6 +1,8 @@
 #ifndef CORE_ACCUMULATORS_TIMESERIES_HPP
 #define CORE_ACCUMULATORS_TIMESERIES_HPP
 
+#include <memory>
+
 #include "AccumulatorBase.hpp"
 #include "observables/Observable.hpp"
 
@@ -23,12 +25,14 @@ public:
   std::string get_internal_state() const;
   void set_internal_state(std::string const &);
 
-  const std::vector<std::vector<double>> &time_series() const { return m_data; }
+  const std::vector<Utils::Tensor<double>> &time_series() const {
+    return m_data;
+  }
   void clear() { m_data.clear(); }
 
 private:
   std::shared_ptr<Observables::Observable> m_obs;
-  std::vector<std::vector<double>> m_data;
+  std::vector<Utils::Tensor<double>> m_data;
 };
 
 } // namespace Accumulators

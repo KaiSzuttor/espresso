@@ -28,16 +28,16 @@ namespace Observables {
 class DipoleMoment : public PidObservable {
 public:
   using PidObservable::PidObservable;
-  int n_values() const override { return 3; };
-  std::vector<double> evaluate(PartCfg &partCfg) const override {
-    std::vector<double> res(n_values(), 0.0);
-    for (int i : ids()) {
+  std::size_t n_values() const override { return 3; };
+  Utils::Tensor<double> evaluate(PartCfg &partCfg) const override {
+    Utils::Tensor<double> res({n_values()});
+    for (auto const i : ids()) {
 #ifdef ELECTROSTATICS
-      double charge = partCfg[i].p.q;
+      auto const charge = partCfg[i].p.q;
 
-      res[0] += charge * partCfg[i].r.p[0];
-      res[1] += charge * partCfg[i].r.p[1];
-      res[2] += charge * partCfg[i].r.p[2];
+      res({0}) += charge * partCfg[i].r.p[0];
+      res({1}) += charge * partCfg[i].r.p[1];
+      res({2}) += charge * partCfg[i].r.p[2];
 #endif // ELECTROSTATICS
     }
     return res;

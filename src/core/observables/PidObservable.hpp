@@ -38,11 +38,11 @@ class PidObservable : virtual public Observable {
   /** Identifiers of particles measured by this observable */
   std::vector<int> m_ids;
 
-  virtual std::vector<double> evaluate(PartCfg &partCfg) const = 0;
+  virtual Utils::Tensor<double> evaluate(PartCfg &partCfg) const = 0;
 
 public:
   explicit PidObservable(std::vector<int> ids) : m_ids(std::move(ids)) {}
-  std::vector<double> operator()() const final;
+  Utils::Tensor<double> operator()() const final;
 
   std::vector<int> &ids() { return m_ids; }
   std::vector<int> const &ids() const { return m_ids; }

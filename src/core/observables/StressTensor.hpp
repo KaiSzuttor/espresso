@@ -27,9 +27,9 @@ namespace Observables {
 
 class StressTensor : public Observable {
 public:
-  int n_values() const override { return 9; };
-  std::vector<double> operator()() const override {
-    std::vector<double> res(n_values());
+  std::size_t n_values() const override { return 9; };
+  Utils::Tensor<double> operator()() const override {
+    Utils::Tensor<double> res({n_values()});
     observable_compute_stress_tensor(1, res.data());
     return res;
   }

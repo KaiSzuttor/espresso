@@ -22,9 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/variant.hpp>
 
 #include "None.hpp"
-#include "utils/AutoObjectId.hpp"
-#include "utils/Vector.hpp"
-#include "utils/serialization/unordered_map.hpp"
+#include <utils/AutoObjectId.hpp>
+#include <utils/Vector.hpp>
+#include <utils/serialization/unordered_map.hpp>
+#include <utils/tensor.hpp>
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/string.hpp>
@@ -43,9 +44,10 @@ constexpr const None none{};
  * @brief Possible types for parameters.
  */
 using Variant = boost::make_recursive_variant<
-    None, bool, int, double, std::string, std::vector<int>, std::vector<double>,
-    ObjectId, std::vector<boost::recursive_variant_>, Utils::Vector2d,
-    Utils::Vector3d, Utils::Vector4d>::type;
+    None, bool, int, std::size_t, double, std::string, std::vector<int>,
+    std::vector<double>, ObjectId, std::vector<boost::recursive_variant_>,
+    Utils::Vector2d, Utils::Vector3d, Utils::Vector4d,
+    Utils::Tensor<double>>::type;
 
 using VariantMap = std::unordered_map<std::string, Variant>;
 

@@ -34,11 +34,11 @@ namespace Observables {
 class ParticleAngles : public PidObservable {
 public:
   using PidObservable::PidObservable;
-  std::vector<double> evaluate(PartCfg &partCfg) const override {
-    std::vector<double> res(n_values());
+  Utils::Tensor<double> evaluate(PartCfg &partCfg) const override {
+    Utils::Tensor<double> res({n_values()});
     auto v1 = get_mi_vector(partCfg[ids()[1]].r.p, partCfg[ids()[0]].r.p);
     auto n1 = v1.norm();
-    for (int i = 0, end = n_values(); i < end; i++) {
+    for (std::size_t i = 0, end = n_values(); i < end; i++) {
       auto v2 =
           get_mi_vector(partCfg[ids()[i + 2]].r.p, partCfg[ids()[i + 1]].r.p);
       auto n2 = v2.norm();
@@ -53,13 +53,13 @@ public:
        * to be multiplied -1; it's cheaper to do this operation on a double
        * than on a vector of doubles
        */
-      res[i] = acos(-cosine);
+      res({i}) = acos(-cosine);
       v1 = v2;
       n1 = n2;
     }
     return res;
   }
-  int n_values() const override { return ids().size() - 2; }
+  std::size_t n_values() const override { return ids().size() - 2; }
 };
 
 } // Namespace Observables

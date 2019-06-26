@@ -41,25 +41,25 @@ namespace Observables {
 class ParticleDihedrals : public PidObservable {
 public:
   using PidObservable::PidObservable;
-  std::vector<double> evaluate(PartCfg &partCfg) const override {
-    std::vector<double> res(n_values());
+  Utils::Tensor<double> evaluate(PartCfg &partCfg) const override {
+    Utils::Tensor<double> res({n_values()});
     auto v1 = get_mi_vector(partCfg[ids()[1]].r.p, partCfg[ids()[0]].r.p);
     auto v2 = get_mi_vector(partCfg[ids()[2]].r.p, partCfg[ids()[1]].r.p);
     auto c1 = vector_product(v1, v2);
-    for (int i = 0, end = n_values(); i < end; i++) {
+    for (std::size_t i = 0, end = n_values(); i < end; i++) {
       auto v3 =
           get_mi_vector(partCfg[ids()[i + 3]].r.p, partCfg[ids()[i + 2]].r.p);
       auto c2 = vector_product(v2, v3);
       /* the 2-argument arctangent returns an angle in the range [-pi, pi] that
        * allows for an unambiguous determination of the 4th particle position */
-      res[i] = atan2((vector_product(c1, c2) * v2) / v2.norm(), c1 * c2);
+      res({i}) = atan2((vector_product(c1, c2) * v2) / v2.norm(), c1 * c2);
       v1 = v2;
       v2 = v3;
       c1 = c2;
     }
     return res;
   }
-  int n_values() const override { return ids().size() - 3; }
+  std::size_t n_values() const override { return ids().size() - 3; }
 };
 
 } // Namespace Observables

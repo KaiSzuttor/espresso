@@ -263,7 +263,7 @@ private:
            (min_r + r_bin * r_bin_size) * (min_r + r_bin * r_bin_size)) *
           z_bin_size * phi_bin_size / (2 * Utils::pi());
       for (size_t dim = 0; dim < m_n_dims_data; ++dim) {
-        m_hist[ind + dim] /= bin_volume;
+        m_hist({ind + dim}) /= bin_volume;
       }
     }
   }

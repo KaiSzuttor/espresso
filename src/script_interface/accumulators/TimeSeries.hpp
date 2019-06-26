@@ -37,7 +37,7 @@ public:
 
       boost::transform(
           series, ret.begin(),
-          [](std::vector<double> const &sample) { return sample; });
+          [](Utils::Tensor<double> const &sample) { return sample; });
 
       return ret;
     }

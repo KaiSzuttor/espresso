@@ -28,15 +28,15 @@ namespace Observables {
 class Current : public PidObservable {
 public:
   using PidObservable::PidObservable;
-  int n_values() const override { return 3; };
-  std::vector<double> evaluate(PartCfg &partCfg) const override {
-    std::vector<double> res(n_values());
-    for (int i : ids()) {
+  std::size_t n_values() const override { return 3; };
+  Utils::Tensor<double> evaluate(PartCfg &partCfg) const override {
+    Utils::Tensor<double> res({n_values()});
+    for (auto i : ids()) {
 #ifdef ELECTROSTATICS
-      double charge = partCfg[i].p.q;
-      res[0] += charge * partCfg[i].m.v[0];
-      res[1] += charge * partCfg[i].m.v[1];
-      res[2] += charge * partCfg[i].m.v[2];
+      auto const charge = partCfg[i].p.q;
+      res({0}) += charge * partCfg[i].m.v[0];
+      res({1}) += charge * partCfg[i].m.v[1];
+      res({2}) += charge * partCfg[i].m.v[2];
 #endif
     };
     return res;

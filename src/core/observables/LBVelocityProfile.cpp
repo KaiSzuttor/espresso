@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Observables {
 
-std::vector<double> LBVelocityProfile::operator()() const {
+Utils::Tensor<double> LBVelocityProfile::operator()() const {
   std::array<size_t, 3> n_bins{{static_cast<size_t>(n_x_bins),
                                 static_cast<size_t>(n_y_bins),
                                 static_cast<size_t>(n_z_bins)}};
@@ -45,7 +45,7 @@ std::vector<double> LBVelocityProfile::operator()() const {
       throw std::runtime_error(error);
     }
     if (tot_count[ind] > 0) {
-      hist_tmp[ind] /= tot_count[ind];
+      hist_tmp({ind}) /= tot_count[ind];
     }
   }
   return hist_tmp;

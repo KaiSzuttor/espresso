@@ -25,10 +25,11 @@
 #include "grid_based_algorithms/lb_interpolation.hpp"
 #include <utils/Histogram.hpp>
 #include <utils/math/coordinate_transformation.hpp>
+#include <utils/tensor.hpp>
 
 namespace Observables {
 
-std::vector<double> CylindricalLBVelocityProfile::operator()() const {
+Utils::Tensor<double> CylindricalLBVelocityProfile::operator()() const {
   std::array<size_t, 3> n_bins{{static_cast<size_t>(n_r_bins),
                                 static_cast<size_t>(n_phi_bins),
                                 static_cast<size_t>(n_z_bins)}};

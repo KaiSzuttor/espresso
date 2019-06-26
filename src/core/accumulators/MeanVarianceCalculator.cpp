@@ -18,6 +18,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "MeanVarianceCalculator.hpp"
+
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/iostreams/device/array.hpp>
@@ -25,8 +27,7 @@
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
-
-#include "MeanVarianceCalculator.hpp"
+#include <sstream>
 
 namespace Accumulators {
 void MeanVarianceCalculator::update() { m_acc(m_obs->operator()()); }

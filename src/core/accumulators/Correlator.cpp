@@ -16,10 +16,8 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "Correlator.hpp"
-#include "integrate.hpp"
 
-#include <utils/serialization/multi_array.hpp>
+#include <limits>
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
@@ -28,7 +26,11 @@
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
 
-#include <limits>
+#include <utils/serialization/multi_array.hpp>
+
+#include "Correlator.hpp"
+#include "errorhandling.hpp"
+#include "integrate.hpp"
 
 namespace {
 int min(int i, unsigned int j) { return std::min(i, static_cast<int>(j)); }
@@ -423,9 +425,9 @@ void Correlator::update() {
   newest[0] = (newest[0] + 1) % (m_tau_lin + 1);
   n_vals[0]++;
 
-  A[0][newest[0]] = A_obs->operator()();
+  A[0][newest[0]] = A_obs->operator()().as_vector();
   if (A_obs != B_obs) {
-    B[0][newest[0]] = B_obs->operator()();
+    B[0][newest[0]] = B_obs->operator()().as_vector();
   } else {
     B[0][newest[0]] = A[0][newest[0]];
   }

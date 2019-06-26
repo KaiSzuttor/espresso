@@ -27,7 +27,7 @@
 
 namespace Observables {
 
-std::vector<double>
+Utils::Tensor<double>
 CylindricalLBFluxDensityProfileAtParticlePositions::evaluate(
     PartCfg &partCfg) const {
   std::array<size_t, 3> n_bins{{static_cast<size_t>(n_r_bins),
@@ -41,7 +41,7 @@ CylindricalLBFluxDensityProfileAtParticlePositions::evaluate(
   // get the fluid velocities only once).
   std::vector<Utils::Vector3d> folded_positions(ids().size());
   boost::transform(ids(), folded_positions.begin(),
-                   [&partCfg](int id) -> Utils::Vector3d {
+                   [&partCfg](std::size_t id) -> Utils::Vector3d {
                      return folded_position(partCfg[id]);
                    });
 
@@ -53,7 +53,7 @@ CylindricalLBFluxDensityProfileAtParticlePositions::evaluate(
       });
   for (auto &p : folded_positions)
     p -= center;
-  for (int ind = 0; ind < ids().size(); ++ind) {
+  for (std::size_t ind = 0; ind < ids().size(); ++ind) {
     histogram.update(Utils::transform_coordinate_cartesian_to_cylinder(
                          folded_positions[ind], axis),
                      Utils::transform_vector_cartesian_to_cylinder(

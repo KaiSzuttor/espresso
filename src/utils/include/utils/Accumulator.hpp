@@ -26,6 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdexcept>
 #include <vector>
 
+#include <utils/tensor.hpp>
+
 namespace Utils {
 
 template <typename T> struct AccumulatorData {
@@ -46,7 +48,7 @@ private:
 class Accumulator {
 public:
   explicit Accumulator(std::size_t N) : m_n(0), m_acc_data(N) {}
-  void operator()(const std::vector<double> &);
+  void operator()(Utils::Tensor<double> const &);
   std::vector<double> get_mean() const;
   std::vector<double> get_variance() const;
   std::vector<double> get_std_error() const;
@@ -63,7 +65,7 @@ private:
   }
 };
 
-inline void Accumulator::operator()(const std::vector<double> &data) {
+inline void Accumulator::operator()(Utils::Tensor<double> const &data) {
   if (data.size() != m_acc_data.size())
     throw std::runtime_error(
         "The given data size does not fit the initialized size!");
