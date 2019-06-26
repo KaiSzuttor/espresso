@@ -34,21 +34,21 @@ BOOST_AUTO_TEST_CASE(histogram) {
   BOOST_CHECK((hist.get_bin_sizes() ==
                std::array<double, 2>{{19.0 / 10.0, 5.0 / 10.0}}));
   // Check that histogram is initialized to zero.
-  BOOST_CHECK(hist.get_histogram() ==
+  BOOST_CHECK(hist.get_histogram().as_vector() ==
               std::vector<double>(n_dims_data * n_bins[0] * n_bins[1], 0.0));
   // Check that histogram still empty if data is out of bounds.
   hist.update(std::vector<double>{{1.0, 4.0}});
-  BOOST_CHECK(hist.get_histogram() ==
+  BOOST_CHECK(hist.get_histogram().as_vector() ==
               std::vector<double>(n_dims_data * n_bins[0] * n_bins[1], 0.0));
   // Check if putting in data at the first bin is set correctly.
   hist.update(std::vector<double>{{limits[0].first, limits[1].first}});
-  BOOST_CHECK((hist.get_histogram())[0] == 1.0);
-  BOOST_CHECK((hist.get_histogram())[1] == 1.0);
+  BOOST_CHECK((hist.get_histogram().as_vector())[0] == 1.0);
+  BOOST_CHECK((hist.get_histogram().as_vector())[1] == 1.0);
   // Check if weights are correctly set.
   hist.update(std::vector<double>{{limits[0].first, limits[1].first}},
               std::vector<double>{{10.0, 10.0}});
-  BOOST_CHECK((hist.get_histogram())[0] == 11.0);
-  BOOST_CHECK((hist.get_histogram())[1] == 11.0);
+  BOOST_CHECK((hist.get_histogram().as_vector())[0] == 11.0);
+  BOOST_CHECK((hist.get_histogram().as_vector())[1] == 11.0);
   BOOST_CHECK_THROW(hist.update(std::vector<double>{{1.0, 5.0, 3.0}}),
                     std::invalid_argument);
 }

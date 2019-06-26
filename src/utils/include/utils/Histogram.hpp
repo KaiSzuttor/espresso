@@ -26,9 +26,10 @@
 #include <numeric>
 #include <vector>
 
-#include "Span.hpp"
-#include "constants.hpp"
+#include "utils/Span.hpp"
+#include "utils/constants.hpp"
 #include "utils/index.hpp"
+#include "utils/tensor.hpp"
 
 namespace Utils {
 
@@ -65,12 +66,11 @@ inline bool check_limits(Span<const T> data,
   if (data.size() != limits.size()) {
     throw std::invalid_argument("Dimension of data and limits not the same!");
   }
-  bool within_range = true;
   for (size_t i = 0; i < data.size(); ++i) {
     if (data[i] < limits[i].first or data[i] >= limits[i].second)
-      within_range = false;
+      return false;
   }
-  return within_range;
+  return true;
 }
 
 template <typename T, size_t Dims> class Histogram {
@@ -78,7 +78,7 @@ public:
   explicit Histogram(std::array<size_t, Dims> n_bins, size_t n_dims_data,
                      std::array<std::pair<T, T>, Dims> limits);
   std::array<size_t, Dims> get_n_bins() const;
-  std::vector<T> get_histogram() const;
+  Utils::Tensor<T> get_histogram() const;
   std::vector<size_t> get_tot_count() const;
   std::array<std::pair<T, T>, Dims> get_limits() const;
   std::array<T, Dims> get_bin_sizes() const;
@@ -97,7 +97,7 @@ private:
 
 protected:
   // Flat histogram data.
-  std::vector<T> m_hist;
+  Utils::Tensor<T> m_hist;
   // Number of dimensions for a single data point.
   size_t m_n_dims_data;
   // Track the number of total hits per bin entry.
@@ -127,7 +127,7 @@ Histogram<T, Dims>::Histogram(std::array<size_t, Dims> n_bins,
   size_t n_bins_total =
       m_n_dims_data * std::accumulate(std::begin(n_bins), std::end(n_bins), 1,
                                       std::multiplies<size_t>());
-  m_hist = std::vector<T>(n_bins_total);
+  m_hist = Utils::Tensor<T>({n_bins_total});
   m_tot_count = std::vector<size_t>(n_bins_total);
 }
 
@@ -164,7 +164,7 @@ void Histogram<T, Dims>::update(Span<const T> data, Span<const T> weights) {
     if (weights.size() != m_n_dims_data)
       throw std::invalid_argument("Wrong dimensions of given weights!");
     for (size_t ind = 0; ind < m_n_dims_data; ++ind) {
-      m_hist[flat_index + ind] += weights[ind];
+      m_hist({flat_index + ind}) += weights[ind];
       m_tot_count[flat_index + ind] += 1;
     }
   }
@@ -198,7 +198,7 @@ std::array<std::pair<T, T>, Dims> Histogram<T, Dims>::get_limits() const {
  * \brief Get the histogram data.
  */
 template <typename T, size_t Dims>
-std::vector<T> Histogram<T, Dims>::get_histogram() const {
+Utils::Tensor<T> Histogram<T, Dims>::get_histogram() const {
   return m_hist;
 }
 
