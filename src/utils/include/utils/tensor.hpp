@@ -52,6 +52,8 @@ public:
                      });
   }
 
+  Tensor() = default;
+
   /**
    * @brief Element access.
    * @param indices index for each dimension
@@ -120,6 +122,16 @@ public:
     return operator()(indices);
   }
 
+  void resize(std::initializer_list<std::size_t> const &extents) {
+    _resize(extents);
+  }
+
+  template <typename Container> void resize(Container const &extents) {
+    _resize(extents);
+  }
+
+  std::vector<T> const &as_vector() const { return m_data; }
+
   reference front() { return *begin(); }
 
   const_reference front() const { return *cbegin(); }
@@ -183,6 +195,17 @@ private:
   template <typename Container>
   std::size_t calc_linear_index(Container const &indices) {
     return boost::inner_product(m_strides, indices, 0);
+  }
+  
+  template<typename Container>
+  void _resize(Container const &extents) {
+    m_extents.clear();
+    m_extents.resize(extents.size());
+    std::copy(extents.begin(), extents.end(), m_extents.begin());
+    auto const data_size = std::accumulate(extents.begin(), extents.end(), 1,
+                                           std::multiplies<std::size_t>());
+    m_data.clear();
+    m_data.resize(data_size);
   }
 
   std::vector<T> m_data;

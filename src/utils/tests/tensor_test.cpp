@@ -95,3 +95,21 @@ BOOST_AUTO_TEST_CASE(row_major) {
   test_tensor(1, 0) = 1.6;
   BOOST_CHECK_EQUAL(*(test_tensor.begin() + 1), 1.6);
 }
+
+BOOST_AUTO_TEST_CASE(one_dimensional) {
+  auto test_tensor = Tensor<double>({3});
+  test_tensor({1}) = 1.6;
+  BOOST_CHECK_EQUAL(*(test_tensor.begin() + 1), 1.6);
+}
+
+BOOST_AUTO_TEST_CASE(default_ctor) {
+  auto test_tensor = Tensor<double>();
+}
+
+BOOST_AUTO_TEST_CASE(resize) {
+  auto test_tensor = Tensor<double>();
+  test_tensor.resize({10, 20});
+  BOOST_CHECK_EQUAL(test_tensor.extents()[0], 10);
+  BOOST_CHECK_EQUAL(test_tensor.extents()[1], 20);
+  BOOST_CHECK_EQUAL(test_tensor.rank(), 2);
+}
