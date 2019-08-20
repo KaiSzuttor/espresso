@@ -1,7 +1,7 @@
 name: CI
 
 on: [pull_request, push]
-secrets: GITLAB_ACCESS_TOKEN
+
 jobs:
   push_to_gitlab:
 
@@ -17,4 +17,10 @@ jobs:
         git remote -v
         pr_number=$(jq .pull_request.number ${GITHUB_EVENT_PATH})
         git checkout -b PR-${pr_number}
-        git push gitlab
+        git push -f gitlab
+    - name: push to non-PR branch
+      if: github.event_name == "push"
+      run: |
+        branch_name=${GITHUB_REF##*/}
+        git checkout -b branch_name
+        git push -f gitlab
