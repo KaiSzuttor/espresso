@@ -10,7 +10,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Add gitlab remote
-      run: git remote add gitlab https://oauth2:${GITLAB_ACCESS_TOKEN}@gitlab.icp.uni-stuttgart.de/kai/espresso_mirror
+      env: # Or as an environment variable
+        access_token: ${{ secrets.GITLAB_ACCESS_TOKEN }}
+      run: git remote add gitlab https://oauth2:${access_token}@gitlab.icp.uni-stuttgart.de/kai/espresso_mirror
     - name: push to PR branch
       if: github.event_name == 'pull_request'
       run: |
