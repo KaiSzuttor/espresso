@@ -14,5 +14,5 @@ jobs:
     - name: push to PR branch
       if: github.event_name == 'pull_request'
       run: |
-        pr_number=$(jq .pull_request.number ${GITHUB_EVENT_PATH}
+        pr_number=$(jq .pull_request.number ${GITHUB_EVENT_PATH})
         git checkout -b PR-${pr_number}
