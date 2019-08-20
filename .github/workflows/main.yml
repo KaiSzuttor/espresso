@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Add gitlab remote
-      run: git remote add origin https://oauth2:${GITLAB_ACCESS_TOKEN}@gitlab.icp.uni-stuttgart.de/kai/espresso_mirror.git
+      run: git remote add gitlab https://oauth2:${GITLAB_ACCESS_TOKEN}@gitlab.icp.uni-stuttgart.de/kai/espresso_mirror.git
     - name: Run a multi-line script
       run: |
         echo Add other actions to build,
