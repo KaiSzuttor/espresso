@@ -6,9 +6,9 @@ jobs:
   push_to_gitlab:
 
     runs-on: ubuntu-latest
-    secrets: GITLAB_ACCESS_TOKEN
     
     steps:
+    - secrets: GITLAB_ACCESS_TOKEN
     - uses: actions/checkout@v1
     - name: Add gitlab remote
       run: git remote add gitlab https://oauth2:${GITLAB_ACCESS_TOKEN}@gitlab.icp.uni-stuttgart.de/kai/espresso_mirror
