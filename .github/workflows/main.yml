@@ -1,6 +1,6 @@
 name: CI
 
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
   push_to_gitlab:
@@ -11,7 +11,5 @@ jobs:
     - uses: actions/checkout@v1
     - name: Add gitlab remote
       run: git remote add gitlab https://oauth2:${GITLAB_ACCESS_TOKEN}@gitlab.icp.uni-stuttgart.de/kai/espresso_mirror.git
-    - name: Run a multi-line script
-      run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+    - name: push to remote
+      run: git push gitlab test
