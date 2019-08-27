@@ -62,6 +62,28 @@ public:
   auto operator[](std::size_t i) const { return m_lhs[i] - m_rhs[i]; }
 };
 
+template <typename LHS, typename RHS>
+class EqualityExpression : public VectorExpression<EqualityExpression<LHS, RHS>> {
+  using R = decltype(std::declval<LHS>()[0] + std::declval<RHS>()[0]);
+  const LHS &m_lhs;
+  const RHS &m_rhs;
+
+public:
+  EqualityExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
+  auto operator[](std::size_t i) const { return m_lhs[i] == m_rhs[i]; }
+};
+
+template <typename LHS, typename RHS>
+class UnEqualityExpression : public VectorExpression<UnEqualityExpression<LHS, RHS>> {
+  using R = decltype(std::declval<LHS>()[0] + std::declval<RHS>()[0]);
+  const LHS &m_lhs;
+  const RHS &m_rhs;
+
+public:
+  UnEqualityExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
+  auto operator[](std::size_t i) const { return not(m_lhs[i] == m_rhs[i]); }
+};
+
 template <typename T>
 class MinusExpression : public VectorExpression<MinusExpression<T>> {
   using R = T;
@@ -70,6 +92,16 @@ class MinusExpression : public VectorExpression<MinusExpression<T>> {
 public:
   MinusExpression(T const &lhs) : m_lhs(lhs) {}
   auto operator[](std::size_t i) const { return -m_lhs[i]; }
+};
+
+template <typename T>
+class NotExpression : public VectorExpression<NotExpression<T>> {
+  using R = T;
+  const T &m_lhs;
+
+public:
+  NotExpression(T const &lhs) : m_lhs(lhs) {}
+  auto operator[](std::size_t i) const { return not(m_lhs[i]); }
 };
 
 } // namespace detail
@@ -88,10 +120,30 @@ operator-(detail::VectorExpression<L> const &lhs,
   return detail::DiffExpression<L, R>(lhs, rhs);
 }
 
+template <typename L, typename R>
+inline detail::EqualityExpression<L, R>
+operator==(detail::VectorExpression<L> const &lhs,
+          detail::VectorExpression<R> const &rhs) {
+  return detail::EqualityExpression<L, R>(lhs, rhs);
+}
+
+template <typename L, typename R>
+inline detail::UnEqualityExpression<L, R>
+operator!=(detail::VectorExpression<L> const &lhs,
+          detail::VectorExpression<R> const &rhs) {
+  return detail::UnEqualityExpression<L, R>(lhs, rhs);
+}
+
 template <typename T>
 inline detail::MinusExpression<T>
 operator-(detail::VectorExpression<T> const &lhs) {
   return detail::MinusExpression<T>(lhs);
+}
+
+template <typename T>
+inline detail::NotExpression<T>
+operator!(detail::VectorExpression<T> const &lhs) {
+  return detail::NotExpression<T>(lhs);
 }
 
 template <typename T, std::size_t N>
@@ -282,16 +334,6 @@ constexpr bool operator<=(Vector<T, N> const &a, Vector<T, N> const &b) {
 template <size_t N, typename T>
 constexpr bool operator>=(Vector<T, N> const &a, Vector<T, N> const &b) {
   return detail::all_of(a, b, std::greater_equal<T>());
-}
-
-template <size_t N, typename T>
-constexpr bool operator==(Vector<T, N> const &a, Vector<T, N> const &b) {
-  return detail::all_of(a, b, std::equal_to<T>());
-}
-
-template <size_t N, typename T>
-constexpr bool operator!=(Vector<T, N> const &a, Vector<T, N> const &b) {
-  return not(a == b);
 }
 
 template <size_t N, typename T>
