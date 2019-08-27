@@ -33,7 +33,70 @@
 
 namespace Utils {
 
-template <typename T, std::size_t N> class Vector : public Array<T, N> {
+namespace detail {
+
+template <typename T> struct VectorExpression {
+  T &operator~() { return static_cast<T &>(*this); }
+  const T &operator~() const { return static_cast<const T &>(*this); }
+};
+
+template <typename LHS, typename RHS>
+class SumExpression : public VectorExpression<SumExpression<LHS, RHS>> {
+  using R = decltype(std::declval<LHS>()[0] + std::declval<RHS>()[0]);
+  const LHS &m_lhs;
+  const RHS &m_rhs;
+
+public:
+  SumExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
+  auto operator[](std::size_t i) const { return m_lhs[i] + m_rhs[i]; }
+};
+
+template <typename LHS, typename RHS>
+class DiffExpression : public VectorExpression<DiffExpression<LHS, RHS>> {
+  using R = decltype(std::declval<LHS>()[0] + std::declval<RHS>()[0]);
+  const LHS &m_lhs;
+  const RHS &m_rhs;
+
+public:
+  DiffExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
+  auto operator[](std::size_t i) const { return m_lhs[i] - m_rhs[i]; }
+};
+
+template <typename T>
+class MinusExpression : public VectorExpression<MinusExpression<T>> {
+  using R = T;
+  const T &m_lhs;
+
+public:
+  MinusExpression(T const &lhs) : m_lhs(lhs) {}
+  auto operator[](std::size_t i) const { return -m_lhs[i]; }
+};
+
+} // namespace detail
+
+template <typename L, typename R>
+inline detail::SumExpression<L, R>
+operator+(detail::VectorExpression<L> const &lhs,
+          detail::VectorExpression<R> const &rhs) {
+  return detail::SumExpression<L, R>(lhs, rhs);
+}
+
+template <typename L, typename R>
+inline detail::DiffExpression<L, R>
+operator-(detail::VectorExpression<L> const &lhs,
+          detail::VectorExpression<R> const &rhs) {
+  return detail::DiffExpression<L, R>(lhs, rhs);
+}
+
+template <typename T>
+inline detail::MinusExpression<T>
+operator-(detail::VectorExpression<T> const &lhs) {
+  return detail::MinusExpression<T>(lhs);
+}
+
+template <typename T, std::size_t N>
+class Vector : public Array<T, N>,
+               public detail::VectorExpression<Vector<T, N>> {
   using Base = Array<T, N>;
 
 public:
@@ -54,7 +117,20 @@ public:
   using Array<T, N>::broadcast;
   Vector() = default;
   Vector(Vector const &) = default;
+  template <typename E> Vector(detail::VectorExpression<E> const &e) {
+    for (std::size_t i = 0; i < N; ++i) {
+      operator[](i) = (~e)[i];
+    }
+  }
   Vector &operator=(Vector const &) = default;
+  template <typename E>
+  Vector &operator=(detail::VectorExpression<E> const &e) {
+    Vector ret;
+    for (std::size_t i = 0; i < size; ++i) {
+      ret[i] = ~e[i];
+    }
+    return ret;
+  }
 
   void swap(Vector &rhs) { std::swap_ranges(begin(), end(), rhs.begin()); }
 
@@ -218,28 +294,9 @@ constexpr bool operator!=(Vector<T, N> const &a, Vector<T, N> const &b) {
   return not(a == b);
 }
 
-template <size_t N, typename T, typename U>
-auto operator+(Vector<T, N> const &a, Vector<U, N> const &b) {
-  return detail::binary_op(a, b, std::plus<>());
-}
-
 template <size_t N, typename T>
 Vector<T, N> &operator+=(Vector<T, N> &a, Vector<T, N> const &b) {
   return detail::binary_op_assign(a, b, std::plus<T>());
-}
-
-template <size_t N, typename T, typename U>
-auto operator-(Vector<T, N> const &a, Vector<U, N> const &b) {
-  return detail::binary_op(a, b, std::minus<>());
-}
-
-template <size_t N, typename T> Vector<T, N> operator-(Vector<T, N> const &a) {
-  Vector<T, N> ret;
-
-  std::transform(std::begin(a), std::end(a), std::begin(ret),
-                 [](T const &v) { return -v; });
-
-  return ret;
 }
 
 template <size_t N, typename T>
