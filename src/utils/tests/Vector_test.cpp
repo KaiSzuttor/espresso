@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(algebraic_operators) {
 
   {
     Utils::Vector3i v1{2, 4, 6};
-    auto v2 = 2 * v1;
+    Utils::Vector3i v2 = 2 * v1;
     BOOST_CHECK(v2 == (v1 *= 2));
   }
 
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE(scalar_product) {
                              double>::value,
                 "");
   static_assert(std::is_same<decltype(Vector<std::complex<float>, 2>{} * 3.f),
-                             Vector<std::complex<float>, 2>>::value,
+                               Utils::ScalarMultExpression<float, Utils::Vector<std::complex<float>, 2>, 2>>::value,
                 "");
 
   auto const v1 = Utils::Vector3d{1., 2., 3.};

@@ -34,13 +34,13 @@
 
 namespace Utils {
 
-template <typename T> struct VectorExpression {
+template <typename T, std::size_t N> struct VectorExpression {
   T &operator~() { return static_cast<T &>(*this); }
   const T &operator~() const { return static_cast<const T &>(*this); }
 };
 
-template <typename LHS, typename RHS>
-class SumExpression : public VectorExpression<SumExpression<LHS, RHS>> {
+template <typename LHS, typename RHS, std::size_t N>
+class SumExpression : public VectorExpression<SumExpression<LHS, RHS, N>, N> {
   const LHS &m_lhs;
   const RHS &m_rhs;
 
@@ -49,8 +49,8 @@ public:
   auto operator[](std::size_t i) const { return m_lhs[i] + m_rhs[i]; }
 };
 
-template <typename LHS, typename RHS>
-class DiffExpression : public VectorExpression<DiffExpression<LHS, RHS>> {
+template <typename LHS, typename RHS, std::size_t N>
+class DiffExpression : public VectorExpression<DiffExpression<LHS, RHS, N>, N> {
   const LHS &m_lhs;
   const RHS &m_rhs;
 
@@ -59,8 +59,20 @@ public:
   auto operator[](std::size_t i) const { return m_lhs[i] - m_rhs[i]; }
 };
 
-template <typename T>
-class MinusExpression : public VectorExpression<MinusExpression<T>> {
+template <typename LHS, typename RHS, std::size_t N>
+class ScalarMultExpression
+    : public VectorExpression<ScalarMultExpression<LHS, RHS, N>, N> {
+  const LHS &m_lhs;
+  const RHS &m_rhs;
+
+public:
+  ScalarMultExpression(LHS const &lhs, RHS const &rhs)
+      : m_lhs(lhs), m_rhs(rhs) {}
+  auto operator[](std::size_t i) const { return m_lhs * m_rhs[i]; }
+};
+
+template <typename T, std::size_t N>
+class MinusExpression : public VectorExpression<MinusExpression<T, N>, N> {
   const T &m_lhs;
 
 public:
@@ -68,8 +80,8 @@ public:
   auto operator[](std::size_t i) const { return -m_lhs[i]; }
 };
 
-template <typename T>
-class NotExpression : public VectorExpression<NotExpression<T>> {
+template <typename T, std::size_t N>
+class NotExpression : public VectorExpression<NotExpression<T, N>, N> {
   const T &m_lhs;
 
 public:
@@ -77,30 +89,56 @@ public:
   auto operator[](std::size_t i) const { return not(m_lhs[i]); }
 };
 
-template <typename L, typename R>
-inline SumExpression<L, R> operator+(VectorExpression<L> const &lhs,
-                                     VectorExpression<R> const &rhs) {
-  return SumExpression<L, R>(~lhs, ~rhs);
+template <typename L, typename R, std::size_t N>
+inline auto operator+(VectorExpression<L, N> const &lhs,
+                      VectorExpression<R, N> const &rhs) {
+  return SumExpression<L, R, N>(~lhs, ~rhs);
 }
 
-template <typename L, typename R>
-inline DiffExpression<L, R> operator-(VectorExpression<L> const &lhs,
-                                      VectorExpression<R> const &rhs) {
-  return DiffExpression<L, R>(~lhs, ~rhs);
-}
-
-template <typename T>
-inline MinusExpression<T> operator-(VectorExpression<T> const &lhs) {
-  return MinusExpression<T>(~lhs);
-}
-
-template <typename T>
-inline NotExpression<T> operator!(VectorExpression<T> const &lhs) {
-  return NotExpression<T>(~lhs);
+template <typename L, typename R, std::size_t N>
+inline auto operator-(VectorExpression<L, N> const &lhs,
+                      VectorExpression<R, N> const &rhs) {
+  return DiffExpression<L, R, N>(~lhs, ~rhs);
 }
 
 template <typename T, std::size_t N>
-class Vector : public Array<T, N>, public VectorExpression<Vector<T, N>> {
+inline auto operator-(VectorExpression<T, N> const &lhs) {
+  return MinusExpression<T, N>(~lhs);
+}
+
+template <typename T, std::size_t N>
+inline auto operator!(VectorExpression<T, N> const &lhs) {
+  return NotExpression<T, N>(~lhs);
+}
+
+/* Scalar multiplication */
+template <typename E, typename Scalar, std::size_t N,
+          typename =
+              std::enable_if_t<std::is_arithmetic<std::decay_t<Scalar>>::value>>
+inline auto operator*(VectorExpression<E, N> const &a, Scalar const &b) {
+  return ScalarMultExpression<Scalar, E, N>(b, ~a);
+}
+
+template <typename E, typename Scalar, std::size_t N,
+          typename =
+              std::enable_if_t<std::is_arithmetic<std::decay_t<Scalar>>::value>>
+inline auto operator*(Scalar const &b, VectorExpression<E, N> const &a) {
+  return a * b;
+}
+
+/* Inner product */
+template <typename E1, typename E2, std::size_t N>
+auto operator*(VectorExpression<E1, N> const &a,
+               VectorExpression<E2, N> const &b) {
+  auto res = (~a)[0] * (~b)[0];
+  for (int i = 1; i < N; ++i) {
+    res += (~a)[i] * (~b)[i];
+  }
+  return res;
+}
+
+template <typename T, std::size_t N>
+class Vector : public Array<T, N>, public VectorExpression<Vector<T, N>, N> {
   using Base = Array<T, N>;
 
 public:
@@ -122,7 +160,7 @@ public:
   Vector() = default;
   Vector(Vector const &) = default;
 
-  template <typename E> Vector(VectorExpression<E> const &e) {
+  template <typename E> Vector(VectorExpression<E, N> const &e) {
     for (std::size_t i = 0; i < N; ++i) {
       operator[](i) = (~e)[i];
     }
@@ -130,7 +168,7 @@ public:
 
   Vector &operator=(Vector const &) = default;
 
-  template <typename E> Vector &operator=(VectorExpression<E> const &e) {
+  template <typename E> Vector &operator=(VectorExpression<E, N> const &e) {
     for (std::size_t i = 0; i < N; ++i) {
       operator[](i) = (~e)[i];
     }
@@ -269,7 +307,7 @@ constexpr bool all_of(Vector<T, N> const &a, Vector<T, N> const &b, Op op) {
 }
 
 template <size_t N, typename T, typename E, typename Op>
-constexpr bool all_of(VectorExpression<E> const &a, Vector<T, N> const &b,
+constexpr bool all_of(VectorExpression<E, N> const &a, Vector<T, N> const &b,
                       Op op) {
   for (int i = 0; i < N; i++) {
     /* Short circuit */
@@ -282,7 +320,7 @@ constexpr bool all_of(VectorExpression<E> const &a, Vector<T, N> const &b,
 }
 
 template <size_t N, typename T, typename E, typename Op>
-constexpr bool all_of(Vector<T, N> const &a, VectorExpression<E> const &b,
+constexpr bool all_of(Vector<T, N> const &a, VectorExpression<E, N> const &b,
                       Op op) {
   return all_of(b, a, op);
 }
@@ -295,12 +333,14 @@ constexpr bool operator==(Vector<T, N> const &a, Vector<T, N> const &b) {
 }
 
 template <size_t N, typename T, typename E>
-constexpr bool operator==(Vector<T, N> const &a, VectorExpression<E> const &b) {
+constexpr bool operator==(Vector<T, N> const &a,
+                          VectorExpression<E, N> const &b) {
   return detail::all_of(a, b, std::equal_to<T>());
 }
 
 template <size_t N, typename T, typename E>
-constexpr bool operator==(VectorExpression<E> const &a, Vector<T, N> const &b) {
+constexpr bool operator==(VectorExpression<E, N> const &a,
+                          Vector<T, N> const &b) {
   return detail::all_of(a, b, std::equal_to<T>());
 }
 
@@ -339,29 +379,6 @@ Vector<T, N> &operator-=(Vector<T, N> &a, Vector<T, N> const &b) {
   return detail::binary_op_assign(a, b, std::minus<T>());
 }
 
-/* Scalar multiplication */
-template <size_t N, typename T, class U>
-auto operator*(U const &a, Vector<T, N> const &b) {
-  using R = decltype(a * std::declval<T>());
-  Vector<R, N> ret;
-
-  std::transform(std::begin(b), std::end(b), std::begin(ret),
-                 [a](T const &val) { return a * val; });
-
-  return ret;
-}
-
-template <size_t N, typename T, class U>
-auto operator*(Vector<T, N> const &b, U const &a) {
-  using R = decltype(std::declval<T>() * a);
-  Vector<R, N> ret;
-
-  std::transform(std::begin(b), std::end(b), std::begin(ret),
-                 [a](T const &val) { return a * val; });
-
-  return ret;
-}
-
 template <size_t N, typename T>
 Vector<T, N> &operator*=(Vector<T, N> &b, T const &a) {
   std::transform(std::begin(b), std::end(b), std::begin(b),
@@ -384,15 +401,6 @@ Vector<T, N> &operator/=(Vector<T, N> &a, T const &b) {
   std::transform(std::begin(a), std::end(a), std::begin(a),
                  [b](T const &val) { return val / b; });
   return a;
-}
-
-/* Scalar product */
-template <size_t N, typename T, class U>
-auto operator*(Vector<T, N> const &a, Vector<U, N> const &b) {
-  using std::declval;
-  using R = decltype(declval<T>() * declval<U>());
-
-  return std::inner_product(std::begin(a), std::end(a), std::begin(b), R{});
 }
 
 template <size_t N, typename T, class U,
