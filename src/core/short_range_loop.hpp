@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 struct Distance {
   explicit Distance(Utils::Vector3d const &vec21)
-      : vec21(vec21), dist2(vec21.norm2()) {}
+      : vec21(vec21), dist2(Utils::norm2(vec21)) {}
 
   Utils::Vector3d vec21;
   const double dist2;

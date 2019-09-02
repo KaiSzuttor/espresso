@@ -95,9 +95,9 @@ calc_angle_generic_force(Utils::Vector3d const &r_mid,
   /* force factor */
   auto const fac = forceFactor(cosine);
   /* distribute forces */
-  auto f_left = (fac * d1i) * (vec1 * cosine - vec2);
-  auto f_right = (fac * d2i) * (vec2 * cosine - vec1);
-  auto f_mid = -(f_left + f_right);
+  Utils::Vector3d const f_left = (fac * d1i) * (vec1 * cosine - vec2);
+  Utils::Vector3d const f_right = (fac * d2i) * (vec2 * cosine - vec1);
+  Utils::Vector3d const f_mid = -(f_left + f_right);
   return std::make_tuple(f_mid, f_left, f_right);
 }
 

@@ -60,6 +60,17 @@ public:
 };
 
 template <typename LHS, typename RHS, std::size_t N>
+class HadamardExpression
+    : public VectorExpression<HadamardExpression<LHS, RHS, N>, N> {
+  const LHS &m_lhs;
+  const RHS &m_rhs;
+
+public:
+  HadamardExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
+  auto operator[](std::size_t i) const { return m_lhs[i] * m_rhs[i]; }
+};
+
+template <typename LHS, typename RHS, std::size_t N>
 class ScalarMultExpression
     : public VectorExpression<ScalarMultExpression<LHS, RHS, N>, N> {
   const LHS &m_lhs;
@@ -99,6 +110,15 @@ class NotExpression : public VectorExpression<NotExpression<T, N>, N> {
 public:
   NotExpression(T const &lhs) : m_lhs(lhs) {}
   auto operator[](std::size_t i) const { return not(m_lhs[i]); }
+};
+
+template <typename T, std::size_t N>
+class SqrtExpression : public VectorExpression<SqrtExpression<T, N>, N> {
+  const T &m_lhs;
+
+public:
+  SqrtExpression(T const &lhs) : m_lhs(lhs) {}
+  auto operator[](std::size_t i) const { return std::sqrt(m_lhs[i]); }
 };
 
 template <typename L, typename R, std::size_t N>
@@ -157,6 +177,12 @@ inline auto operator/(VectorExpression<E, N> const &a, Scalar const &b) {
   return ScalarDivExpression<E, Scalar, N>(~a, b);
 }
 
+/* Componentwise square root */
+template <typename E, std::size_t N>
+auto sqrt(VectorExpression<E, N> const &a) {
+  return SqrtExpression<E, N>(~a);
+}
+
 template <typename T, std::size_t N>
 class Vector : public Array<T, N>, public VectorExpression<Vector<T, N>, N> {
   using Base = Array<T, N>;
@@ -206,8 +232,6 @@ private:
   }
 
 public:
-  template <class Range>
-  explicit Vector(Range const &rng) : Vector(std::begin(rng), std::end(rng)) {}
   explicit constexpr Vector(T const (&v)[N]) : Base() {
     copy_init(std::begin(v), std::end(v));
   }
@@ -305,9 +329,12 @@ auto binary_op(Vector<T, N> const &a, Vector<U, N> const &b, Op op) {
   return ret;
 }
 
-template <size_t N, typename T, typename Op>
-Vector<T, N> &binary_op_assign(Vector<T, N> &a, Vector<T, N> const &b, Op op) {
-  std::transform(std::begin(a), std::end(a), std::begin(b), std::begin(a), op);
+template <size_t N, typename T, typename E, typename Op>
+Vector<T, N> &binary_op_assign(Vector<T, N> &a, VectorExpression<E, N> const &b,
+                               Op op) {
+  for (int i = 0; i < N; ++i) {
+    a[i] = op(a[i], (~b)[i]);
+  }
   return a;
 }
 
@@ -386,13 +413,13 @@ constexpr bool operator>=(Vector<T, N> const &a, Vector<T, N> const &b) {
   return detail::all_of(a, b, std::greater_equal<T>());
 }
 
-template <size_t N, typename T>
-Vector<T, N> &operator+=(Vector<T, N> &a, Vector<T, N> const &b) {
+template <size_t N, typename T, typename E>
+Vector<T, N> &operator+=(Vector<T, N> &a, VectorExpression<E, N> const &b) {
   return detail::binary_op_assign(a, b, std::plus<T>());
 }
 
-template <size_t N, typename T>
-Vector<T, N> &operator-=(Vector<T, N> &a, Vector<T, N> const &b) {
+template <size_t N, typename T, typename E>
+Vector<T, N> &operator-=(Vector<T, N> &a, VectorExpression<E, N> const &b) {
   return detail::binary_op_assign(a, b, std::minus<T>());
 }
 
@@ -433,33 +460,18 @@ auto operator%(Vector<T, N> const &a, Vector<U, N> const &b) {
   return ret;
 }
 
-/* Componentwise square root */
-template <size_t N, typename T> Vector<T, N> sqrt(Vector<T, N> const &a) {
-  using std::sqrt;
-  Vector<T, N> ret;
-
-  std::transform(std::begin(a), std::end(a), ret.begin(),
-                 [](T const &v) { return sqrt(v); });
-
-  return ret;
-}
-
 template <typename E1, typename E2>
-Vector<double, 3> vector_product(VectorExpression<E1, 3> const &a, VectorExpression<E2, 3> const &b) {
-  return {(~a)[1] * (~b)[2] - (~a)[2] * (~b)[1], (~a)[2] * (~b)[0] - (~a)[0] * (~b)[2],
+Vector<double, 3> vector_product(VectorExpression<E1, 3> const &a,
+                                 VectorExpression<E2, 3> const &b) {
+  return {(~a)[1] * (~b)[2] - (~a)[2] * (~b)[1],
+          (~a)[2] * (~b)[0] - (~a)[0] * (~b)[2],
           (~a)[0] * (~b)[1] - (~a)[1] * (~b)[0]};
 }
 
-template <class T, class U, size_t N>
-auto hadamard_product(Vector<T, N> const &a, Vector<U, N> const &b) {
-  using std::declval;
-  using R = decltype(declval<T>() * declval<U>());
-
-  Vector<R, N> ret;
-  std::transform(a.cbegin(), a.cend(), b.cbegin(), ret.begin(),
-                 [](auto ai, auto bi) { return ai * bi; });
-
-  return ret;
+template <typename E1, typename E2, size_t N>
+auto hadamard_product(VectorExpression<E1, N> const &a,
+                      VectorExpression<E2, N> const &b) {
+  return HadamardExpression<E1, E2, N>(~a, ~b);
 }
 
 /**

@@ -80,7 +80,7 @@ int create_diamond(PartCfg &partCfg, double const a, double const bond_length,
                    int const nonet) {
   Utils::Vector3d pos;
   double const off = bond_length / sqrt(3);
-  auto const dnodes =
+  Utils::Vector<Utils::Vector3d, 8> const dnodes =
       a / 4. * Utils::Vector<Utils::Vector3d, 8>{{0, 0, 0}, {1, 1, 1},
                                                  {2, 2, 0}, {0, 2, 2},
                                                  {2, 0, 2}, {3, 3, 1},
