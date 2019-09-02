@@ -25,10 +25,10 @@
 #include <cmath>
 #include <functional>
 #include <initializer_list>
+#include <iostream>
 #include <iterator>
 #include <numeric>
 #include <vector>
-#include <iostream>
 
 #include "utils/Array.hpp"
 
