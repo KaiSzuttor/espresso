@@ -71,6 +71,18 @@ public:
   auto operator[](std::size_t i) const { return m_lhs * m_rhs[i]; }
 };
 
+template <typename LHS, typename RHS, std::size_t N>
+class ScalarDivExpression
+    : public VectorExpression<ScalarDivExpression<LHS, RHS, N>, N> {
+  const LHS &m_lhs;
+  const RHS &m_rhs;
+
+public:
+  ScalarDivExpression(LHS const &lhs, RHS const &rhs)
+      : m_lhs(lhs), m_rhs(rhs) {}
+  auto operator[](std::size_t i) const { return m_lhs[i] / m_rhs; }
+};
+
 template <typename T, std::size_t N>
 class MinusExpression : public VectorExpression<MinusExpression<T, N>, N> {
   const T &m_lhs;
@@ -135,6 +147,14 @@ auto operator*(VectorExpression<E1, N> const &a,
     res += (~a)[i] * (~b)[i];
   }
   return res;
+}
+
+/* Scalar division */
+template <typename E, typename Scalar, std::size_t N,
+          typename =
+              std::enable_if_t<std::is_arithmetic<std::decay_t<Scalar>>::value>>
+inline auto operator/(VectorExpression<E, N> const &a, Scalar const &b) {
+  return ScalarDivExpression<E, Scalar, N>(~a, b);
 }
 
 template <typename T, std::size_t N>
@@ -235,9 +255,6 @@ public:
     return ret;
   }
 
-  inline T norm2() const { return (*this) * (*this); }
-  inline T norm() const { return std::sqrt(norm2()); }
-
   /*
    * @brief Normalize the vector.
    *
@@ -246,7 +263,7 @@ public:
    */
 
   inline Vector &normalize() {
-    auto const l = norm();
+    auto const l = norm(*this);
     if (l > T(0)) {
       for (int i = 0; i < N; i++)
         this->operator[](i) /= l;
@@ -386,14 +403,13 @@ Vector<T, N> &operator*=(Vector<T, N> &b, T const &a) {
   return b;
 }
 
-/* Scalar division */
-template <size_t N, typename T>
-Vector<T, N> operator/(Vector<T, N> const &a, T const &b) {
-  Vector<T, N> ret;
-
-  std::transform(std::begin(a), std::end(a), ret.begin(),
-                 [b](T const &val) { return val / b; });
-  return ret;
+template <typename E, std::size_t N>
+auto norm2(VectorExpression<E, N> const &a) {
+  return a * a;
+}
+template <typename E, std::size_t N>
+auto norm(VectorExpression<E, N> const &a) {
+  return std::sqrt(norm2(a));
 }
 
 template <size_t N, typename T>
@@ -428,10 +444,10 @@ template <size_t N, typename T> Vector<T, N> sqrt(Vector<T, N> const &a) {
   return ret;
 }
 
-template <class T>
-Vector<T, 3> vector_product(Vector<T, 3> const &a, Vector<T, 3> const &b) {
-  return {a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2],
-          a[0] * b[1] - a[1] * b[0]};
+template <typename E1, typename E2>
+Vector<double, 3> vector_product(VectorExpression<E1, 3> const &a, VectorExpression<E2, 3> const &b) {
+  return {(~a)[1] * (~b)[2] - (~a)[2] * (~b)[1], (~a)[2] * (~b)[0] - (~a)[0] * (~b)[2],
+          (~a)[0] * (~b)[1] - (~a)[1] * (~b)[0]};
 }
 
 template <class T, class U, size_t N>

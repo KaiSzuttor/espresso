@@ -50,7 +50,7 @@ constexpr int n_test_numbers = sizeof(test_numbers) / sizeof(int);
 template <int n> bool norm2() {
   Vector<int, n> v(std::begin(test_numbers), test_numbers + n);
 
-  return v.norm2() == std::inner_product(v.begin(), v.end(), v.begin(), 0);
+  return Utils::norm2(v) == std::inner_product(v.begin(), v.end(), v.begin(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(initializer_list_constructor) {
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(normalize) {
   Utils::Vector3d v{1, 2, 3};
   v.normalize();
 
-  BOOST_CHECK((v.norm2() - 1.0) <= std::numeric_limits<double>::epsilon());
+  BOOST_CHECK((Utils::norm2(v) - 1.0) <= std::numeric_limits<double>::epsilon());
 }
 
 BOOST_AUTO_TEST_CASE(comparison_operators) {
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE(algebraic_operators) {
 
   {
     Utils::Vector3i v1{2, 4, 6};
-    auto v2 = v1 / 2;
+    Utils::Vector3i v2 = v1 / 2;
     BOOST_CHECK(v2 == (v1 /= 2));
   }
 
