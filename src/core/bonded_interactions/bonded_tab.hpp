@@ -71,7 +71,7 @@ inline bool calc_tab_bond_force(Bonded_ia_parameters const *const iaparams,
                                 Utils::Vector3d const &dx,
                                 Utils::Vector3d &force) {
   auto const *tab_pot = iaparams->p.tab.pot;
-  auto const dist = dx.norm();
+  auto const dist = Utils::norm(dx);
 
   if (dist < tab_pot->cutoff()) {
     auto const fac = tab_pot->force(dist) / dist;
@@ -95,7 +95,7 @@ inline bool calc_tab_bond_force(Bonded_ia_parameters const *const iaparams,
 inline bool tab_bond_energy(Bonded_ia_parameters const *const iaparams,
                             Utils::Vector3d const &dx, double *_energy) {
   auto const *tab_pot = iaparams->p.tab.pot;
-  auto const dist = dx.norm();
+  auto const dist = Utils::norm(dx);
 
   if (dist < tab_pot->cutoff()) {
     *_energy = tab_pot->energy(dist);

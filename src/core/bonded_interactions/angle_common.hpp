@@ -51,11 +51,11 @@ calc_vectors_and_cosine(Utils::Vector3d const &r_mid,
                         bool sanitize_cosine = false) {
   /* normalized vector from p_mid to p_left */
   auto vec1 = get_mi_vector(r_left, r_mid, box_geo);
-  auto const d1i = 1.0 / vec1.norm();
+  auto const d1i = 1.0 / Utils::norm(vec1);
   vec1 *= d1i;
   /* normalized vector from p_mid to p_right */
   auto vec2 = get_mi_vector(r_right, r_mid, box_geo);
-  auto const d2i = 1.0 / vec2.norm();
+  auto const d2i = 1.0 / Utils::norm(vec2);
   vec2 *= d2i;
   /* cosine of the angle between vec1 and vec2 */
   auto cosine = vec1 * vec2;

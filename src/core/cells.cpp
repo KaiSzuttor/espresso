@@ -97,7 +97,7 @@ std::vector<std::pair<int, int>> get_pairs(double distance) {
                          boost::make_indirect_iterator(local_cells.end()),
                          Utils::NoOp{}, pair_kernel,
                          [](Particle const &p1, Particle const &p2) {
-                           return (p1.r.p - p2.r.p).norm2();
+                           return Utils::norm2(p1.r.p - p2.r.p);
                          });
     break;
   case CELL_STRUCTURE_NSQUARE:
@@ -105,7 +105,7 @@ std::vector<std::pair<int, int>> get_pairs(double distance) {
         boost::make_indirect_iterator(local_cells.begin()),
         boost::make_indirect_iterator(local_cells.end()), Utils::NoOp{},
         pair_kernel, [](Particle const &p1, Particle const &p2) {
-          return get_mi_vector(p1.r.p, p2.r.p, box_geo).norm2();
+          return Utils::norm2(get_mi_vector(p1.r.p, p2.r.p, box_geo));
         });
     break;
   case CELL_STRUCTURE_LAYERED:
@@ -116,7 +116,7 @@ std::vector<std::pair<int, int>> get_pairs(double distance) {
                            auto vec21 = get_mi_vector(p1.r.p, p2.r.p, box_geo);
                            vec21[2] = p1.r.p[2] - p2.r.p[2];
 
-                           return vec21.norm2();
+                           return Utils::norm2(vec21);
                          });
   }
 
@@ -451,7 +451,7 @@ void check_resort_particles() {
   resort_particles |= (std::any_of(local_cells.particles().begin(),
                                    local_cells.particles().end(),
                                    [&skin2](Particle const &p) {
-                                     return (p.r.p - p.l.p_old).norm2() > skin2;
+                                     return Utils::norm2(p.r.p - p.l.p_old) > skin2;
                                    }))
                           ? Cells::RESORT_LOCAL
                           : Cells::RESORT_NONE;

@@ -78,8 +78,8 @@ calc_dihedral_angle(Utils::Vector3d const &r1, Utils::Vector3d const &r2,
   bXc = vector_product(b, c);
 
   /* calculate the unit vectors */
-  *l_aXb = aXb.norm();
-  *l_bXc = bXc.norm();
+  *l_aXb = Utils::norm(aXb);
+  *l_bXc = Utils::norm(bXc);
 
   /* catch case of undefined dihedral angle */
   if (*l_aXb <= TINY_LENGTH_VALUE || *l_bXc <= TINY_LENGTH_VALUE) {

@@ -103,7 +103,7 @@ convert_dip_to_quat(const Utils::Vector3d &dip) {
   Utils::Vector4d quat;
   convert_director_to_quat(dip, quat);
 
-  return {quat, dip.norm()};
+  return {quat, Utils::norm(dip)};
 }
 
 #endif
