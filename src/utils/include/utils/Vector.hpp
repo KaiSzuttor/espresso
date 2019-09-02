@@ -280,6 +280,13 @@ constexpr bool all_of(VectorExpression<E> const &a, Vector<T, N> const &b,
 
   return true;
 }
+
+template <size_t N, typename T, typename E, typename Op>
+constexpr bool all_of(Vector<T, N> const &a, VectorExpression<E> const &b,
+                      Op op) {
+  return all_of(b, a, op);
+}
+
 } // namespace detail
 
 template <size_t N, typename T>
