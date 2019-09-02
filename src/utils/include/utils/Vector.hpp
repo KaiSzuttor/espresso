@@ -33,8 +33,6 @@
 
 namespace Utils {
 
-namespace detail {
-
 template <typename T> struct VectorExpression {
   T &operator~() { return static_cast<T &>(*this); }
   const T &operator~() const { return static_cast<const T &>(*this); }
@@ -62,28 +60,6 @@ public:
   auto operator[](std::size_t i) const { return m_lhs[i] - m_rhs[i]; }
 };
 
-template <typename LHS, typename RHS>
-class EqualityExpression : public VectorExpression<EqualityExpression<LHS, RHS>> {
-  using R = decltype(std::declval<LHS>()[0] + std::declval<RHS>()[0]);
-  const LHS &m_lhs;
-  const RHS &m_rhs;
-
-public:
-  EqualityExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
-  auto operator[](std::size_t i) const { return m_lhs[i] == m_rhs[i]; }
-};
-
-template <typename LHS, typename RHS>
-class UnEqualityExpression : public VectorExpression<UnEqualityExpression<LHS, RHS>> {
-  using R = decltype(std::declval<LHS>()[0] + std::declval<RHS>()[0]);
-  const LHS &m_lhs;
-  const RHS &m_rhs;
-
-public:
-  UnEqualityExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
-  auto operator[](std::size_t i) const { return not(m_lhs[i] == m_rhs[i]); }
-};
-
 template <typename T>
 class MinusExpression : public VectorExpression<MinusExpression<T>> {
   using R = T;
@@ -104,51 +80,30 @@ public:
   auto operator[](std::size_t i) const { return not(m_lhs[i]); }
 };
 
-} // namespace detail
-
 template <typename L, typename R>
-inline detail::SumExpression<L, R>
-operator+(detail::VectorExpression<L> const &lhs,
-          detail::VectorExpression<R> const &rhs) {
-  return detail::SumExpression<L, R>(lhs, rhs);
+inline SumExpression<L, R> operator+(VectorExpression<L> const &lhs,
+                                     VectorExpression<R> const &rhs) {
+  return SumExpression<L, R>(lhs, rhs);
 }
 
 template <typename L, typename R>
-inline detail::DiffExpression<L, R>
-operator-(detail::VectorExpression<L> const &lhs,
-          detail::VectorExpression<R> const &rhs) {
-  return detail::DiffExpression<L, R>(lhs, rhs);
-}
-
-template <typename L, typename R>
-inline detail::EqualityExpression<L, R>
-operator==(detail::VectorExpression<L> const &lhs,
-          detail::VectorExpression<R> const &rhs) {
-  return detail::EqualityExpression<L, R>(lhs, rhs);
-}
-
-template <typename L, typename R>
-inline detail::UnEqualityExpression<L, R>
-operator!=(detail::VectorExpression<L> const &lhs,
-          detail::VectorExpression<R> const &rhs) {
-  return detail::UnEqualityExpression<L, R>(lhs, rhs);
+inline DiffExpression<L, R> operator-(VectorExpression<L> const &lhs,
+                                      VectorExpression<R> const &rhs) {
+  return DiffExpression<L, R>(lhs, rhs);
 }
 
 template <typename T>
-inline detail::MinusExpression<T>
-operator-(detail::VectorExpression<T> const &lhs) {
-  return detail::MinusExpression<T>(lhs);
+inline MinusExpression<T> operator-(VectorExpression<T> const &lhs) {
+  return MinusExpression<T>(lhs);
 }
 
 template <typename T>
-inline detail::NotExpression<T>
-operator!(detail::VectorExpression<T> const &lhs) {
-  return detail::NotExpression<T>(lhs);
+inline NotExpression<T> operator!(VectorExpression<T> const &lhs) {
+  return NotExpression<T>(lhs);
 }
 
 template <typename T, std::size_t N>
-class Vector : public Array<T, N>,
-               public detail::VectorExpression<Vector<T, N>> {
+class Vector : public Array<T, N>, public VectorExpression<Vector<T, N>> {
   using Base = Array<T, N>;
 
 public:
@@ -169,14 +124,13 @@ public:
   using Array<T, N>::broadcast;
   Vector() = default;
   Vector(Vector const &) = default;
-  template <typename E> Vector(detail::VectorExpression<E> const &e) {
+  template <typename E> Vector(VectorExpression<E> const &e) {
     for (std::size_t i = 0; i < N; ++i) {
       operator[](i) = (~e)[i];
     }
   }
   Vector &operator=(Vector const &) = default;
-  template <typename E>
-  Vector &operator=(detail::VectorExpression<E> const &e) {
+  template <typename E> Vector &operator=(VectorExpression<E> const &e) {
     Vector ret;
     for (std::size_t i = 0; i < size; ++i) {
       ret[i] = ~e[i];
@@ -314,7 +268,40 @@ constexpr bool all_of(Vector<T, N> const &a, Vector<T, N> const &b, Op op) {
 
   return true;
 }
+
+template <size_t N, typename T, typename E, typename Op>
+constexpr bool all_of(VectorExpression<E> const &a, Vector<T, N> const &b,
+                      Op op) {
+  for (int i = 0; i < N; i++) {
+    /* Short circuit */
+    if (!static_cast<bool>(op(a[i], b[i]))) {
+      return false;
+    }
+  }
+
+  return true;
+}
 } // namespace detail
+
+template <size_t N, typename T>
+constexpr bool operator==(Vector<T, N> const &a, Vector<T, N> const &b) {
+  return detail::all_of(a, b, std::equal_to<T>());
+}
+
+template <size_t N, typename T, typename E>
+constexpr bool operator==(Vector<T, N> const &a, VectorExpression<E> const &b) {
+  return detail::all_of(a, ~b, std::equal_to<T>());
+}
+
+template <size_t N, typename T, typename E>
+constexpr bool operator==(VectorExpression<E> const &a, Vector<T, N> const &b) {
+  return detail::all_of(~a, b, std::equal_to<T>());
+}
+
+template <size_t N, typename T>
+constexpr bool operator!=(Vector<T, N> const &a, Vector<T, N> const &b) {
+  return not(a == b);
+}
 
 template <size_t N, typename T>
 constexpr bool operator<(Vector<T, N> const &a, Vector<T, N> const &b) {
