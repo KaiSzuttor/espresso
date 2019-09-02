@@ -28,6 +28,7 @@
 #include <iterator>
 #include <numeric>
 #include <vector>
+#include <iostream>
 
 #include "utils/Array.hpp"
 
@@ -40,7 +41,6 @@ template <typename T> struct VectorExpression {
 
 template <typename LHS, typename RHS>
 class SumExpression : public VectorExpression<SumExpression<LHS, RHS>> {
-  using R = decltype(std::declval<LHS>()[0] + std::declval<RHS>()[0]);
   const LHS &m_lhs;
   const RHS &m_rhs;
 
@@ -51,7 +51,6 @@ public:
 
 template <typename LHS, typename RHS>
 class DiffExpression : public VectorExpression<DiffExpression<LHS, RHS>> {
-  using R = decltype(std::declval<LHS>()[0] + std::declval<RHS>()[0]);
   const LHS &m_lhs;
   const RHS &m_rhs;
 
@@ -62,7 +61,6 @@ public:
 
 template <typename T>
 class MinusExpression : public VectorExpression<MinusExpression<T>> {
-  using R = T;
   const T &m_lhs;
 
 public:
@@ -72,7 +70,6 @@ public:
 
 template <typename T>
 class NotExpression : public VectorExpression<NotExpression<T>> {
-  using R = T;
   const T &m_lhs;
 
 public:
@@ -83,23 +80,23 @@ public:
 template <typename L, typename R>
 inline SumExpression<L, R> operator+(VectorExpression<L> const &lhs,
                                      VectorExpression<R> const &rhs) {
-  return SumExpression<L, R>(lhs, rhs);
+  return SumExpression<L, R>(~lhs, ~rhs);
 }
 
 template <typename L, typename R>
 inline DiffExpression<L, R> operator-(VectorExpression<L> const &lhs,
                                       VectorExpression<R> const &rhs) {
-  return DiffExpression<L, R>(lhs, rhs);
+  return DiffExpression<L, R>(~lhs, ~rhs);
 }
 
 template <typename T>
 inline MinusExpression<T> operator-(VectorExpression<T> const &lhs) {
-  return MinusExpression<T>(lhs);
+  return MinusExpression<T>(~lhs);
 }
 
 template <typename T>
 inline NotExpression<T> operator!(VectorExpression<T> const &lhs) {
-  return NotExpression<T>(lhs);
+  return NotExpression<T>(~lhs);
 }
 
 template <typename T, std::size_t N>
@@ -124,18 +121,20 @@ public:
   using Array<T, N>::broadcast;
   Vector() = default;
   Vector(Vector const &) = default;
+
   template <typename E> Vector(VectorExpression<E> const &e) {
     for (std::size_t i = 0; i < N; ++i) {
       operator[](i) = (~e)[i];
     }
   }
+
   Vector &operator=(Vector const &) = default;
+
   template <typename E> Vector &operator=(VectorExpression<E> const &e) {
-    Vector ret;
-    for (std::size_t i = 0; i < size; ++i) {
-      ret[i] = ~e[i];
+    for (std::size_t i = 0; i < N; ++i) {
+      operator[](i) = (~e)[i];
     }
-    return ret;
+    return *this;
   }
 
   void swap(Vector &rhs) { std::swap_ranges(begin(), end(), rhs.begin()); }
@@ -274,7 +273,7 @@ constexpr bool all_of(VectorExpression<E> const &a, Vector<T, N> const &b,
                       Op op) {
   for (int i = 0; i < N; i++) {
     /* Short circuit */
-    if (!static_cast<bool>(op(a[i], b[i]))) {
+    if (!static_cast<bool>(op((~a)[i], b[i]))) {
       return false;
     }
   }
@@ -290,12 +289,12 @@ constexpr bool operator==(Vector<T, N> const &a, Vector<T, N> const &b) {
 
 template <size_t N, typename T, typename E>
 constexpr bool operator==(Vector<T, N> const &a, VectorExpression<E> const &b) {
-  return detail::all_of(a, ~b, std::equal_to<T>());
+  return detail::all_of(a, b, std::equal_to<T>());
 }
 
 template <size_t N, typename T, typename E>
 constexpr bool operator==(VectorExpression<E> const &a, Vector<T, N> const &b) {
-  return detail::all_of(~a, b, std::equal_to<T>());
+  return detail::all_of(a, b, std::equal_to<T>());
 }
 
 template <size_t N, typename T>
