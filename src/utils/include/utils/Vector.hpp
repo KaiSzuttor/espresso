@@ -45,7 +45,7 @@ class SumExpression : public VectorExpression<SumExpression<LHS, RHS, N>, N> {
   const RHS &m_rhs;
 
 public:
-  using value_type = decltype(std::declval<typename LHS::value_type>() + std::declval<typename RHS::value_type>());
+  using value_type = decltype(std::declval<LHS>()[0] + std::declval<RHS>()[0]);
   SumExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
   auto operator[](std::size_t i) const { return m_lhs[i] + m_rhs[i]; }
 };
@@ -56,7 +56,7 @@ class DiffExpression : public VectorExpression<DiffExpression<LHS, RHS, N>, N> {
   const RHS &m_rhs;
 
 public:
-  using value_type = decltype(std::declval<typename LHS::value_type>() - std::declval<typename RHS::value_type>());
+  using value_type = decltype(std::declval<LHS>()[0] - std::declval<RHS>()[0]);
   DiffExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
   auto operator[](std::size_t i) const { return m_lhs[i] - m_rhs[i]; }
 };
@@ -68,7 +68,7 @@ class HadamardExpression
   const RHS &m_rhs;
 
 public:
-  using value_type = decltype(std::declval<typename LHS::value_type>() * std::declval<typename RHS::value_type>());
+  using value_type = decltype(std::declval<LHS>()[0] * std::declval<RHS>()[0]);
   HadamardExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
   auto operator[](std::size_t i) const { return m_lhs[i] * m_rhs[i]; }
 };
@@ -80,7 +80,7 @@ class ScalarMultExpression
   const RHS &m_rhs;
 
 public:
-  using value_type = decltype(std::declval<Scalar>() * std::declval<typename RHS::value_type>());
+  using value_type = decltype(std::declval<Scalar>() * std::declval<RHS>()[0]);
   ScalarMultExpression(Scalar const &lhs, RHS const &rhs)
       : m_lhs(lhs), m_rhs(rhs) {}
   auto operator[](std::size_t i) const { return m_lhs * m_rhs[i]; }
@@ -93,7 +93,7 @@ class ScalarDivExpression
   const Scalar m_rhs;
 
 public:
-  using value_type = decltype(std::declval<typename LHS::value_type>() / std::declval<Scalar>());
+  using value_type = decltype(std::declval<LHS>()[0] / std::declval<Scalar>());
   ScalarDivExpression(LHS const &lhs, Scalar const &rhs)
       : m_lhs(lhs), m_rhs(rhs) {}
   auto operator[](std::size_t i) const { return m_lhs[i] / m_rhs; }
@@ -104,7 +104,7 @@ class MinusExpression : public VectorExpression<MinusExpression<T, N>, N> {
   const T &m_lhs;
 
 public:
-  using value_type = typename T::value_type;
+  using value_type = decltype(std::declval<T>()[0]);
   MinusExpression(T const &lhs) : m_lhs(lhs) {}
   auto operator[](std::size_t i) const { return -m_lhs[i]; }
 };
@@ -114,7 +114,7 @@ class NotExpression : public VectorExpression<NotExpression<T, N>, N> {
   const T &m_lhs;
 
 public:
-  using value_type = typename T::value_type;
+  using value_type = decltype(std::declval<T>()[0]);
   NotExpression(T const &lhs) : m_lhs(lhs) {}
   auto operator[](std::size_t i) const { return not(m_lhs[i]); }
 };
@@ -124,7 +124,7 @@ class SqrtExpression : public VectorExpression<SqrtExpression<T, N>, N> {
   const T &m_lhs;
 
 public:
-  using value_type = typename T::value_type;
+  using value_type =  decltype(std::declval<T>()[0]);
   SqrtExpression(T const &lhs) : m_lhs(lhs) {}
   auto operator[](std::size_t i) const { return std::sqrt(m_lhs[i]); }
 };
@@ -170,7 +170,7 @@ inline auto operator*(Scalar const &b, VectorExpression<E, N> const &a) {
 template <typename E1, typename E2, std::size_t N>
 auto operator*(VectorExpression<E1, N> const &a,
                VectorExpression<E2, N> const &b) {
-  using R = decltype(std::declval<typename E1::value_type>() * std::declval<typename E2::value_type>());
+  using R = decltype(std::declval<E1>()[0] * std::declval<E2>()[0]);
   R res{};
   for (int i = 0; i < N; ++i) {
     res += (~a)[i] * (~b)[i];
@@ -242,8 +242,8 @@ private:
   }
 
 public:
-  //template <class Range>
-  //explicit Vector(Range const &rng) : Vector(std::begin(rng), std::end(rng)) {}
+  template <class Range>
+  explicit Vector(Range const &rng) : Vector(std::begin(rng), std::end(rng)) {}
 
   explicit constexpr Vector(T const (&v)[N]) : Base() {
     copy_init(std::begin(v), std::end(v));

@@ -69,6 +69,19 @@ BOOST_AUTO_TEST_CASE(non_square) {
     }
 }
 
+BOOST_AUTO_TEST_CASE(expression) {
+  Utils::Vector3d x1{1, 2, 3};
+  Utils::Vector3d x2{2, 3, 5};
+  Utils::Vector3d y{4, 5, 6};
+  Utils::Vector3d const x = x1 + x2;
+  auto prod = tensor_product(x1 + x2, y);
+  /* Check values */
+  for (std::size_t i = 0; i < x.size(); i++)
+    for (std::size_t j = 0; j < y.size(); j++) {
+      BOOST_CHECK(prod[i][j] == x[i] * y[j]);
+    }
+}
+
 BOOST_AUTO_TEST_CASE(left_scalar) {
   double x = 3.;
   Utils::Vector2d y{1., 2.};
