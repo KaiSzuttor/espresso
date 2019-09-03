@@ -91,7 +91,7 @@ double slab_dip_count_mu(double *mt, double *mx, double *my,
   MPI_Allreduce(node_sums.data(), tot_sums.data(), 3, MPI_DOUBLE, MPI_SUM,
                 comm_cart);
 
-  auto const M = tot_sums.norm();
+  auto const M = Utils::norm(tot_sums);
   auto const Mz = tot_sums[2];
   auto const Mx = tot_sums[0];
   auto const My = tot_sums[1];

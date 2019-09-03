@@ -148,7 +148,7 @@ void meta_perform(const ParticleRange &particles) {
   for (int i = 0; i < meta_xi_num_bins; ++i) {
     if (meta_switch == META_DIST) {
       // reaction coordinate value
-      meta_val_xi = meta_cur_xi.norm();
+      meta_val_xi = Utils::norm(meta_cur_xi);
       // Update free energy profile and biased force
       if (int(sim_time / time_step) % meta_num_relaxation_steps == 0) {
         meta_acc_fprofile[i] -=
@@ -158,7 +158,7 @@ void meta_perform(const ParticleRange &particles) {
       }
 
       // direction of the bias force
-      meta_apply_direction = meta_cur_xi / meta_cur_xi.norm();
+      meta_apply_direction = meta_cur_xi / Utils::norm(meta_cur_xi);
     } else if (meta_switch == META_REL_Z) {
       // reaction coordinate value: relative height of z_pid1 with respect to
       // z_pid2

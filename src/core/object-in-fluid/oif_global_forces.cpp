@@ -129,7 +129,7 @@ void calc_oif_global(
         partArea += VOL_A;
 
         auto const VOL_norm = get_n_triangle(p11, p22, p33);
-        auto const VOL_dn = VOL_norm.norm();
+        auto const VOL_dn = Utils::norm(VOL_norm);
         auto const VOL_hz = 1.0 / 3.0 * (p11[2] + p22[2] + p33[2]);
         VOL_partVol += VOL_A * -1 * VOL_norm[2] / VOL_dn * VOL_hz;
       } else {
@@ -215,9 +215,9 @@ void add_oif_global_forces(
         auto const m2 = h - p22;
         auto const m3 = h - p33;
 
-        auto const m1_length = m1.norm();
-        auto const m2_length = m2.norm();
-        auto const m3_length = m3.norm();
+        auto const m1_length = Utils::norm(m1);
+        auto const m2_length = Utils::norm(m2);
+        auto const m3_length = Utils::norm(m3);
 
         auto const fac = iaparams->p.oif_global_forces.ka_g * VOL_A * deltaA /
                          (m1_length * m1_length + m2_length * m2_length +

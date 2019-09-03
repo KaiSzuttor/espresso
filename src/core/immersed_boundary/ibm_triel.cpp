@@ -73,11 +73,11 @@ int IBM_Triel_CalcForce(Particle *const p1, Particle *const p2,
   // l = length between 1 and 3
   // get_mi_vector is an Espresso function which considers PBC
   auto const vec2 = get_mi_vector(p3->r.p, p1->r.p, box_geo);
-  auto const l = vec2.norm();
+  auto const l = Utils::norm(vec2);
 
   // lp = lenght between 1 and 2
   auto const vec1 = get_mi_vector(p2->r.p, p1->r.p, box_geo);
-  auto const lp = vec1.norm();
+  auto const lp = Utils::norm(vec1);
 
   // Check for sanity
   if ((lp - iaparams->p.ibm_triel.lp0 > iaparams->p.ibm_triel.maxDist) ||
@@ -88,7 +88,7 @@ int IBM_Triel_CalcForce(Particle *const p1, Particle *const p2,
   // angles between these vectors; calculated directly via the products
   auto const cosPhi = (vec1 * vec2) / (lp * l);
   auto const vecpro = vector_product(vec1, vec2);
-  auto const sinPhi = vecpro.norm() / (l * lp);
+  auto const sinPhi = Utils::norm(vecpro) / (l * lp);
 
   // Variables in the reference state
   const double l0 = iaparams->p.ibm_triel.l0;
@@ -301,16 +301,16 @@ int IBM_Triel_SetParams(const int bond_type, const int ind1, const int ind2,
   // Calculate equilibrium lengths and angle; Note the sequence of the points!
   // lo = length between 1 and 3
   auto const templo = get_mi_vector(part3.r.p, part1.r.p, box_geo);
-  const double l0 = templo.norm();
+  const double l0 = Utils::norm(templo);
   // lpo = length between 1 and 2
   auto const templpo = get_mi_vector(part2.r.p, part1.r.p, box_geo);
-  const double lp0 = templpo.norm();
+  const double lp0 = Utils::norm(templpo);
 
   // cospo / sinpo angle functions between these vectors; calculated directly
   // via the products
   const double cosPhi0 = (templo * templpo) / (l0 * lp0);
   auto const vecpro = vector_product(templo, templpo);
-  const double sinPhi0 = vecpro.norm() / (l0 * lp0);
+  const double sinPhi0 = Utils::norm(vecpro) / (l0 * lp0);
 
   // Use the values determined above for further constants of the stretch-force
   // calculation

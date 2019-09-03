@@ -317,7 +317,8 @@ void calc_rdf(PartCfg &partCfg, int const *p1_types, int n_p1,
         for (; jt != partCfg.end(); ++jt) {
           for (t2 = 0; t2 < n_p2; t2++) {
             if (jt->p.type == p2_types[t2]) {
-              auto const dist = get_mi_vector(it->r.p, jt->r.p, box_geo).norm();
+              auto const dist =
+                  Utils::norm(get_mi_vector(it->r.p, jt->r.p, box_geo));
               if (dist > r_min && dist < r_max) {
                 ind = (int)((dist - r_min) * inv_bin_width);
                 rdf[ind]++;
@@ -393,12 +394,10 @@ void calc_rdf_av(PartCfg &partCfg, int const *p1_types, int n_p1,
                 using Utils::make_const_span;
                 using Utils::Vector3d;
 
-                auto const dist =
-                    get_mi_vector(
-                        Vector3d{make_const_span(configs[k].data() + 3 * i, 3)},
-                        Vector3d{make_const_span(configs[k].data() + 3 * j, 3)},
-                        box_geo)
-                        .norm();
+                auto const dist = Utils::norm(get_mi_vector(
+                    Vector3d{make_const_span(configs[k].data() + 3 * i, 3)},
+                    Vector3d{make_const_span(configs[k].data() + 3 * j, 3)},
+                    box_geo));
                 if (dist > r_min && dist < r_max) {
                   auto const ind =
                       static_cast<int>((dist - r_min) * inv_bin_width);
@@ -559,7 +558,7 @@ int calc_cylindrical_average(
     }
   }
 
-  auto const norm_direction = direction.norm();
+  auto const norm_direction = Utils::norm(direction);
 
   for (auto const &p : partCfg) {
     for (unsigned int type_id = 0; type_id < types.size(); type_id++) {
@@ -573,14 +572,15 @@ int calc_cylindrical_average(
         // Find the height of the particle above the axis (height) and
         // the distance from the center point (dist)
         auto const hat = vector_product(direction, diff);
-        auto const height = hat.norm();
+        auto const height = Utils::norm(hat);
         auto const dist = direction * diff / norm_direction;
 
         // Determine the components of the velocity parallel and
         // perpendicular to the direction vector
         double v_radial;
         if (height == 0)
-          v_radial = vector_product(vel, direction).norm() / norm_direction;
+          v_radial =
+              Utils::norm(vector_product(vel, direction)) / norm_direction;
         else
           v_radial = vel * hat / height;
 

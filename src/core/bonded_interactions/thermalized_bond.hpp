@@ -118,7 +118,7 @@ calc_thermalized_bond_forces(Particle const *const p1, Particle const *const p2,
                              Utils::Vector3d &force2) {
   // Bond broke?
   if (iaparams->p.thermalized_bond.r_cut > 0.0 &&
-      dx.norm() > iaparams->p.thermalized_bond.r_cut) {
+      Utils::norm(dx) > iaparams->p.thermalized_bond.r_cut) {
     return true;
   }
 

@@ -76,8 +76,8 @@ double Cluster::longest_distance() {
   double ld = 0.;
   for (auto a = particles.begin(); a != particles.end(); a++) {
     for (auto b = a; ++b != particles.end();) {
-      auto const dist =
-          get_mi_vector(partCfg()[*a].r.p, partCfg()[*b].r.p, box_geo).norm();
+      auto const dist = Utils::norm(
+          get_mi_vector(partCfg()[*a].r.p, partCfg()[*b].r.p, box_geo));
 
       // Larger than previous largest distance?
       ld = std::max(ld, dist);
@@ -129,9 +129,10 @@ std::pair<double, double> Cluster::fractal_dimension(double dr) {
   std::vector<double> distances;
 
   for (auto const &it : particles) {
-    distances.push_back(get_mi_vector(com, partCfg()[it].r.p, box_geo)
-                            .norm()); // add distance from the current particle
-                                      // to the com in the distances vectors
+    distances.push_back(Utils::norm(
+        get_mi_vector(com, partCfg()[it].r.p,
+                      box_geo))); // add distance from the current particle
+                                  // to the com in the distances vectors
   }
 
   // Get particle indices in the cluster which yield distances  sorted in

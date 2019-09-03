@@ -335,7 +335,7 @@ void ImmersedBoundaries::calc_volume_force() {
             // This is Dupin 2008. I guess the result will be very similar as
             // the code above
             auto const n = vector_product(a12, a13);
-            const double ln = n.norm();
+            const double ln = Utils::norm(n);
             const double A = 0.5 * ln;
             const double fact = kappaV * (VolumesCurrent[softID] - volRef) /
                                 VolumesCurrent[softID];

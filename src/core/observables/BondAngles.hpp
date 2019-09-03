@@ -38,11 +38,11 @@ public:
     std::vector<double> res(n_values());
     auto v1 =
         get_mi_vector(partCfg[ids()[1]].r.p, partCfg[ids()[0]].r.p, box_geo);
-    auto n1 = v1.norm();
+    auto n1 = Utils::norm(v1);
     for (int i = 0, end = n_values(); i < end; i++) {
       auto v2 = get_mi_vector(partCfg[ids()[i + 2]].r.p,
                               partCfg[ids()[i + 1]].r.p, box_geo);
-      auto n2 = v2.norm();
+      auto n2 = Utils::norm(v2);
       auto cosine = (v1 * v2) / (n1 * n2);
       // sanitize cosine value
       if (cosine > TINY_COS_VALUE)

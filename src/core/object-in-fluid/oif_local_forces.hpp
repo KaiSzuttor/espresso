@@ -76,7 +76,7 @@ calc_oif_local(Particle const *const p2, Particle const *const p1,
   // non-linear stretching
   if (iaparams->p.oif_local_forces.ks > TINY_OIF_ELASTICITY_COEFFICIENT) {
     auto const dx = fp2 - fp3;
-    auto const len = dx.norm();
+    auto const len = Utils::norm(dx);
     auto const dr = len - iaparams->p.oif_local_forces.r0;
     auto const lambda = 1.0 * len / iaparams->p.oif_local_forces.r0;
     auto const fac =
@@ -89,7 +89,7 @@ calc_oif_local(Particle const *const p2, Particle const *const p1,
   // linear stretching
   if (iaparams->p.oif_local_forces.kslin > TINY_OIF_ELASTICITY_COEFFICIENT) {
     auto const dx = fp2 - fp3;
-    auto const len = dx.norm();
+    auto const len = Utils::norm(dx);
     auto const dr = len - iaparams->p.oif_local_forces.r0;
     auto const fac =
         -iaparams->p.oif_local_forces.kslin * dr; // no normalization

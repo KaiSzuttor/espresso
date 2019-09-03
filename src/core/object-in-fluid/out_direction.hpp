@@ -61,7 +61,7 @@ inline int calc_out_direction(Particle *const p1, Particle const *const p2,
   auto const fp4 = fp2 + get_mi_vector(p4->r.p, fp2, box_geo);
 
   auto const n = get_n_triangle(fp2, fp3, fp4);
-  auto const dn = n.norm();
+  auto const dn = Utils::norm(n);
 
   if (std::abs(dn) < 0.001) {
     printf("out_direction.hpp, calc_out_direction: Length of outward vector is "

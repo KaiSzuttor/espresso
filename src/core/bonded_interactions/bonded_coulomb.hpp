@@ -69,7 +69,7 @@ inline bool
 bonded_coulomb_pair_energy(double const q1q2,
                            Bonded_ia_parameters const *const iaparams,
                            Utils::Vector3d const &dx, double *_energy) {
-  auto const dist = dx.norm();
+  auto const dist = Utils::norm(dx);
   *_energy = iaparams->p.bonded_coulomb.prefactor * q1q2 / dist;
   return false;
 }

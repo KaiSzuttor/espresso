@@ -50,7 +50,7 @@ inline bool calc_subt_lj_pair_force(IA_parameters const *const iaparams,
                                     Utils::Vector3d const &dx,
                                     Utils::Vector3d &force) {
   auto const neg_dir = -dx;
-  add_lj_pair_force(iaparams, neg_dir, neg_dir.norm(), force);
+  add_lj_pair_force(iaparams, neg_dir, Utils::norm(neg_dir), force);
 
   return false;
 }
@@ -63,7 +63,7 @@ inline bool calc_subt_lj_pair_force(IA_parameters const *const iaparams,
  */
 inline bool subt_lj_pair_energy(IA_parameters const *const iaparams,
                                 Utils::Vector3d const &dx, double *_energy) {
-  *_energy = -lj_pair_energy(iaparams, dx.norm());
+  *_energy = -lj_pair_energy(iaparams, Utils::norm(dx));
   return false;
 }
 

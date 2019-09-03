@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(image_shift_test) {
   auto const expected =
       Utils::Vector3d{img[0] * box[0], img[1] * box[1], img[2] * box[2]};
 
-  BOOST_CHECK_SMALL((result - expected).norm(), epsilon<double>);
+  BOOST_CHECK_SMALL(Utils::norm(result - expected), epsilon<double>);
 }
 
 BOOST_AUTO_TEST_CASE(unfolded_position_test) {
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(unfolded_position_test) {
   auto expected = pos + image_shift(img, box);
   auto result = unfolded_position(pos, img, box);
 
-  BOOST_CHECK_SMALL((result - expected).norm(), epsilon<double>);
+  BOOST_CHECK_SMALL(Utils::norm(result - expected), epsilon<double>);
 }
 
 BOOST_AUTO_TEST_CASE(fold_coordinate_test) {

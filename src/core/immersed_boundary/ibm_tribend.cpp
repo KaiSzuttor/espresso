@@ -46,10 +46,10 @@ void IBM_Tribend_CalcForce(Particle *p1, Particle *p2, Particle *p3,
 
   // Get 2*area of triangles out of the magnitude of the resulting normals and
   // make the latter unity
-  auto const Ai = n1.norm();
+  auto const Ai = Utils::norm(n1);
   n1 /= Ai;
 
-  auto const Aj = n2.norm();
+  auto const Aj = Utils::norm(n2);
   n2 /= Aj;
 
   // Get the prefactor for the force term
@@ -129,8 +129,8 @@ int IBM_Tribend_SetParams(const int bond_type, const int ind1, const int ind2,
       auto const n1l = vector_product(dx1, dx2);
       auto const n2l = -vector_product(dx1, dx3);
 
-      auto const n1 = n1l / n1l.norm();
-      auto const n2 = n2l / n2l.norm();
+      auto const n1 = n1l / Utils::norm(n1l);
+      auto const n2 = n2l / Utils::norm(n2l);
 
       // calculate theta by taking the acos of the scalar n1*n2
       auto sc = n1 * n2;

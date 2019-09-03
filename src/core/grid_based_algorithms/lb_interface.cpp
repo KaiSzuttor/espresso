@@ -167,7 +167,7 @@ void lb_boundary_mach_check() {
   using LBBoundaries::lbboundaries;
   if (std::any_of(lbboundaries.begin(), lbboundaries.end(),
                   [conv_fac, mach_limit](auto const &b) {
-                    return (b->velocity() * conv_fac).norm() >= mach_limit;
+                    return Utils::norm(b->velocity() * conv_fac) >= mach_limit;
                   })) {
     runtimeErrorMsg() << "Lattice velocity exceeds the Mach number limit";
   }

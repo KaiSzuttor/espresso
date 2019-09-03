@@ -75,7 +75,7 @@ void SimplePore::calculate_dist(const Utils::Vector3d &pos, double &dist,
   Utils::Vector3d const c_dist = pos - m_center;
   auto const z = e_z * c_dist;
   auto const r_vec = c_dist - z * e_z;
-  auto const r = r_vec.norm();
+  auto const r = Utils::norm(r_vec);
 
   /* If exactly on the axis, chose e_r orthogonal
      to e_z. */

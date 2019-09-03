@@ -67,8 +67,8 @@ void Stomatocyte::calculate_dist(const Utils::Vector3d &pos, double &dist,
   // So the shortest distance to the line is
 
   Utils::Vector2d dist_2D;
-  dist_2D[0] = (closest_pos - pos).norm();
-  dist_2D[1] = mu * m_orientation.norm();
+  dist_2D[0] = Utils::norm(closest_pos - pos);
+  dist_2D[1] = mu * Utils::norm(m_orientation);
 
   /***** Use the obtained planar coordinates in distance function *****/
 
@@ -169,10 +169,10 @@ void Stomatocyte::calculate_dist(const Utils::Vector3d &pos, double &dist,
 
   // Distance of point of interest to center points
 
-  dst0 = (pt0 - dist_2D).norm();
-  dst1 = (pt1 - dist_2D).norm();
-  dst2 = (pt2 - dist_2D).norm();
-  dst3 = (pt3 - dist_2D).norm();
+  dst0 = Utils::norm(pt0 - dist_2D);
+  dst1 = Utils::norm(pt1 - dist_2D);
+  dst2 = Utils::norm(pt2 - dist_2D);
+  dst3 = Utils::norm(pt3 - dist_2D);
 
   // Now for the minimum distances, the fourth
   // is for the line segment
@@ -191,10 +191,10 @@ void Stomatocyte::calculate_dist(const Utils::Vector3d &pos, double &dist,
 
   ttota = T0 + T1 + T2 + T3 + T4;
 
-  t0 = acos((dist_2D[1] - pt0[1]) / (dist_2D - pt0).norm());
-  t1 = acos((dist_2D[0] - pt1[0]) / (dist_2D - pt1).norm());
-  t2 = acos((dist_2D[1] - pt2[1]) / (dist_2D - pt2).norm());
-  t3 = acos((dist_2D[1] - pt3[1]) / (dist_2D - pt3).norm());
+  t0 = acos((dist_2D[1] - pt0[1]) / Utils::norm(dist_2D - pt0));
+  t1 = acos((dist_2D[0] - pt1[0]) / Utils::norm(dist_2D - pt1));
+  t2 = acos((dist_2D[1] - pt2[1]) / Utils::norm(dist_2D - pt2));
+  t3 = acos((dist_2D[1] - pt3[1]) / Utils::norm(dist_2D - pt3));
   t4 = (3.0 * c - d + 2.0 * e + 2.0 * T0 + 2.0 * T1 - dist_2D[0] + dist_2D[1]) /
        (2.0 * ttota);
 
@@ -268,9 +268,9 @@ void Stomatocyte::calculate_dist(const Utils::Vector3d &pos, double &dist,
   // transformation to get it in 3D. The minimum distance stays
   // the same though. We first get the normalized direction vector.
 
-  xd = m_orientation[0] / m_orientation.norm();
-  yd = m_orientation[1] / m_orientation.norm();
-  zd = m_orientation[2] / m_orientation.norm();
+  xd = m_orientation[0] / Utils::norm(m_orientation);
+  yd = m_orientation[1] / Utils::norm(m_orientation);
+  zd = m_orientation[2] / Utils::norm(m_orientation);
 
   // We now establish the rotation matrix required to go
   // form {0,0,1} to {xd,yd,zd}

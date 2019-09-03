@@ -54,7 +54,7 @@ inline bool calc_harmonic_dumbbell_pair_force(
     Utils::Vector3d const &director, Bonded_ia_parameters const *const iaparams,
     Utils::Vector3d const &dx, Utils::Vector3d &force,
     Utils::Vector3d &torque) {
-  auto const dist = dx.norm();
+  auto const dist = Utils::norm(dx);
 
   if ((iaparams->p.harmonic_dumbbell.r_cut > 0.0) &&
       (dist > iaparams->p.harmonic_dumbbell.r_cut)) {
@@ -84,7 +84,7 @@ inline bool
 harmonic_dumbbell_pair_energy(Utils::Vector3d const &director,
                               Bonded_ia_parameters const *const iaparams,
                               Utils::Vector3d const &dx, double *_energy) {
-  auto const dist = dx.norm();
+  auto const dist = Utils::norm(dx);
 
   if ((iaparams->p.harmonic_dumbbell.r_cut > 0.0) &&
       (dist > iaparams->p.harmonic_dumbbell.r_cut)) {

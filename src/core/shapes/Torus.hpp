@@ -22,7 +22,7 @@ public:
   Utils::Vector3d e_z;
 
   /** @brief Calculate derived parameters. */
-  void precalc() { e_z = m_normal / m_normal.norm(); }
+  void precalc() { e_z = m_normal / Utils::norm(m_normal); }
 
 public:
   Torus()

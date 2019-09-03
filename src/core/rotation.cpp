@@ -223,7 +223,7 @@ void propagate_omega_quat_particle(Particle *p) {
       time_step * (Qd[3] + time_step_half * Qdd[3]) - lambda * p->r.quat[3];
 
   /* and rescale quaternion, so it is exactly of unit length */
-  auto const scale = p->r.quat.norm();
+  auto const scale = Utils::norm(p->r.quat);
   if (scale == 0) {
     p->r.quat[0] = 1;
   } else {
@@ -284,8 +284,8 @@ void convert_torques_propagate_omega(const ParticleRange &particles) {
       auto const diff = p.swim.v_center - p.swim.v_source;
 
       const Utils::Vector3d cross = vector_product(diff, dip);
-      const double l_diff = diff.norm();
-      const double l_cross = cross.norm();
+      const double l_diff = Utils::norm(diff);
+      const double l_cross = Utils::norm(cross);
 
       if (l_cross > 0 && p.swim.dipole_length > 0) {
         auto const omega_swim =
@@ -367,7 +367,7 @@ void local_rotate_particle(Particle &p, const Utils::Vector3d &axis_space_frame,
   if (!(p.p.rotation & ROTATION_Z))
     axis[2] = 0;
   // Re-normalize rotation axis
-  double l = axis.norm();
+  double l = Utils::norm(axis);
   // Check, if the rotation axis is nonzero
   if (l < std::numeric_limits<double>::epsilon())
     return;

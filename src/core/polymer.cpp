@@ -63,7 +63,7 @@ Utils::Vector3d random_unit_vector(std::function<double()> const &generate_rn) {
   v[0] = sin(phi) * cos(theta);
   v[1] = sin(phi) * sin(theta);
   v[2] = cos(phi);
-  v /= v.norm();
+  v /= Utils::norm(v);
   return v;
 }
 

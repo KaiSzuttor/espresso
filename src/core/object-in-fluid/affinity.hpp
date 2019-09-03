@@ -59,7 +59,7 @@ inline void add_affinity_pair_force(Particle *const p1, Particle *const p2,
   auto const unfolded_pos =
       unfolded_position(p1->r.p, p1->l.i, box_geo.length());
   auto const vec = p1->p.bond_site - unfolded_pos;
-  auto const len = vec.norm();
+  auto const len = Utils::norm(vec);
 
   if (aff_type_extracted == 1) {
     /************************

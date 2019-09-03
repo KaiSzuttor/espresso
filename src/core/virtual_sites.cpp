@@ -55,7 +55,7 @@ void calculate_vs_relate_to_params(const Particle &p_current,
 
   // Check, if the distance between virtual and non-virtual particles is larger
   // htan minimum global cutoff If so, warn user
-  l = d.norm();
+  l = Utils::norm(d);
   if (l > min_global_cut && n_nodes > 1) {
     runtimeErrorMsg()
         << "Warning: The distance between virtual and non-virtual particle ("

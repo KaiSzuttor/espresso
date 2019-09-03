@@ -38,7 +38,7 @@ public:
     for (int i = 0, end = n_values(); i < end; i++) {
       auto v = get_mi_vector(partCfg[ids()[i]].r.p, partCfg[ids()[i + 1]].r.p,
                              box_geo);
-      res[i] = v.norm();
+      res[i] = Utils::norm(v);
     }
     return res;
   }

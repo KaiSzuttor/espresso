@@ -60,8 +60,8 @@ void HollowCone::calculate_dist(const Utils::Vector3d &pos, double &dist,
 
   // So the shortest distance to the line is
 
-  x_2D = (closest_point_3D - point_3D).norm();
-  y_2D = mu * m_orientation.norm();
+  x_2D = Utils::norm(closest_point_3D - point_3D);
+  y_2D = mu * Utils::norm(m_orientation);
 
   /***** Use the obtained planar coordinates in distance function *****/
 
@@ -269,9 +269,9 @@ void HollowCone::calculate_dist(const Utils::Vector3d &pos, double &dist,
   // transformation to get it in 3D. The minimum distance stays
   // the same though. We first get the normalized direction vector.
 
-  xd = m_orientation[0] / m_orientation.norm();
-  yd = m_orientation[1] / m_orientation.norm();
-  zd = m_orientation[2] / m_orientation.norm();
+  xd = m_orientation[0] / Utils::norm(m_orientation);
+  yd = m_orientation[1] / Utils::norm(m_orientation);
+  zd = m_orientation[2] / Utils::norm(m_orientation);
 
   // We now establish the rotation matrix required to go
   // form {0,0,1} to {xd,yd,zd}

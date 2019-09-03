@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(ForceField_test) {
 
 struct DummyScalarField {
   double operator()(const Utils::Vector3d &x, double t) const {
-    return t * x.norm();
+    return t * Utils::norm(x);
   }
   Utils::Vector3d jacobian(const Utils::Vector3d &x, double = {}) const {
     return 3. * x;
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(PotentialField_test) {
                                                        DummyScalarField{});
   const Utils::Vector3d x{1., 2., 3.};
 
-  BOOST_CHECK((2. * x.norm()) == pf.energy(5, x, 2.));
+  BOOST_CHECK((2. * Utils::norm(x)) == pf.energy(5, x, 2.));
   BOOST_CHECK(1 == pf.coupling().count);
 
   BOOST_CHECK(-(3. * x) == pf.force(5, x, 0));

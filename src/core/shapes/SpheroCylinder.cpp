@@ -34,7 +34,7 @@ void SpheroCylinder::calculate_dist(const Utils::Vector3d &pos, double &dist,
 
   auto const z = e_z * c_dist;
   auto const r_vec = c_dist - z * e_z;
-  auto const r = r_vec.norm();
+  auto const r = Utils::norm(r_vec);
 
   /* If exactly on the axis, chose e_r orthogonal
      to e_z. */
@@ -57,7 +57,7 @@ void SpheroCylinder::calculate_dist(const Utils::Vector3d &pos, double &dist,
       if (z < 0)
         dir = -1;
       Utils::Vector3d c_dist_cap = pos - (m_center + dir * e_z * m_half_length);
-      dist = c_dist_cap.norm() - m_rad;
+      dist = Utils::norm(c_dist_cap) - m_rad;
       c_dist_cap.normalize();
       vec = dist * c_dist_cap;
       dist *= m_direction;
@@ -79,7 +79,7 @@ void SpheroCylinder::calculate_dist(const Utils::Vector3d &pos, double &dist,
         dir = -1;
       Utils::Vector3d c_dist_cap =
           -(pos - (m_center + dir * e_z * m_half_length));
-      dist = m_rad - c_dist_cap.norm();
+      dist = m_rad - Utils::norm(c_dist_cap);
       c_dist_cap.normalize();
       vec = dist * c_dist_cap;
       dist *= -m_direction;

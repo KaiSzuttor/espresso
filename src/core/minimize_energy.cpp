@@ -76,7 +76,7 @@ bool steepest_descent_step(const ParticleRange &particles) {
       auto const t = Utils::norm2(p.f.torque);
 
       // Normalize rotation axis and compute amount of rotation
-      auto const l = dq.norm();
+      auto const l = Utils::norm(dq);
       if (l > 0.0) {
         auto const axis = dq / l;
         auto const angle = boost::algorithm::clamp(l, -params->max_displacement,

@@ -53,7 +53,7 @@ inline bool
 calc_bonded_coulomb_sr_pair_force(Bonded_ia_parameters const *const iaparams,
                                   Utils::Vector3d const &dx,
                                   Utils::Vector3d &force) {
-  auto const dist = dx.norm();
+  auto const dist = Utils::norm(dx);
 
   force = Coulomb::central_force(iaparams->p.bonded_coulomb_sr.q1q2, dx, dist);
 

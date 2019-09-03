@@ -88,7 +88,7 @@ inline void add_membrane_collision_pair_force(
       // this is the direction in which the repulsive forces will be applied and
       // its norm
       auto const dir = out1 - out2;
-      auto const ndir = dir.norm();
+      auto const ndir = Utils::norm(dir);
 
       // for very small angles the force should not be applied - these happen at
       // the crossing of the boundary and would result in oscillation

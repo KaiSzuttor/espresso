@@ -19,7 +19,7 @@ inline Vector3d get_n_triangle(const Vector3d &P1, const Vector3d &P2,
  *  by computing the crossproduct P1P2 x P1P3 and taking the half of its norm */
 inline double area_triangle(const Vector3d &P1, const Vector3d &P2,
                             const Vector3d &P3) {
-  return 0.5 * get_n_triangle(P1, P2, P3).norm();
+  return 0.5 * Utils::norm(get_n_triangle(P1, P2, P3));
 }
 
 /** This function returns the angle btw the triangle p1,p2,p3 and p2,p3,p4.  Be

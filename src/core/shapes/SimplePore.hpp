@@ -45,7 +45,7 @@ class SimplePore : public Shape {
   void precalc() {
     m_half_length = 0.5 * m_length;
 
-    e_z = m_axis / m_axis.norm();
+    e_z = m_axis / Utils::norm(m_axis);
 
     /* Find a vector orthogonal to e_z, since {1,0,0} and
        {0,1,0} are independent, e_z can not be parallel to both

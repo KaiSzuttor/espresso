@@ -45,7 +45,7 @@ public:
     };
     for (int i = 0; i < no_of_bonds; ++i) {
       auto const tmp = get_bond_vector(i);
-      bond_vectors[i] = tmp / tmp.norm();
+      bond_vectors[i] = tmp / Utils::norm(tmp);
     }
     // calculate angles between neighbouring bonds, next neighbours, etc...
     for (int i = 0; i < no_of_angles; ++i) {

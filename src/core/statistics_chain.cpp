@@ -113,7 +113,7 @@ std::array<double, 2> calc_rh(PartCfg &partCfg) {
          i < chain_start + chain_length * (p + 1); i++) {
       for (int j = i + 1; j < chain_start + chain_length * (p + 1); j++) {
         auto const d = partCfg[i].r.p - partCfg[j].r.p;
-        ri += 1.0 / d.norm();
+        ri += 1.0 / Utils::norm(d);
       }
     }
     tmp = prefac / ri;

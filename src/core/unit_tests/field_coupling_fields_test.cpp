@@ -308,7 +308,7 @@ BOOST_AUTO_TEST_CASE(interpolated_scalar_field) {
         p, [&data](const std::array<int, 3> &ind) { return data(ind); },
         grid_spacing, origin, Utils::Vector3d{});
 
-    BOOST_CHECK((interpolated_value - field_value).norm() <
+    BOOST_CHECK(Utils::norm(interpolated_value - field_value) <
                 2 * std::numeric_limits<double>::epsilon());
   }
 }
@@ -357,7 +357,7 @@ BOOST_AUTO_TEST_CASE(interpolated_vector_field) {
         p, [&data](const std::array<int, 3> &ind) { return data(ind); },
         grid_spacing, origin, Utils::Vector2d{});
 
-    BOOST_CHECK_SMALL((interpolated_value - field_value).norm(),
+    BOOST_CHECK_SMALL(Utils::norm(interpolated_value - field_value),
                       std::numeric_limits<double>::epsilon());
   }
 
@@ -394,9 +394,9 @@ BOOST_AUTO_TEST_CASE(interpolated_vector_field) {
         p, [&data](const std::array<int, 3> &ind) { return data(ind); },
         grid_spacing, origin, Field::jacobian_type{});
 
-    BOOST_CHECK_SMALL((interpolated_value[0] - field_value[0]).norm(),
+    BOOST_CHECK_SMALL(Utils::norm(interpolated_value[0] - field_value[0]),
                       std::numeric_limits<double>::epsilon());
-    BOOST_CHECK_SMALL((interpolated_value[1] - field_value[1]).norm(),
+    BOOST_CHECK_SMALL(Utils::norm(interpolated_value[1] - field_value[1]),
                       std::numeric_limits<double>::epsilon());
   }
 }
