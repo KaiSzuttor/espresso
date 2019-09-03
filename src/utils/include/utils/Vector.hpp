@@ -45,6 +45,7 @@ class SumExpression : public VectorExpression<SumExpression<LHS, RHS, N>, N> {
   const RHS &m_rhs;
 
 public:
+  using value_type = decltype(std::declval<typename LHS::value_type>() + std::declval<typename RHS::value_type>());
   SumExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
   auto operator[](std::size_t i) const { return m_lhs[i] + m_rhs[i]; }
 };
@@ -55,6 +56,7 @@ class DiffExpression : public VectorExpression<DiffExpression<LHS, RHS, N>, N> {
   const RHS &m_rhs;
 
 public:
+  using value_type = decltype(std::declval<typename LHS::value_type>() - std::declval<typename RHS::value_type>());
   DiffExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
   auto operator[](std::size_t i) const { return m_lhs[i] - m_rhs[i]; }
 };
@@ -66,30 +68,33 @@ class HadamardExpression
   const RHS &m_rhs;
 
 public:
+  using value_type = decltype(std::declval<typename LHS::value_type>() * std::declval<typename RHS::value_type>());
   HadamardExpression(LHS const &lhs, RHS const &rhs) : m_lhs(lhs), m_rhs(rhs) {}
   auto operator[](std::size_t i) const { return m_lhs[i] * m_rhs[i]; }
 };
 
-template <typename LHS, typename RHS, std::size_t N>
+template <typename Scalar, typename RHS, std::size_t N, typename = std::enable_if_t<std::is_arithmetic<std::decay_t<Scalar>>::value>>
 class ScalarMultExpression
-    : public VectorExpression<ScalarMultExpression<LHS, RHS, N>, N> {
-  const LHS &m_lhs;
+    : public VectorExpression<ScalarMultExpression<Scalar, RHS, N>, N> {
+  const Scalar m_lhs;
   const RHS &m_rhs;
 
 public:
-  ScalarMultExpression(LHS const &lhs, RHS const &rhs)
+  using value_type = decltype(std::declval<Scalar>() * std::declval<typename RHS::value_type>());
+  ScalarMultExpression(Scalar const &lhs, RHS const &rhs)
       : m_lhs(lhs), m_rhs(rhs) {}
   auto operator[](std::size_t i) const { return m_lhs * m_rhs[i]; }
 };
 
-template <typename LHS, typename RHS, std::size_t N>
+template <typename LHS, typename Scalar, std::size_t N, typename = std::enable_if_t<std::is_arithmetic<std::decay_t<Scalar>>::value>>
 class ScalarDivExpression
-    : public VectorExpression<ScalarDivExpression<LHS, RHS, N>, N> {
+    : public VectorExpression<ScalarDivExpression<LHS, Scalar, N>, N> {
   const LHS &m_lhs;
-  const RHS &m_rhs;
+  const Scalar m_rhs;
 
 public:
-  ScalarDivExpression(LHS const &lhs, RHS const &rhs)
+  using value_type = decltype(std::declval<typename LHS::value_type>() / std::declval<Scalar>());
+  ScalarDivExpression(LHS const &lhs, Scalar const &rhs)
       : m_lhs(lhs), m_rhs(rhs) {}
   auto operator[](std::size_t i) const { return m_lhs[i] / m_rhs; }
 };
@@ -99,6 +104,7 @@ class MinusExpression : public VectorExpression<MinusExpression<T, N>, N> {
   const T &m_lhs;
 
 public:
+  using value_type = typename T::value_type;
   MinusExpression(T const &lhs) : m_lhs(lhs) {}
   auto operator[](std::size_t i) const { return -m_lhs[i]; }
 };
@@ -108,6 +114,7 @@ class NotExpression : public VectorExpression<NotExpression<T, N>, N> {
   const T &m_lhs;
 
 public:
+  using value_type = typename T::value_type;
   NotExpression(T const &lhs) : m_lhs(lhs) {}
   auto operator[](std::size_t i) const { return not(m_lhs[i]); }
 };
@@ -117,6 +124,7 @@ class SqrtExpression : public VectorExpression<SqrtExpression<T, N>, N> {
   const T &m_lhs;
 
 public:
+  using value_type = typename T::value_type;
   SqrtExpression(T const &lhs) : m_lhs(lhs) {}
   auto operator[](std::size_t i) const { return std::sqrt(m_lhs[i]); }
 };
@@ -162,8 +170,9 @@ inline auto operator*(Scalar const &b, VectorExpression<E, N> const &a) {
 template <typename E1, typename E2, std::size_t N>
 auto operator*(VectorExpression<E1, N> const &a,
                VectorExpression<E2, N> const &b) {
-  auto res = (~a)[0] * (~b)[0];
-  for (int i = 1; i < N; ++i) {
+  using R = decltype(std::declval<typename E1::value_type>() * std::declval<typename E2::value_type>());
+  R res{};
+  for (int i = 0; i < N; ++i) {
     res += (~a)[i] * (~b)[i];
   }
   return res;
@@ -188,6 +197,7 @@ class Vector : public Array<T, N>, public VectorExpression<Vector<T, N>, N> {
   using Base = Array<T, N>;
 
 public:
+  using value_type = T;
   using Base::Base;
   using Array<T, N>::at;
   using Array<T, N>::operator[];
@@ -232,6 +242,9 @@ private:
   }
 
 public:
+  //template <class Range>
+  //explicit Vector(Range const &rng) : Vector(std::begin(rng), std::end(rng)) {}
+
   explicit constexpr Vector(T const (&v)[N]) : Base() {
     copy_init(std::begin(v), std::end(v));
   }
