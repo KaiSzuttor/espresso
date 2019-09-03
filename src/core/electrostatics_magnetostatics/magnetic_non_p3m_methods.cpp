@@ -58,7 +58,7 @@ double calc_dipole_dipole_ia(Particle *p1, const Utils::Vector3d &dip1,
   auto const dr = get_mi_vector(p1->r.p, p2->r.p, box_geo);
 
   // Powers of distance
-  auto const r2 = dr.norm2();
+  auto const r2 = Utils::norm2(dr);
   auto const r = sqrt(r2);
   auto const r3 = r2 * r;
   auto const r5 = r3 * r2;

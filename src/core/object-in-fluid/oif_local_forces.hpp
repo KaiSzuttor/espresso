@@ -102,7 +102,7 @@ calc_oif_local(Particle const *const p2, Particle const *const p1,
   if (iaparams->p.oif_local_forces.kvisc >
       TINY_OIF_ELASTICITY_COEFFICIENT) { // to be implemented....
     auto const dx = fp2 - fp3;
-    auto const len2 = dx.norm2();
+    auto const len2 = Utils::norm2(dx);
     auto const v_ij = p3->m.v - p2->m.v;
 
     // Variant A
@@ -182,9 +182,9 @@ calc_oif_local(Particle const *const p2, Particle const *const p1,
       auto const m2 = h - fp2;
       auto const m3 = h - fp3;
 
-      auto const m1_length2 = m1.norm2();
-      auto const m2_length2 = m2.norm2();
-      auto const m3_length2 = m3.norm2();
+      auto const m1_length2 = Utils::norm2(m1);
+      auto const m2_length2 = Utils::norm2(m2);
+      auto const m3_length2 = Utils::norm2(m3);
 
       auto const fac =
           kal * A0 * (2 * t + t * t) / (m1_length2 + m2_length2 + m3_length2);

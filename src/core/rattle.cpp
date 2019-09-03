@@ -135,7 +135,7 @@ void compute_pos_corr_vec(int *repeat_, const ParticleRange &particles) {
         }
 
         auto const r_ij = get_mi_vector(p1->r.p, p2->r.p, box_geo);
-        auto const r_ij2 = r_ij.norm2();
+        auto const r_ij2 = Utils::norm2(r_ij);
 
         if (fabs(1.0 - r_ij2 / ia_params->p.rigid_bond.d2) >
             ia_params->p.rigid_bond.p_tol) {

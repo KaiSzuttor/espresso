@@ -88,7 +88,7 @@ void Rhomboid::calculate_dist(const Utils::Vector3d &pos, double &dist,
     auto const A = (d * axis1) / dir1##_dot_##axis1;                           \
     auto const B = (d * axis2) / dir2##_dot_##axis2;                           \
     if (op1{}(A, 0) & op2{}(B, 0)) {                                           \
-      auto const tmp = (d * edge) / edge.norm2();                              \
+      auto const tmp = (d * edge) / Utils::norm2(edge);                        \
       vec = d - edge * tmp;                                                    \
       dist = m_direction * vec.norm();                                         \
       return;                                                                  \

@@ -49,7 +49,7 @@ void update_mol_pos_particle(Particle *p) {
 void distribute_mol_force(const ParticleRange &particles) {
   for (auto &p : particles) {
     if (p.p.is_virtual) {
-      if (p.f.f.norm2() != 0) {
+      if (Utils::norm2(p.f.f) != 0) {
         put_mol_force_on_parts(&p);
       }
     }

@@ -60,6 +60,6 @@ BOOST_AUTO_TEST_CASE(rotation_matrix_test) {
   auto const v = Vector3d{3., 2., 1.};
   auto const expected = vec_rotate(axis, -angle, v);
   auto const result = rotation_matrix(q) * v;
-  BOOST_CHECK_SMALL((expected - result).norm2(),
+  BOOST_CHECK_SMALL(Utils::norm2(expected - result),
                     std::numeric_limits<double>::epsilon());
 }

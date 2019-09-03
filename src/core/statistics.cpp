@@ -195,7 +195,7 @@ IntList nbhood(PartCfg &partCfg, const Utils::Vector3d &pos, double r_catch,
       }
     }
 
-    if (d.norm2() < r2) {
+    if (Utils::norm2(d) < r2) {
       ids.push_back(p.p.identity);
     }
   }
@@ -209,7 +209,7 @@ double distto(PartCfg &partCfg, const Utils::Vector3d &pos, int pid) {
   for (auto const &part : partCfg) {
     if (pid != part.p.identity) {
       auto const d = get_mi_vector({pos[0], pos[1], pos[2]}, part.r.p, box_geo);
-      mindist = std::min(mindist, d.norm2());
+      mindist = std::min(mindist, Utils::norm2(d));
     }
   }
   return std::sqrt(mindist);
@@ -245,7 +245,7 @@ void calc_part_distribution(PartCfg &partCfg, int const *p1_types, int n_p1,
             for (t2 = 0; t2 < n_p2; t2++) {
               if (p2.p.type == p2_types[t2]) {
                 auto const act_dist2 =
-                    get_mi_vector(p1.r.p, p2.r.p, box_geo).norm2();
+                    Utils::norm2(get_mi_vector(p1.r.p, p2.r.p, box_geo));
                 if (act_dist2 < min_dist2) {
                   min_dist2 = act_dist2;
                 }

@@ -52,7 +52,7 @@ void HollowCone::calculate_dist(const Utils::Vector3d &pos, double &dist,
   // where the difference segment is orthogonal
 
   mu = (m_orientation * point_3D - m_position * m_orientation) /
-       m_orientation.norm2();
+       Utils::norm2(m_orientation);
 
   // Then the closest point to the line is
 
@@ -329,7 +329,7 @@ void HollowCone::calculate_dist(const Utils::Vector3d &pos, double &dist,
 
   // Now use this direction to orient the normal
 
-  if (pp.norm2() > 1.0e-10) {
+  if (Utils::norm2(pp) > 1.0e-10) {
     // The point is off the rotational symmetry
     // axis of the hollow cone
 

@@ -58,7 +58,7 @@ void Stomatocyte::calculate_dist(const Utils::Vector3d &pos, double &dist,
   // where the difference segment is orthogonal
 
   mu = (m_orientation * pos - m_position * m_orientation) /
-       m_orientation.norm2();
+       Utils::norm2(m_orientation);
 
   // Then the closest point to the line is
 

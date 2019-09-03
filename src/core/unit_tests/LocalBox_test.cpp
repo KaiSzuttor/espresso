@@ -34,7 +34,7 @@ template <class T> void check_length(LocalBox<T> box) {
   auto const expected = box.my_right() - box.my_left();
   auto const result = box.length();
 
-  BOOST_CHECK_SMALL((result - expected).norm2(),
+  BOOST_CHECK_SMALL(Utils::norm2(result - expected),
                     std::numeric_limits<T>::epsilon());
 }
 
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(constructors) {
   /* default */
   {
     auto const box = LocalBox<float>();
-    BOOST_CHECK_EQUAL(box.my_left().norm2(), 0.f);
+    BOOST_CHECK_EQUAL(Utils::norm2(box.my_left()), 0.f);
     check_length(box);
   }
 

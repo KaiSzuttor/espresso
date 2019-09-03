@@ -73,7 +73,7 @@ bool steepest_descent_step(const ParticleRange &particles) {
     {
       // Rotational increment
       auto const dq = params->gamma * p.f.torque; // Vector parallel to torque
-      auto const t = p.f.torque.norm2();
+      auto const t = Utils::norm2(p.f.torque);
 
       // Normalize rotation axis and compute amount of rotation
       auto const l = dq.norm();

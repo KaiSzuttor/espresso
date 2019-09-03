@@ -1883,7 +1883,7 @@ void MMM2D_dielectric_layers_force_contribution() {
         a[2] = -pl[j].r.p[2];
         Utils::Vector3d d;
         layered_get_mi_vector(d.data(), p1->r.p.data(), a);
-        auto const dist2 = d.norm2();
+        auto const dist2 = Utils::norm2(d);
         auto const dist = sqrt(dist2);
         charge_factor = p1->p.q * pl[j].p.q * mmm2d_params.delta_mid_bot;
         add_mmm2d_coulomb_pair_force(charge_factor, d, dist, force);
@@ -1909,7 +1909,7 @@ void MMM2D_dielectric_layers_force_contribution() {
         a[2] = 2 * box_geo.length()[2] - pl[j].r.p[2];
         Utils::Vector3d d;
         layered_get_mi_vector(d.data(), p1->r.p.data(), a);
-        auto const dist2 = d.norm2();
+        auto const dist2 = Utils::norm2(d);
         auto const dist = sqrt(dist2);
         charge_factor = p1->p.q * pl[j].p.q * mmm2d_params.delta_mid_top;
         add_mmm2d_coulomb_pair_force(charge_factor, d, dist, force);
@@ -1948,7 +1948,7 @@ double MMM2D_dielectric_layers_energy_contribution() {
         a[2] = -pl[j].r.p[2];
         Utils::Vector3d d;
         layered_get_mi_vector(d.data(), p1->r.p.data(), a);
-        auto const dist2 = d.norm2();
+        auto const dist2 = Utils::norm2(d);
         charge_factor = mmm2d_params.delta_mid_bot * p1->p.q * pl[j].p.q;
         /* last term removes unwanted 2 pi |z| part (cancels due to charge
          * neutrality) */
@@ -1971,7 +1971,7 @@ double MMM2D_dielectric_layers_energy_contribution() {
         a[2] = 2 * box_geo.length()[2] - pl[j].r.p[2];
         Utils::Vector3d d;
         layered_get_mi_vector(d.data(), p1->r.p.data(), a);
-        auto const dist2 = d.norm2();
+        auto const dist2 = Utils::norm2(d);
         charge_factor = mmm2d_params.delta_mid_top * p1->p.q * pl[j].p.q;
         /* last term removes unwanted 2 pi |z| part (cancels due to charge
          * neutrality) */

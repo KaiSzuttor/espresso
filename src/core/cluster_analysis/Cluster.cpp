@@ -98,7 +98,8 @@ Cluster::radius_of_gyration_subcluster(std::vector<int> &subcl_particle_ids) {
   double sum_sq_dist = 0.;
   for (auto const pid : subcl_particle_ids) {
     // calculate square length of this distance
-    sum_sq_dist += get_mi_vector(com, partCfg()[pid].r.p, box_geo).norm2();
+    sum_sq_dist +=
+        Utils::norm2(get_mi_vector(com, partCfg()[pid].r.p, box_geo));
   }
 
   return sqrt(sum_sq_dist / subcl_particle_ids.size());

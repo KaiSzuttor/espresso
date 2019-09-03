@@ -73,7 +73,7 @@ bonded_coulomb_sr_pair_energy(Particle const *const p1,
                               Particle const *const p2,
                               Bonded_ia_parameters const *const iaparams,
                               Utils::Vector3d const &dx, double *_energy) {
-  auto const dist2 = dx.norm2();
+  auto const dist2 = Utils::norm2(dx);
   auto const dist = sqrt(dist2);
 
   *_energy = Coulomb::pair_energy(p1, p2, iaparams->p.bonded_coulomb_sr.q1q2,

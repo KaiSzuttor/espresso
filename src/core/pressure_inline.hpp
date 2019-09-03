@@ -234,12 +234,12 @@ inline void add_kinetic_virials(Particle const *const p1, int v_comp) {
   /* kinetic energy */
   if (v_comp) {
     virials.data.e[0] +=
-        ((p1->m.v * time_step) -
-         (p1->f.f * (0.5 * Utils::sqr(time_step) / p1->p.mass)))
-            .norm2() *
+        Utils::norm2((p1->m.v * time_step) -
+                     (p1->f.f * (0.5 * Utils::sqr(time_step) / p1->p.mass))) *
         p1->p.mass;
   } else {
-    virials.data.e[0] += Utils::sqr(time_step) * p1->m.v.norm2() * p1->p.mass;
+    virials.data.e[0] +=
+        Utils::sqr(time_step) * Utils::norm2(p1->m.v) * p1->p.mass;
   }
 
   /* ideal gas contribution (the rescaling of the velocities by '/=time_step'

@@ -50,7 +50,8 @@ constexpr int n_test_numbers = sizeof(test_numbers) / sizeof(int);
 template <int n> bool norm2() {
   Vector<int, n> v(std::begin(test_numbers), test_numbers + n);
 
-  return Utils::norm2(v) == std::inner_product(v.begin(), v.end(), v.begin(), 0);
+  return Utils::norm2(v) ==
+         std::inner_product(v.begin(), v.end(), v.begin(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(initializer_list_constructor) {
@@ -114,7 +115,8 @@ BOOST_AUTO_TEST_CASE(normalize) {
   Utils::Vector3d v{1, 2, 3};
   v.normalize();
 
-  BOOST_CHECK((Utils::norm2(v) - 1.0) <= std::numeric_limits<double>::epsilon());
+  BOOST_CHECK((Utils::norm2(v) - 1.0) <=
+              std::numeric_limits<double>::epsilon());
 }
 
 BOOST_AUTO_TEST_CASE(comparison_operators) {
@@ -248,9 +250,11 @@ BOOST_AUTO_TEST_CASE(scalar_product) {
   static_assert(std::is_same<decltype(Utils::Vector3d{} * Utils::Vector3i{}),
                              double>::value,
                 "");
-  static_assert(std::is_same<decltype(Vector<std::complex<float>, 2>{} * 3.f),
-                               Utils::ScalarMultExpression<float, Utils::Vector<std::complex<float>, 2>, 2>>::value,
-                "");
+  static_assert(
+      std::is_same<decltype(Vector<std::complex<float>, 2>{} * 3.f),
+                   Utils::ScalarMultExpression<
+                       float, Utils::Vector<std::complex<float>, 2>, 2>>::value,
+      "");
 
   auto const v1 = Utils::Vector3d{1., 2., 3.};
   auto const v2 = Utils::Vector3d{4.1, 5.2, 6.3};

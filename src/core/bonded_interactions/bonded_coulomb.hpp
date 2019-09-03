@@ -50,7 +50,7 @@ int bonded_coulomb_set_params(int bond_type, double prefactor);
 inline bool calc_bonded_coulomb_pair_force(
     double const q1q2, Bonded_ia_parameters const *const iaparams,
     Utils::Vector3d const &dx, Utils::Vector3d &force) {
-  auto const dist2 = dx.norm2();
+  auto const dist2 = Utils::norm2(dx);
   auto const dist3 = dist2 * std::sqrt(dist2);
   auto const fac = iaparams->p.bonded_coulomb.prefactor * q1q2 / dist3;
   force = fac * dx;

@@ -98,7 +98,7 @@ void VirtualSitesRelative::update_pos(Particle &p) const {
   auto const shift = get_mi_vector(new_pos, p.r.p, box_geo);
   p.r.p += shift;
 
-  if ((p.r.p - p.l.p_old).norm2() > Utils::sqr(0.5 * skin))
+  if (Utils::norm2(p.r.p - p.l.p_old) > Utils::sqr(0.5 * skin))
     set_resort_particles(Cells::RESORT_LOCAL);
 }
 

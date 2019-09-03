@@ -56,7 +56,7 @@ bool check_distance_function(const Shapes::Shape &s) {
       s.calculate_dist(pos, d, dist);
 
       /* trivial test */
-      if ((dist.norm2() - d * d) > 1e-12)
+      if ((Utils::norm2(dist) - d * d) > 1e-12)
         return false;
     }
   }

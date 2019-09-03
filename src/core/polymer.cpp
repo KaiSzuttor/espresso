@@ -76,7 +76,8 @@ double mindist(PartCfg &partCfg, Utils::Vector3d const &pos) {
   auto const mindist = std::accumulate(
       partCfg.begin(), partCfg.end(), std::numeric_limits<double>::infinity(),
       [&pos](double mindist, Particle const &p) {
-        return std::min(mindist, get_mi_vector(pos, p.r.p, box_geo).norm2());
+        return std::min(mindist,
+                        Utils::norm2(get_mi_vector(pos, p.r.p, box_geo)));
       });
 
   if (mindist < std::numeric_limits<double>::infinity())
@@ -118,8 +119,8 @@ bool is_valid_position(
     double h;
     for (auto const p : *positions) {
       for (auto m : p) {
-        h = (folded_position(*pos, box_geo) - folded_position(m, box_geo))
-                .norm2();
+        h = Utils::norm2(folded_position(*pos, box_geo) -
+                         folded_position(m, box_geo));
         buff_mindist = std::min(h, buff_mindist);
       }
     }

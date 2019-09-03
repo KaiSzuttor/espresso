@@ -44,7 +44,7 @@ void forcecap_cap(ParticleRange particles) {
   auto const fc2 = force_cap * force_cap;
 
   for (auto &p : particles) {
-    auto const f2 = p.f.f.norm2();
+    auto const f2 = Utils::norm2(p.f.f);
     if (f2 > fc2) {
       auto const scale = force_cap / std::sqrt(f2);
 

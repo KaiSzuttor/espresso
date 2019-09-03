@@ -614,7 +614,7 @@ void propagate_pos(const ParticleRange &particles) {
         }
       }
       /* Verlet criterion check */
-      if ((p.r.p - p.l.p_old).norm2() > skin2)
+      if (Utils::norm2(p.r.p - p.l.p_old) > skin2)
         set_resort_particles(Cells::RESORT_LOCAL);
     }
   }

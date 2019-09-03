@@ -2120,7 +2120,7 @@ void dp3m_count_magnetic_particles() {
 
   for (auto const &p : local_cells.particles()) {
     if (p.p.dipm != 0.0) {
-      node_sums[0] += p.calc_dip().norm2();
+      node_sums[0] += Utils::norm2(p.calc_dip());
       node_sums[1] += 1.0;
     }
   }

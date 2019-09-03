@@ -54,7 +54,7 @@ std::array<double, 4> calc_re(PartCfg &partCfg) {
     auto const d =
         partCfg[chain_start + i * chain_length + chain_length - 1].r.p -
         partCfg[chain_start + i * chain_length].r.p;
-    auto const norm2 = d.norm2();
+    auto const norm2 = Utils::norm2(d);
     dist += sqrt(norm2);
     dist2 += norm2;
     dist4 += norm2 * norm2;
@@ -86,7 +86,7 @@ std::array<double, 4> calc_rg(PartCfg &partCfg) {
     for (int j = 0; j < chain_length; ++j) {
       p = chain_start + i * chain_length + j;
       Utils::Vector3d const d = partCfg[p].r.p - r_CM;
-      tmp += d.norm2();
+      tmp += Utils::norm2(d);
     }
     tmp /= (double)chain_length;
     r_G += sqrt(tmp);
