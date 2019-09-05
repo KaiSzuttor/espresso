@@ -960,6 +960,7 @@ inline void lb_collide_stream() {
         {
           // backup the force densities caused by particle coupling
           lbfields[index].force_density_buf = lbfields[index].force_density;
+
           /* calculate modes locally */
           auto const modes = lb_calc_modes(index, lbfluid);
 

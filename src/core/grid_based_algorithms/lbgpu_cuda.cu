@@ -2317,12 +2317,9 @@ __global__ void momentum(LB_nodes_gpu n_a, LB_rho_v_gpu *d_v,
 
     calc_mode(mode, n_a, index);
 
-    j[0] += mode[1] +
-            0.5f * para->ext_force_density[0];
-    j[1] += mode[2] +
-            0.5f * para->ext_force_density[1];
-    j[2] += mode[3] +
-            0.5f * para->ext_force_density[2];
+    j[0] += mode[1] + 0.5f * para->ext_force_density[0];
+    j[1] += mode[2] + 0.5f * para->ext_force_density[1];
+    j[2] += mode[3] + 0.5f * para->ext_force_density[2];
 
 #ifdef LB_BOUNDARIES_GPU
     if (n_a.boundary[index])
