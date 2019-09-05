@@ -40,7 +40,7 @@ auto lb_calc_fluid_kernel(Utils::Vector3i const &index, Kernel kernel) {
   return lb_calc(index, [&](auto index) {
     auto const linear_index =
         get_linear_index(lblattice.local_index(index), lblattice.halo_grid);
-    auto const force_density = lbfields[linear_index].force_density;
+    auto const force_density = lbpar.ext_force_density;
     auto const modes = lb_calc_modes(linear_index, lbfluid);
     return kernel(modes, force_density);
   });
@@ -1085,12 +1085,11 @@ double lb_lbnode_get_density(const Utils::Vector3i &ind) {
 const Utils::Vector3d lb_lbnode_get_velocity(const Utils::Vector3i &ind) {
   if (lattice_switch == ActiveLB::GPU) {
 #ifdef CUDA
-    static LB_rho_v_pi_gpu host_print_values;
+    float u[3];
     int single_nodeindex = ind[0] + ind[1] * lbpar_gpu.dim_x +
                            ind[2] * lbpar_gpu.dim_x * lbpar_gpu.dim_y;
-    lb_print_node_GPU(single_nodeindex, &host_print_values);
-    return {{host_print_values.v[0], host_print_values.v[1],
-             host_print_values.v[2]}};
+    lb_get_node_velocity_gpu(single_nodeindex, u);
+    return {{u[0], u[1], u[2]}};
 #endif
   }
   if (lattice_switch == ActiveLB::CPU) {

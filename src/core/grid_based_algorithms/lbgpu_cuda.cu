@@ -2306,6 +2306,34 @@ __global__ void lb_print_node(int single_nodeindex, LB_rho_v_pi_gpu *d_p_v,
   }
 }
 
+__global__ void lb_get_node_velocity_kernel(int single_nodeindex, LB_nodes_gpu n_a, float u[3]) {
+  unsigned int index = blockIdx.y * gridDim.x * blockDim.x +
+                       blockDim.x * blockIdx.x + threadIdx.x;
+  if (index == 0) {
+    Utils::Array<float, 19> mode;
+    calc_m_from_n(n_a, single_nodeindex, mode);
+    u[0] = (mode[1] + 0.5f * para->ext_force_density[0]) / (mode[0] + para->rho);
+    u[1] = (mode[2] + 0.5f * para->ext_force_density[1]) / (mode[0] + para->rho);
+    u[2] = (mode[3] + 0.5f * para->ext_force_density[2]) / (mode[0] + para->rho);
+  }
+}
+
+void lb_get_node_velocity_gpu(int single_nodeindex, float u[3]) {
+  float *u_device;
+  cuda_safe_mem(cudaMalloc((void **)&u_device, 3 * sizeof(float)));
+  int threads_per_block_print = 1;
+  int blocks_per_grid_print_y = 1;
+  int blocks_per_grid_print_x = 1;
+  dim3 dim_grid_print =
+    make_uint3(blocks_per_grid_print_x, blocks_per_grid_print_y, 1);
+  KERNELCALL(lb_get_node_velocity_kernel, dim_grid_print, threads_per_block_print,
+           single_nodeindex, *current_nodes, u_device);
+  cuda_safe_mem(cudaMemcpy(u, u_device,
+                         3 * sizeof(float), cudaMemcpyDeviceToHost));
+  cudaFree(u_device);
+}
+
+
 __global__ void momentum(LB_nodes_gpu n_a, LB_rho_v_gpu *d_v,
                          LB_node_force_density_gpu node_f, float *sum) {
   unsigned int index = blockIdx.y * gridDim.x * blockDim.x +
