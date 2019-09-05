@@ -1460,6 +1460,7 @@ void lb_collect_boundary_forces(double *result) {
 void lb_reset_force_densities() {
   if (fluidstep == 0) {
     for (auto &lbfield : lbfields) {
+      lbfield.force_density_buf = Utils::Vector3d{};
       lbfield.force_density = lbpar.ext_force_density;
     }
   }
