@@ -948,10 +948,6 @@ inline void lb_collide_stream() {
   }
 #endif // LB_BOUNDARIES
 
-  for (int i = 0; i < lblattice.halo_grid_volume; ++i) {
-    lbfields[i].force_density_buf = lbfields[i].force_density;
-  }
-
   Lattice::index_t index = lblattice.halo_offset;
   for (int z = 1; z <= lblattice.grid[2]; z++) {
     for (int y = 1; y <= lblattice.grid[1]; y++) {
@@ -962,6 +958,8 @@ inline void lb_collide_stream() {
         if (!lbfields[index].boundary)
 #endif // LB_BOUNDARIES
         {
+          // backup the force densities caused by particle coupling
+          lbfields[index].force_density_buf = lbfields[index].force_density;
           /* calculate modes locally */
           auto const modes = lb_calc_modes(index, lbfluid);
 
