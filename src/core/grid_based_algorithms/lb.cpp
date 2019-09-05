@@ -948,17 +948,9 @@ inline void lb_collide_stream() {
   }
 #endif // LB_BOUNDARIES
 
-#ifdef VIRTUAL_SITES_INERTIALESS_TRACERS
-  // Safeguard the node forces so that we can later use them for the IBM
-  // particle update
-  // In the following loop the lbfields[XX].force are reset to zero
-  // Safeguard the node forces so that we can later use them for the IBM
-  // particle update In the following loop the lbfields[XX].force are reset to
-  // zero
   for (int i = 0; i < lblattice.halo_grid_volume; ++i) {
     lbfields[i].force_density_buf = lbfields[i].force_density;
   }
-#endif
 
   Lattice::index_t index = lblattice.halo_offset;
   for (int z = 1; z <= lblattice.grid[2]; z++) {
@@ -984,12 +976,8 @@ inline void lb_collide_stream() {
           auto const modes_with_forces =
               lb_apply_forces(index, thermalized_modes, lbpar, lbfields);
 
-          /* reset the force density */
-          lbfields[index].force_density = lbpar.ext_force_density;
-
           auto const populations = lb_calc_n_from_m(modes_with_forces);
 
-          /* transform back to populations and streaming */
           lb_stream(lbfluid_post, index, populations, lblattice);
         }
 
@@ -1446,7 +1434,7 @@ void lb_calc_fluid_momentum(double *result, const LB_Parameters &lb_parameters,
         auto const index = get_linear_index(x, y, z, lb_lattice.halo_grid);
 
         momentum_density = lb_calc_local_momentum_density(index, lbfluid);
-        momentum += momentum_density + .5 * lb_fields[index].force_density;
+        momentum += momentum_density + .5 * lb_parameters.ext_force_density;
       }
     }
   }
@@ -1470,4 +1458,11 @@ void lb_collect_boundary_forces(double *result) {
 #endif
 }
 
+void lb_reset_force_densities() {
+  if (fluidstep == 0) {
+    for (auto &lbfield : lbfields) {
+      lbfield.force_density = lbpar.ext_force_density;
+    }
+  }
+}
 /*@}*/

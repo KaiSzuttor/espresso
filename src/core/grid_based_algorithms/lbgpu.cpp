@@ -292,4 +292,10 @@ void lb_set_agrid_gpu(double agrid) {
       lbpar_gpu.dim_x * lbpar_gpu.dim_y * lbpar_gpu.dim_z;
 }
 
+void lb_reset_force_densities_gpu() {
+  if (fluidstep == 0) {
+    reset_LB_force_densities_GPU(true);
+  }
+}
+
 #endif /*  CUDA */

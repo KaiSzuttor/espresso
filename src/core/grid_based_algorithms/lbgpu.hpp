@@ -256,6 +256,7 @@ void lb_coupling_set_rng_state_gpu(uint64_t counter);
 /*@}*/
 extern boost::optional<Utils::Counter<uint64_t>> rng_counter_fluid_gpu;
 extern boost::optional<Utils::Counter<uint64_t>> rng_counter_coupling_gpu;
+void lb_reset_force_densities_gpu();
 #endif /*  CUDA */
 
 #endif /*  CUDA_H */

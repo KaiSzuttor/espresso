@@ -287,6 +287,7 @@ void lb_calc_fluid_momentum(double *result, const LB_Parameters &lb_parameters,
                             const std::vector<LB_FluidNode> &lb_fields,
                             const Lattice &lb_lattice);
 void lb_collect_boundary_forces(double *result);
+void lb_reset_force_densities();
 
 /*@}*/
 

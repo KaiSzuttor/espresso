@@ -1058,8 +1058,6 @@ __device__ void apply_forces(unsigned int index, Utils::Array<float, 19> &mode,
   mode[7] += C[1];
   mode[8] += C[3];
   mode[9] += C[4];
-
-  reset_LB_force_densities(index, node_f);
 }
 
 /** Calculate hydrodynamic fields in LB units
@@ -2320,11 +2318,11 @@ __global__ void momentum(LB_nodes_gpu n_a, LB_rho_v_gpu *d_v,
     calc_mode(mode, n_a, index);
 
     j[0] += mode[1] +
-            0.5f * node_f.force_density[0 * para->number_of_nodes + index];
+            0.5f * para->ext_force_density[0];
     j[1] += mode[2] +
-            0.5f * node_f.force_density[1 * para->number_of_nodes + index];
+            0.5f * para->ext_force_density[1];
     j[2] += mode[3] +
-            0.5f * node_f.force_density[2 * para->number_of_nodes + index];
+            0.5f * para->ext_force_density[2];
 
 #ifdef LB_BOUNDARIES_GPU
     if (n_a.boundary[index])
