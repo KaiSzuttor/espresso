@@ -1433,7 +1433,7 @@ void lb_calc_fluid_momentum(double *result, const LB_Parameters &lb_parameters,
         auto const index = get_linear_index(x, y, z, lb_lattice.halo_grid);
 
         momentum_density = lb_calc_local_momentum_density(index, lbfluid);
-        momentum += momentum_density + .5 * lb_parameters.ext_force_density;
+        momentum += momentum_density + .5 * lbfields[index].force_density_buf;
       }
     }
   }
