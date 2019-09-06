@@ -35,11 +35,13 @@ Vector<Vector<T, M>, N> tensor_product(const Vector<T, N> &x,
   return ret;
 }
 
-template<std::size_t N, std::size_t M, typename E1, typename E2>
-auto tensor_product(VectorExpression<E1, N> const &x, VectorExpression<E2, M> const &y) {
-  using R = decltype(std::declval<typename E1::value_type>() * std::declval<typename E2::value_type>());
+template <std::size_t N, std::size_t M, typename E1, typename E2>
+auto tensor_product(VectorExpression<E1, N> const &x,
+                    VectorExpression<E2, M> const &y) {
+  using R = decltype(std::declval<typename E1::value_type>() *
+                     std::declval<typename E2::value_type>());
   Vector<Vector<R, M>, N> ret;
-  for (int i=0; i<N; ++i) {
+  for (int i = 0; i < N; ++i) {
     ret[i] = (~x)[i] * (~y);
   }
   return ret;
