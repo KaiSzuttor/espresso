@@ -30,6 +30,7 @@ class TestMomentOfInertia(ut.TestCase):
     TIME_STEP = 0.001
     EXT_TORQUE = np.array([2.0, 2.5, 3.0])
     MOMENTS_OF_INERTIA = np.array([2.4, 3.2, 4.1])
+    OMEGA = np.array([1.1, 2.2, 3.3])
 
     @classmethod
     def setUpClass(cls):
@@ -100,6 +101,34 @@ class TestMomentOfInertia(ut.TestCase):
             [0, 1. / np.sqrt(2), 0, 1. / np.sqrt(2)]))
         check(self.system, part, sst.Rotation.from_quat(
             [0, 0, 1. / np.sqrt(2), 1. / np.sqrt(2)]))
+
+    @utx.skipIfMissingFeatures(
+        ["EXTERNAL_FORCES", "ROTATION", "ROTATIONAL_INERTIA"])
+    def test_conservation(self):
+        part = self.system.part.add(
+            pos=0.5 *
+            self.system.box_l,
+            quat=[
+                1,
+                0,
+                0,
+                0],
+            rotation=[
+                1,
+                1,
+                1],
+            rinertia=self.MOMENTS_OF_INERTIA,
+            omega_lab=self.OMEGA)
+
+        initial_inertia = np.dot(
+            np.diag(self.MOMENTS_OF_INERTIA), part.omega_lab)
+        for i in range(10):
+            self.system.integrator.run(1)
+            inertia_body = np.dot(
+                np.diag(self.MOMENTS_OF_INERTIA), part.omega_body)
+            inertia_lab = part.convert_vector_body_to_space(inertia_body)
+            np.testing.assert_almost_equal(
+                initial_inertia, inertia_lab, decimal=6)
 
 
 if __name__ == "__main__":
