@@ -24,7 +24,7 @@
 #include <boost/algorithm/clamp.hpp>
 #include <boost/range/algorithm/transform.hpp>
 
-namespace Observables {
+namespace CoreObservables {
 std::vector<double> PidObservable::operator()() const {
   std::vector<Particle> particles;
   particles.reserve(ids().size());
@@ -55,4 +55,4 @@ std::vector<double> PidObservable::operator()() const {
 
   return this->evaluate(particles_ptrs);
 }
-} // namespace Observables
+} // namespace CoreObservables

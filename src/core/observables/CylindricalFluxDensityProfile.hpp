@@ -23,7 +23,7 @@
 #include "integrate.hpp"
 #include <utils/Histogram.hpp>
 
-namespace Observables {
+namespace CoreObservables {
 class CylindricalFluxDensityProfile : public CylindricalPidProfileObservable {
 public:
   using CylindricalPidProfileObservable::CylindricalPidProfileObservable;
@@ -51,6 +51,6 @@ public:
   }
 };
 
-} // Namespace Observables
+} // namespace CoreObservables
 
 #endif

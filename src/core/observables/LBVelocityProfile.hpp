@@ -24,7 +24,7 @@
 
 #include <vector>
 
-namespace Observables {
+namespace CoreObservables {
 
 class LBVelocityProfile : public LBProfileObservable {
 public:
@@ -35,6 +35,6 @@ public:
   std::vector<double> operator()() const override;
 };
 
-} // Namespace Observables
+} // namespace CoreObservables
 
 #endif

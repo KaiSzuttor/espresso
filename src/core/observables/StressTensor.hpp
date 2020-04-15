@@ -23,7 +23,7 @@
 #include "pressure.hpp"
 #include <vector>
 
-namespace Observables {
+namespace CoreObservables {
 
 class StressTensor : public Observable {
 public:
@@ -35,6 +35,6 @@ public:
   }
 };
 
-} // Namespace Observables
+} // namespace CoreObservables
 
 #endif

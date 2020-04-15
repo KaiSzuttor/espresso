@@ -24,7 +24,7 @@
 #include "integrate.hpp"
 #include <vector>
 
-namespace Observables {
+namespace CoreObservables {
 
 /** Extract particle forces.
  *  For \f$n\f$ particles, return \f$3 n\f$ forces ordered as
@@ -47,5 +47,5 @@ public:
   std::vector<size_t> shape() const override { return {ids().size(), 3}; }
 };
 
-} // Namespace Observables
+} // namespace CoreObservables
 #endif

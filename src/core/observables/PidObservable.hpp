@@ -20,14 +20,17 @@
 #ifndef OBSERVABLES_PIDOBSERVABLE_HPP
 #define OBSERVABLES_PIDOBSERVABLE_HPP
 
+#include <observables/observable.hpp>
+
 #include "Observable.hpp"
 #include "Particle.hpp"
+#include "ParticleTraits.hpp"
 
 #include <utils/Span.hpp>
 
 #include <vector>
 
-namespace Observables {
+namespace CoreObservables {
 
 /** %Particle-based observable.
  *
@@ -49,5 +52,26 @@ public:
   std::vector<int> const &ids() const { return m_ids; }
 };
 
-} // Namespace Observables
+template <class ObsType> class ParticleObservable : public PidObservable {
+  std::vector<size_t> shape_(Utils::Vector3d res) const { return {3}; }
+  std::vector<size_t> shape_(double res) const { return {1}; }
+  std::vector<size_t> shape_(std::vector<Utils::Vector3d> const &res) const {
+    return {res.size(), 3};
+  }
+  std::vector<size_t> shape_(std::vector<double> const &res) const {
+    return {res.size(), 1};
+  }
+
+public:
+  using PidObservable::PidObservable;
+  std::vector<size_t> shape() const override {
+    return shape_(ObsType{}(std::vector<Particle>(ids().size())));
+  }
+  std::vector<double>
+  evaluate(Utils::Span<const Particle *const> particles) const override {
+    return ObsType{}(particles);
+  }
+};
+
+} // namespace CoreObservables
 #endif

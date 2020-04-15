@@ -37,7 +37,7 @@ class LBProfileObservable
     : public AutoParameters<LBProfileObservable<CoreLBObs>, Observable> {
 public:
   static_assert(
-      std::is_base_of<::Observables::LBProfileObservable, CoreLBObs>::value,
+      std::is_base_of<CoreObservables::LBProfileObservable, CoreLBObs>::value,
       "");
   LBProfileObservable() {
     this->add_parameters(
@@ -155,11 +155,11 @@ public:
     return {};
   }
 
-  std::shared_ptr<::Observables::Observable> observable() const override {
+  std::shared_ptr<CoreObservables::Observable> observable() const override {
     return m_observable;
   }
 
-  virtual std::shared_ptr<::Observables::LBProfileObservable>
+  virtual std::shared_ptr<CoreObservables::LBProfileObservable>
   profile_observable() const {
     return m_observable;
   }

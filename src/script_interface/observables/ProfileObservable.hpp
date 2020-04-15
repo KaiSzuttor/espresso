@@ -95,11 +95,12 @@ public:
 
   void construct(VariantMap const &params) override {}
 
-  std::shared_ptr<::Observables::ProfileObservable> profile_observable() const {
+  std::shared_ptr<CoreObservables::ProfileObservable>
+  profile_observable() const {
     return m_observable;
   }
 
-  std::shared_ptr<::Observables::Observable> observable() const override {
+  std::shared_ptr<CoreObservables::Observable> observable() const override {
     return m_observable;
   }
 

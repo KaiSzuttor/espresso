@@ -23,7 +23,7 @@
 
 #include <vector>
 
-namespace Observables {
+namespace CoreObservables {
 class FluxDensityProfile : public PidProfileObservable {
 public:
   using PidProfileObservable::PidProfileObservable;
@@ -48,6 +48,6 @@ public:
   }
 };
 
-} // Namespace Observables
+} // namespace CoreObservables
 
 #endif

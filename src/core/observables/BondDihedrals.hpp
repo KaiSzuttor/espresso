@@ -25,7 +25,7 @@
 #include <cmath>
 #include <vector>
 
-namespace Observables {
+namespace CoreObservables {
 
 /** Calculate dihedral angles between particles in a polymer.
  *  For @f$ n @f$ bonded particles, return the @f$ n-3 @f$ dihedral angles
@@ -62,6 +62,6 @@ public:
   std::vector<size_t> shape() const override { return {ids().size() - 3}; }
 };
 
-} // Namespace Observables
+} // namespace CoreObservables
 
 #endif

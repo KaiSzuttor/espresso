@@ -25,7 +25,7 @@
 #include <cmath>
 #include <vector>
 
-namespace Observables {
+namespace CoreObservables {
 
 /** Calculate bond angles in a polymer.
  *  The \a ith entry in the result vector corresponds to the
@@ -62,6 +62,6 @@ public:
   std::vector<size_t> shape() const override { return {ids().size() - 2}; }
 };
 
-} // Namespace Observables
+} // namespace CoreObservables
 
 #endif

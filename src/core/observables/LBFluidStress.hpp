@@ -24,7 +24,7 @@
 
 #include <vector>
 
-namespace Observables {
+namespace CoreObservables {
 class LBFluidStress : public Observable {
 public:
   std::vector<size_t> shape() const override { return {3, 3}; }
@@ -39,6 +39,6 @@ public:
   }
 };
 
-} // Namespace Observables
+} // namespace CoreObservables
 
 #endif

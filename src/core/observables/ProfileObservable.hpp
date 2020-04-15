@@ -21,7 +21,7 @@
 
 #include "Observable.hpp"
 
-namespace Observables {
+namespace CoreObservables {
 
 // Observable which acts on a given list of particle ids
 class ProfileObservable : virtual public Observable {
@@ -42,5 +42,5 @@ public:
   }
 };
 
-} // Namespace Observables
+} // namespace CoreObservables
 #endif

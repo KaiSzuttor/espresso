@@ -23,7 +23,7 @@
 
 #include <vector>
 
-namespace Observables {
+namespace CoreObservables {
 
 class MagneticDipoleMoment : public PidObservable {
 public:
@@ -45,6 +45,6 @@ public:
   }
 };
 
-} // Namespace Observables
+} // namespace CoreObservables
 
 #endif

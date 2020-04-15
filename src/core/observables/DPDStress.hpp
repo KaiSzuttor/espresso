@@ -24,7 +24,7 @@
 #include "dpd.hpp"
 #include <vector>
 
-namespace Observables {
+namespace CoreObservables {
 
 class DPDStress : public Observable {
 public:
@@ -32,6 +32,6 @@ public:
   std::vector<double> operator()() const override { return dpd_stress(); }
 };
 
-} // Namespace Observables
+} // namespace CoreObservables
 
 #endif

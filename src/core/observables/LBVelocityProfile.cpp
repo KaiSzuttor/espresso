@@ -20,7 +20,7 @@
 #include "grid_based_algorithms/lb_interface.hpp"
 #include <utils/Histogram.hpp>
 
-namespace Observables {
+namespace CoreObservables {
 
 std::vector<double> LBVelocityProfile::operator()() const {
   std::array<size_t, 3> n_bins{{n_x_bins, n_y_bins, n_z_bins}};
@@ -48,4 +48,4 @@ std::vector<double> LBVelocityProfile::operator()() const {
   return hist_tmp;
 }
 
-} // namespace Observables
+} // namespace CoreObservables

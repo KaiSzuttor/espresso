@@ -22,7 +22,7 @@
 #include "CylindricalPidProfileObservable.hpp"
 #include <utils/Histogram.hpp>
 
-namespace Observables {
+namespace CoreObservables {
 class CylindricalVelocityProfile : public CylindricalPidProfileObservable {
 public:
   using CylindricalPidProfileObservable::CylindricalPidProfileObservable;
@@ -56,6 +56,6 @@ public:
   }
 };
 
-} // Namespace Observables
+} // namespace CoreObservables
 
 #endif

@@ -26,7 +26,7 @@
 
 #include <utils/Vector.hpp>
 
-namespace Observables {
+namespace CoreObservables {
 
 class LBProfileObservable : public ProfileObservable {
 public:
@@ -77,6 +77,6 @@ public:
   std::vector<Utils::Vector3d> sampling_positions;
 };
 
-} // namespace Observables
+} // namespace CoreObservables
 
 #endif
