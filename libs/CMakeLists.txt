@@ -4,3 +4,6 @@ target_compile_definitions(Random123 INTERFACE R123_USE_MULHILO64_C99)
 
 add_library(h5xx INTERFACE)
 target_include_directories(h5xx SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/h5xx)
+
+add_library(observables INTERFACE)
+target_include_directories(observables SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/observables/include)
