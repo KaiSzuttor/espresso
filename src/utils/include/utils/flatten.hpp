@@ -17,8 +17,21 @@ struct flatten_impl {
   }
 };
 
-template <class It>
-using value_type_t = typename std::iterator_traits<It>::value_type;
+template <typename It> struct it_value_type {
+  using value_type = typename std::iterator_traits<It>::value_type;
+};
+
+template <typename Container>
+struct it_value_type<std::back_insert_iterator<Container>> {
+  using value_type = typename Container::value_type;
+};
+
+template <typename Container>
+struct it_value_type<std::front_insert_iterator<Container>> {
+  using value_type = typename Container::value_type;
+};
+
+template <class It> using value_type_t = typename it_value_type<It>::value_type;
 
 template <class T, class OutputIterator>
 struct flatten_impl<T, OutputIterator,
@@ -26,7 +39,7 @@ struct flatten_impl<T, OutputIterator,
                         T, value_type_t<OutputIterator>>::value>> {
   static OutputIterator apply(T const &v, OutputIterator out) {
     *out = v;
-    return std::next(out);
+    return ++out;
   }
 };
 } // namespace detail
