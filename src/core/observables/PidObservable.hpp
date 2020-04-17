@@ -27,6 +27,7 @@
 #include "ParticleTraits.hpp"
 
 #include <utils/Span.hpp>
+#include <utils/flatten.hpp>
 
 #include <vector>
 
@@ -69,30 +70,6 @@ template <class T> struct shape_impl<std::vector<T>> {
     return ret;
   }
 };
-
-template <class OutputIterator> void flatten(double value, OutputIterator out) {
-  *out++ = value;
-}
-
-template <class OutputIterator>
-void flatten(Utils::Vector3d const &vec, OutputIterator out) {
-  for (auto const &elem : vec) {
-    flatten(elem, out);
-  }
-}
-
-inline std::vector<double> flatten(Utils::Vector3d const &vec) {
-  return vec.as_vector();
-}
-
-template <class T> std::vector<double> flatten(std::vector<T> const &vec) {
-  std::vector<double> ret;
-  for (auto const &elem : vec) {
-    flatten(elem, std::back_inserter(ret));
-  }
-  return ret;
-}
-
 } // namespace detail
 
 template <class ObsType> class ParticleObservable : public PidObservable {
@@ -107,7 +84,9 @@ public:
 
   std::vector<double>
   evaluate(Utils::Span<const Particle *const> particles) const override {
-    return detail::flatten(ObsType{}(particles));
+    std::vector<double> res;
+    Utils::flatten(ObsType{}(particles), std::back_inserter(res));
+    return res;
   }
 };
 
