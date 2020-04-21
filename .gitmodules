@@ -3,4 +3,4 @@
 	url = https://github.com/h5md/h5xx.git
 [submodule "libs/observables"]
 	path = libs/genobs
-	url = https://gitlab.icp.uni-stuttgart.de/kai/observables.git
+	url = https://gitlab.icp.uni-stuttgart.de/kai/genobs.git
