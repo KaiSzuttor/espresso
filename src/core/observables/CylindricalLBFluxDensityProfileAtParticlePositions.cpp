@@ -24,7 +24,7 @@
 #include <utils/Histogram.hpp>
 #include <utils/math/coordinate_transformation.hpp>
 
-namespace CoreObservables {
+namespace Observables {
 std::vector<double>
 CylindricalLBFluxDensityProfileAtParticlePositions::evaluate(
     Utils::Span<const Particle *const> particles) const {
@@ -50,4 +50,4 @@ CylindricalLBFluxDensityProfileAtParticlePositions::evaluate(
   histogram.normalize();
   return histogram.get_histogram();
 }
-} // namespace CoreObservables
+} // namespace Observables

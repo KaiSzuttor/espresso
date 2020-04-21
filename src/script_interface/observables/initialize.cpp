@@ -71,21 +71,21 @@ namespace Observables {
  *  "ProfileObservable"
  */
 #define REGISTER_PROFILE_OBS(name)                                             \
-  ScriptInterface::register_new<ProfileObservable<CoreObservables::name>>(     \
+  ScriptInterface::register_new<ProfileObservable<::Observables::name>>(       \
       "Observables::" #name "");
 
 /** Register a @ref ScriptInterface::Observables::PidObservable
  *  "PidObservable"
  */
 #define REGISTER_PID_OBS(name)                                                 \
-  ScriptInterface::register_new<PidObservable<CoreObservables::name>>(         \
+  ScriptInterface::register_new<PidObservable<::Observables::name>>(           \
       "Observables::" #name "");
 
 /** Register a @ref ScriptInterface::Observables::PidProfileObservable
  *  "PidProfileObservable"
  */
 #define REGISTER_PID_PROFILE_OBS(name)                                         \
-  ScriptInterface::register_new<PidProfileObservable<CoreObservables::name>>(  \
+  ScriptInterface::register_new<PidProfileObservable<::Observables::name>>(    \
       "Observables::" #name "");
 
 /** Register a @ref
@@ -94,7 +94,7 @@ namespace Observables {
  */
 #define REGISTER_CYLPID_PROFILE_OBS(name)                                      \
   ScriptInterface::register_new<                                               \
-      CylindricalPidProfileObservable<CoreObservables::name>>(                 \
+      CylindricalPidProfileObservable<::Observables::name>>(                   \
       "Observables::" #name "");
 
 /** Register a @ref ScriptInterface::Observables::CylindricalLBProfileObservable
@@ -102,14 +102,14 @@ namespace Observables {
  */
 #define REGISTER_CYLLB_OBS(name)                                               \
   ScriptInterface::register_new<                                               \
-      CylindricalLBProfileObservable<CoreObservables::name>>(                  \
+      CylindricalLBProfileObservable<::Observables::name>>(                    \
       "Observables::" #name "");
 
 /** Register an @ref ScriptInterface::Observables::LBProfileObservable
  *  "LBProfileObservable"
  */
 #define REGISTER_LB_OBS(name)                                                  \
-  ScriptInterface::register_new<LBProfileObservable<CoreObservables::name>>(   \
+  ScriptInterface::register_new<LBProfileObservable<::Observables::name>>(     \
       "Observables::" #name "");
 /*@}*/
 

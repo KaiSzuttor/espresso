@@ -31,7 +31,7 @@
 
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
 /** %Particle-based observable.
  *
@@ -90,5 +90,5 @@ public:
   }
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 #endif

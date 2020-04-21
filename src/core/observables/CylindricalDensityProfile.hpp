@@ -23,7 +23,7 @@
 #include <utils/Histogram.hpp>
 #include <utils/math/coordinate_transformation.hpp>
 
-namespace CoreObservables {
+namespace Observables {
 class CylindricalDensityProfile : public CylindricalPidProfileObservable {
 public:
   using CylindricalPidProfileObservable::CylindricalPidProfileObservable;
@@ -48,6 +48,6 @@ public:
   }
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 
 #endif

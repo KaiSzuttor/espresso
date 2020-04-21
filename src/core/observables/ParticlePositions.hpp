@@ -23,12 +23,12 @@
 
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
 /** Extract particle positions.
  *  For \f$n\f$ particles, return \f$3 n\f$ positions ordered as
  *  \f$(x_1, y_1, z_1, \dots, x_n, y_n, z_n)\f$.
  */
-using ParticlePositions = ParticleObservable<Observables::Positions>;
-} // namespace CoreObservables
+using ParticlePositions = ParticleObservable<GenObs::Positions>;
+} // namespace Observables
 #endif

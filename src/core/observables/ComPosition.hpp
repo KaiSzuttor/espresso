@@ -23,9 +23,9 @@
 
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
-using ComPosition = ParticleObservable<Observables::CenterOfMassPosition>;
+using ComPosition = ParticleObservable<GenObs::CenterOfMassPosition>;
 
-} // namespace CoreObservables
+} // namespace Observables
 #endif

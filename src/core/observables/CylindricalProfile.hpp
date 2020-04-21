@@ -23,7 +23,7 @@
 
 #include <string>
 
-namespace CoreObservables {
+namespace Observables {
 class CylindricalProfile {
 public:
   CylindricalProfile(Utils::Vector3d const &center, Utils::Vector3d const &axis,
@@ -44,5 +44,5 @@ public:
   size_t n_r_bins, n_phi_bins, n_z_bins;
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 #endif

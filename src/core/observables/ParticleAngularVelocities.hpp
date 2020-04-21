@@ -25,7 +25,7 @@
 #include "rotation.hpp"
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
 class ParticleAngularVelocities : public PidObservable {
 public:
@@ -52,5 +52,5 @@ public:
   std::vector<size_t> shape() const override { return {ids().size(), 3}; }
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 #endif

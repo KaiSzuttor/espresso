@@ -24,7 +24,7 @@
 #include "CylindricalProfile.hpp"
 #include "PidObservable.hpp"
 
-namespace CoreObservables {
+namespace Observables {
 
 class CylindricalPidProfileObservable : public PidObservable,
                                         public CylindricalProfile {
@@ -40,5 +40,5 @@ public:
                            max_z, n_r_bins, n_phi_bins, n_z_bins) {}
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 #endif

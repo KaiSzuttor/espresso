@@ -24,7 +24,7 @@
 #include <utils/Histogram.hpp>
 #include <utils/math/coordinate_transformation.hpp>
 
-namespace CoreObservables {
+namespace Observables {
 std::vector<double> CylindricalLBVelocityProfileAtParticlePositions::evaluate(
     Utils::Span<const Particle *const> particles) const {
   std::array<size_t, 3> n_bins{{n_r_bins, n_phi_bins, n_z_bins}};
@@ -53,4 +53,4 @@ std::vector<double> CylindricalLBVelocityProfileAtParticlePositions::evaluate(
   return hist_tmp;
 }
 
-} // namespace CoreObservables
+} // namespace Observables

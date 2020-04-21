@@ -23,7 +23,7 @@
 
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
 class ForceDensityProfile : public PidProfileObservable {
 public:
@@ -47,6 +47,6 @@ public:
   }
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 
 #endif
