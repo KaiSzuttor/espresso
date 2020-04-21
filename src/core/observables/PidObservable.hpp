@@ -20,7 +20,7 @@
 #ifndef OBSERVABLES_PIDOBSERVABLE_HPP
 #define OBSERVABLES_PIDOBSERVABLE_HPP
 
-#include <observables/observable.hpp>
+#include <genobs/observable.hpp>
 
 #include "Observable.hpp"
 #include "Particle.hpp"
