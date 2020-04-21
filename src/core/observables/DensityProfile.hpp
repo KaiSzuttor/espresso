@@ -23,7 +23,7 @@
 #include <utils/Histogram.hpp>
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
 class DensityProfile : public PidProfileObservable {
 public:
@@ -45,6 +45,6 @@ public:
     return histogram.get_histogram();
   }
 };
-} // namespace CoreObservables
+} // namespace Observables
 
 #endif

@@ -24,7 +24,7 @@
 
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
 /** Calculate distances between particles in a polymer.
  *  For @f$ n @f$ bonded particles, return the @f$ n-1 @f$ distances separating
@@ -48,6 +48,6 @@ public:
   std::vector<size_t> shape() const override { return {ids().size() - 1}; }
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 
 #endif

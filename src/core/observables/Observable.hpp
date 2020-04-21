@@ -27,7 +27,7 @@
 
 #include "PartCfg.hpp"
 
-namespace CoreObservables {
+namespace Observables {
 
 /** Base class for observables.
  *
@@ -57,5 +57,5 @@ public:
   virtual std::vector<size_t> shape() const = 0;
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 #endif

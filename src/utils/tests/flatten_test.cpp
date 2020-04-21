@@ -20,8 +20,10 @@
 #define BOOST_TEST_MODULE flatten test
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
-
+#include <iterator>
+#include <list>
 #include <utils/flatten.hpp>
+#include <vector>
 
 #include <array>
 
@@ -44,6 +46,19 @@ BOOST_AUTO_TEST_CASE(flatten_) {
 
     const std::array<int, 4> expected = {1, 2, 3, 4};
     BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), out.begin(),
+                                  out.end());
+  }
+  {
+    const std::vector<int> in = {1, 2, 3, 4};
+    std::vector<int> out;
+    flatten(in, std::back_inserter(out));
+    BOOST_CHECK_EQUAL_COLLECTIONS(in.begin(), in.end(), out.begin(), out.end());
+  }
+  {
+    const std::vector<int> in = {1, 2, 3, 4};
+    std::list<int> out;
+    flatten(in, std::front_inserter(out));
+    BOOST_CHECK_EQUAL_COLLECTIONS(in.rbegin(), in.rend(), out.begin(),
                                   out.end());
   }
 }

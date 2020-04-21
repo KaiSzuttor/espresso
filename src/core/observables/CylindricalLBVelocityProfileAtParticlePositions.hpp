@@ -21,7 +21,7 @@
 
 #include "CylindricalPidProfileObservable.hpp"
 
-namespace CoreObservables {
+namespace Observables {
 class CylindricalLBVelocityProfileAtParticlePositions
     : public CylindricalPidProfileObservable {
 public:
@@ -35,6 +35,6 @@ public:
   }
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 
 #endif

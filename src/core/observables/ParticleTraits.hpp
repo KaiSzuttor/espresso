@@ -4,7 +4,7 @@
 #include "Particle.hpp"
 #include "config.hpp"
 
-namespace Observables {
+namespace GenObs {
 template <> struct traits<const ::Particle *> {
   using Particle = ::Particle;
 
@@ -27,6 +27,6 @@ template <> struct traits<const ::Particle *> {
   }
 };
 
-} // namespace Observables
+} // namespace GenObs
 
 #endif

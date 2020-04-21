@@ -2,5 +2,5 @@
 	path = libs/h5xx
 	url = https://github.com/h5md/h5xx.git
 [submodule "libs/observables"]
-	path = libs/observables
-	url = https://gitlab.icp.uni-stuttgart.de/kai/observables.git
+	path = libs/genobs
+	url = https://gitlab.icp.uni-stuttgart.de/kai/genobs.git

@@ -38,7 +38,7 @@ class CylindricalLBProfileObservable
     : public AutoParameters<CylindricalLBProfileObservable<CoreCylLBObs>,
                             Observable> {
 public:
-  static_assert(std::is_base_of<CoreObservables::CylindricalLBProfileObservable,
+  static_assert(std::is_base_of<::Observables::CylindricalLBProfileObservable,
                                 CoreCylLBObs>::value,
                 "");
   CylindricalLBProfileObservable() {
@@ -143,11 +143,11 @@ public:
     return {};
   }
 
-  std::shared_ptr<CoreObservables::Observable> observable() const override {
+  std::shared_ptr<::Observables::Observable> observable() const override {
     return m_observable;
   }
 
-  virtual std::shared_ptr<CoreObservables::CylindricalLBProfileObservable>
+  virtual std::shared_ptr<::Observables::CylindricalLBProfileObservable>
   cylindrical_profile_observable() const {
     return m_observable;
   }

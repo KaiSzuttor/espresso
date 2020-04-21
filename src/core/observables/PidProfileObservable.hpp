@@ -26,7 +26,7 @@
 #include "integrate.hpp"
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
 // Observable which acts on a given list of particle ids
 class PidProfileObservable : public PidObservable, public ProfileObservable {
@@ -39,5 +39,5 @@ public:
                           n_y_bins, n_z_bins) {}
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 #endif

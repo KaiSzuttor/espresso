@@ -25,7 +25,7 @@
 #include <cmath>
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
 /** Calculate bond angles between particles in a polymer.
  *  For @f$ n @f$ bonded particles, return the @f$ n-2 @f$ angles along the
@@ -64,6 +64,6 @@ public:
   std::vector<size_t> shape() const override { return {ids().size() - 2}; }
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 
 #endif

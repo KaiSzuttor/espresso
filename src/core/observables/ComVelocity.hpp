@@ -23,9 +23,9 @@
 
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
-using ComVelocity = ParticleObservable<Observables::CenterOfMassVelocity>;
+using ComVelocity = ParticleObservable<GenObs::CenterOfMassVelocity>;
 
-} // namespace CoreObservables
+} // namespace Observables
 #endif

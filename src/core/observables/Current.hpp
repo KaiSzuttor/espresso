@@ -23,7 +23,7 @@
 
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 class Current : public PidObservable {
 public:
   using PidObservable::PidObservable;
@@ -44,5 +44,5 @@ public:
   };
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 #endif

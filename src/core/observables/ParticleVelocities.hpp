@@ -23,13 +23,13 @@
 
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
 /** Extract particle velocities.
  *  For \f$n\f$ particles, return \f$3 n\f$ velocities ordered as
  *  \f$(v_x^1, v_y^1, v_z^1, \dots, v_x^n, v_y^n, v_z^n)\f$.
  */
-using ParticleVelocities = ParticleObservable<Observables::Velocities>;
+using ParticleVelocities = ParticleObservable<GenObs::Velocities>;
 
-} // namespace CoreObservables
+} // namespace Observables
 #endif

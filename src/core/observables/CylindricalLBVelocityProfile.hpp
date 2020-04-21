@@ -21,7 +21,7 @@
 
 #include "CylindricalLBProfileObservable.hpp"
 
-namespace CoreObservables {
+namespace Observables {
 class CylindricalLBVelocityProfile : public CylindricalLBProfileObservable {
 public:
   using CylindricalLBProfileObservable::CylindricalLBProfileObservable;
@@ -31,6 +31,6 @@ public:
   }
 };
 
-} // namespace CoreObservables
+} // namespace Observables
 
 #endif

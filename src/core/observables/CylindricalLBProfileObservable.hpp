@@ -29,7 +29,7 @@
 
 using Utils::Vector3d;
 
-namespace CoreObservables {
+namespace Observables {
 
 class CylindricalLBProfileObservable : public Observable,
                                        public CylindricalProfile {
@@ -65,5 +65,5 @@ public:
   std::vector<Vector3d> sampling_positions;
   double sampling_density;
 };
-} // namespace CoreObservables
+} // namespace Observables
 #endif

@@ -23,9 +23,9 @@
 
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
-using TotalForce = ParticleObservable<Observables::TotalForce>;
+using TotalForce = ParticleObservable<GenObs::TotalForce>;
 
-} // namespace CoreObservables
+} // namespace Observables
 #endif

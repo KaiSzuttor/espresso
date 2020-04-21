@@ -38,10 +38,9 @@ class CylindricalPidProfileObservable
     : public AutoParameters<CylindricalPidProfileObservable<CoreObs>,
                             Observable> {
 public:
-  static_assert(
-      std::is_base_of<CoreObservables::CylindricalPidProfileObservable,
-                      CoreObs>::value,
-      "");
+  static_assert(std::is_base_of<::Observables::CylindricalPidProfileObservable,
+                                CoreObs>::value,
+                "");
   CylindricalPidProfileObservable() {
     this->add_parameters({
         {"ids",
@@ -132,11 +131,11 @@ public:
             "max_z");
   }
 
-  std::shared_ptr<CoreObservables::Observable> observable() const override {
+  std::shared_ptr<::Observables::Observable> observable() const override {
     return m_observable;
   }
 
-  virtual std::shared_ptr<CoreObservables::CylindricalPidProfileObservable>
+  virtual std::shared_ptr<::Observables::CylindricalPidProfileObservable>
   cylindrical_pid_profile_observable() const {
     return m_observable;
   }

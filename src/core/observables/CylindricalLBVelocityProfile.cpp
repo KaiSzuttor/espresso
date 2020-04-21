@@ -24,7 +24,7 @@
 #include <utils/Histogram.hpp>
 #include <utils/math/coordinate_transformation.hpp>
 
-namespace CoreObservables {
+namespace Observables {
 
 std::vector<double> CylindricalLBVelocityProfile::operator()() const {
   std::array<size_t, 3> n_bins{{n_r_bins, n_phi_bins, n_z_bins}};
@@ -48,4 +48,4 @@ std::vector<double> CylindricalLBVelocityProfile::operator()() const {
   return hist_data;
 }
 
-} // namespace CoreObservables
+} // namespace Observables

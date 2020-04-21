@@ -24,12 +24,12 @@
 #include "integrate.hpp"
 #include <vector>
 
-namespace CoreObservables {
+namespace Observables {
 
 /** Extract particle forces.
  *  For \f$n\f$ particles, return \f$3 n\f$ forces ordered as
  *  \f$(f_x^1, f_y^1, f_z^1, \dots, f_x^n, f_y^n, f_z^n)\f$.
  */
-using ParticleForces = ParticleObservable<Observables::Forces>;
-} // namespace CoreObservables
+using ParticleForces = ParticleObservable<GenObs::Forces>;
+} // namespace Observables
 #endif
