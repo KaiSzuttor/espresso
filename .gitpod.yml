@@ -1,4 +1,5 @@
-image: espressomd/docker-ubuntu-20.04:c9fe9d6d79ffd7e3e89ef282548e0b5278afde2c
+image: 
+  file: .gitpod.Dockerfile
 
 tasks:
   - init: mkdir build && cd build && cmake .. && make 
