@@ -7,7 +7,7 @@ RUN sudo apt-get update \
     autoconf \
     automake \
     build-essential \
-    ccache
+    ccache \
     cmake \
     curl \
     cython3 \
