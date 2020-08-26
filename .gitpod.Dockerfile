@@ -52,7 +52,7 @@ RUN sudo apt-get update \
     nvidia-cuda-toolkit \
     python3-matplotlib \
     texlive-base \
-    && rm -rf /var/lib/apt/lists/*
+    && sudo rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install \
   autopep8==1.3.4 \
