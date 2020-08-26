@@ -2,7 +2,7 @@ image:
   file: .gitpod.Dockerfile
 
 tasks:
-  - init: pip install --upgrade pip && pip install -r ./requirements.txt && mkdir build && cd build && cmake ..
+  - init: mkdir build && cd build && cmake ..
 
 github:
   prebuilds:
