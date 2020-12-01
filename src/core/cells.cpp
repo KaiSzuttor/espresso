@@ -79,12 +79,8 @@ std::vector<std::pair<int, int>> get_pairs(double distance) {
   return ret;
 }
 
-void mpi_get_pairs_local(int, int) {
+void mpi_get_pairs_local(double distance) {
   on_observable_calc();
-
-  double distance;
-  boost::mpi::broadcast(comm_cart, distance, 0);
-
   auto local_pairs = get_pairs(distance);
 
   Utils::Mpi::gather_buffer(local_pairs, comm_cart);
@@ -93,10 +89,8 @@ void mpi_get_pairs_local(int, int) {
 REGISTER_CALLBACK(mpi_get_pairs_local)
 
 std::vector<std::pair<int, int>> mpi_get_pairs(double distance) {
-  mpi_call(mpi_get_pairs_local, 0, 0);
+  mpi_call(mpi_get_pairs_local, distance);
   on_observable_calc();
-
-  boost::mpi::broadcast(comm_cart, distance, 0);
 
   auto pairs = get_pairs(distance);
 
