@@ -99,11 +99,31 @@ void get_pairs_local(double distance) {
 
 REGISTER_CALLBACK(get_pairs_local)
 
+void get_pairs_of_type_local(double distance, int type) {
+  on_observable_calc();
+  auto local_pairs = get_pairs(distance, type);
+  Utils::Mpi::gather_buffer(local_pairs, comm_cars);
+}
+
+REGISTER_CALLBACK(get_pairs_of_type_local)
+
 std::vector<std::pair<int, int>> mpi_get_pairs(double distance) {
   mpi_call(get_pairs_local, distance);
   on_observable_calc();
 
   auto pairs = get_pairs(distance);
+
+  Utils::Mpi::gather_buffer(pairs, comm_cart);
+
+  return pairs;
+}
+
+std::vector<std::pair<int, int>> mpi_get_pairs_of_type(double distance,
+                                                       int type) {
+  mpi_call(get_pairs_of_type_local, distance, type);
+  on_observable_calc();
+
+  auto pairs = get_pairs_of_type(distance, type);
 
   Utils::Mpi::gather_buffer(pairs, comm_cart);
 
