@@ -56,15 +56,17 @@ CellStructure cell_structure;
  *
  * Pairs are sorted so that first.id < second.id
  */
-std::vector<std::pair<int, int>> get_pairs(double distance) {
+template <class Filter>
+std::vector<std::pair<int, int>> get_pairs(double distance, Filter filter) {
   std::vector<std::pair<int, int>> ret;
   auto const cutoff2 = distance * distance;
 
   cells_update_ghosts(Cells::DATA_PART_POSITION | Cells::DATA_PART_PROPERTIES);
 
-  auto pair_kernel = [&ret, &cutoff2](Particle const &p1, Particle const &p2,
-                                      Distance const &d) {
-    if (d.dist2 < cutoff2)
+  auto pair_kernel = [&ret, &cutoff2, &filter](Particle const &p1,
+                                               Particle const &p2,
+                                               Distance const &d) {
+    if (d.dist2 < cutoff2 and filter(p1) and filter(p2))
       ret.emplace_back(p1.p.identity, p2.p.identity);
   };
 
@@ -79,17 +81,26 @@ std::vector<std::pair<int, int>> get_pairs(double distance) {
   return ret;
 }
 
-void mpi_get_pairs_local(double distance) {
+std::vector<std::pair<int, int>> get_pairs(double distance) {
+  return get_pairs(distance, [](Particle const &p) { return true; });
+}
+
+std::vector<std::pair<int, int>> get_pairs_of_type(double distance, int type) {
+  return get_pairs(distance,
+                   [type](Particle const &p) { return type == p.p.type; });
+}
+
+void get_pairs_local(double distance) {
   on_observable_calc();
   auto local_pairs = get_pairs(distance);
 
   Utils::Mpi::gather_buffer(local_pairs, comm_cart);
 }
 
-REGISTER_CALLBACK(mpi_get_pairs_local)
+REGISTER_CALLBACK(get_pairs_local)
 
 std::vector<std::pair<int, int>> mpi_get_pairs(double distance) {
-  mpi_call(mpi_get_pairs_local, distance);
+  mpi_call(get_pairs_local, distance);
   on_observable_calc();
 
   auto pairs = get_pairs(distance);
