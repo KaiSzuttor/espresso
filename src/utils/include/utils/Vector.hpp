@@ -487,8 +487,8 @@ template <class T, std::size_t N> struct vec_traits<::Utils::Vector<T, N>> {
   }
 };
 
-template <typename T> struct deduce_vec<Utils::Vector<T, 3>, 3> {
-  using type = typename Utils::Vector<T, 3>;
+template <typename T, std::size_t N> struct deduce_vec<Utils::Vector<T, N>, N> {
+  using type = Utils::Vector<T, N>;
 };
 
 } // namespace qvm

@@ -19,6 +19,9 @@
 #ifndef SRC_UTILS_INCLUDE_UTILS_MATRIX_HPP
 #define SRC_UTILS_INCLUDE_UTILS_MATRIX_HPP
 
+#include "utils/Array.hpp"
+#include "utils/Vector.hpp"
+
 #include <array>
 
 #include <boost/qvm/deduce_mat.hpp>
@@ -33,9 +36,6 @@
 #include <boost/qvm/mat_traits.hpp>
 #include <boost/qvm/vec_mat_operations.hpp>
 #include <boost/qvm/vec_operations.hpp>
-
-#include "utils/Array.hpp"
-#include "utils/Vector.hpp"
 
 namespace Utils {
 
@@ -107,9 +107,9 @@ struct mat_traits<Utils::Matrix<T, Rows, Cols>> {
   }
 };
 
-template <typename T>
-struct deduce_vec2<Utils::Matrix<T, 3, 3>, Utils::Vector<T, 3>, 3> {
-  using type = Utils::Vector<T, 3>;
+template <typename T, typename U, std::size_t N>
+struct deduce_vec2<Utils::Matrix<T, N, N>, Utils::Vector<U, N>, N> {
+  using type = Utils::Vector<std::common_type_t<T, U>, N>;
 };
 
 template <typename T, std::size_t M, std::size_t N>
@@ -119,7 +119,6 @@ struct deduce_mat<Utils::Matrix<T, M, N>, M, N> {
 
 template <typename T, typename U, std::size_t M, std::size_t N>
 struct deduce_mat2<Utils::Matrix<T, M, N>, Utils::Matrix<U, M, N>, M, N> {
-
   using type = Utils::Matrix<std::common_type_t<T, U>, M, N>;
 };
 

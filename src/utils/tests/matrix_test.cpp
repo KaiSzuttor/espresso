@@ -19,8 +19,6 @@
 #define BOOST_TEST_DYN_LINK
 
 #include <boost/test/unit_test.hpp>
-
-#include <utils/Vector.hpp>
 #include <utils/matrix.hpp>
 
 BOOST_AUTO_TEST_CASE(matrix) {
@@ -37,6 +35,5 @@ BOOST_AUTO_TEST_CASE(matrix) {
 
   Utils::Matrix<int, 3, 3> diag_mat = boost::qvm::diag_mat(diagonal);
   BOOST_CHECK((diag_mat(0, 0) = 1));
-
   BOOST_CHECK((*(diag_mat.data()) == 1));
 }
