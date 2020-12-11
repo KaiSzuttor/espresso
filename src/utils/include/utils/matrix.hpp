@@ -21,8 +21,15 @@
 
 #include "utils/Array.hpp"
 #include "utils/Vector.hpp"
+#include "utils/flatten.hpp"
 
 #include <array>
+
+// clang-format off
+#include <boost/qvm/mat_operations.hpp>
+#include <boost/qvm/vec_mat_operations.hpp>
+#include <boost/qvm/vec_operations.hpp>
+// clang-format on
 
 #include <boost/qvm/deduce_mat.hpp>
 #include <boost/qvm/deduce_scalar.hpp>
@@ -32,10 +39,7 @@
 #include <boost/qvm/map_vec_mat.hpp>
 #include <boost/qvm/mat.hpp>
 #include <boost/qvm/mat_access.hpp>
-#include <boost/qvm/mat_operations.hpp>
 #include <boost/qvm/mat_traits.hpp>
-#include <boost/qvm/vec_mat_operations.hpp>
-#include <boost/qvm/vec_operations.hpp>
 
 namespace Utils {
 
@@ -51,6 +55,17 @@ template <typename T, std::size_t Rows, std::size_t Cols> struct Matrix {
 
   container m_data;
 
+  Matrix() = default;
+  Matrix(std::initializer_list<T> init_list) {
+    assert(init_list.size() == Rows * Cols);
+    std::copy(init_list.begin(), init_list.end(), begin());
+  }
+  Matrix(std::initializer_list<std::initializer_list<T>> init_list) {
+    assert(init_list.size() == Rows);
+    std::array<T, Rows * Cols> tmp;
+    Utils::flatten(init_list, tmp.begin());
+    std::copy(tmp.begin(), tmp.end(), begin());
+  }
   constexpr value_type operator()(std::size_t row, std::size_t col) const {
     assert(row >= 0 and row < Rows);
     assert(col >= 0 and col < Cols);
@@ -63,6 +78,11 @@ template <typename T, std::size_t Rows, std::size_t Cols> struct Matrix {
   }
   constexpr pointer data() { return m_data.data(); }
   constexpr const_pointer data() const noexcept { return m_data.data(); }
+  constexpr iterator begin() noexcept { return m_data.begin(); };
+
+  constexpr const_iterator begin() const noexcept { return m_data.begin(); };
+  constexpr iterator end() noexcept { return m_data.end(); };
+  constexpr const_iterator end() const noexcept { return m_data.end(); };
 };
 
 using boost::qvm::operator*;

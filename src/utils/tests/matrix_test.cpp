@@ -22,7 +22,13 @@
 #include <utils/matrix.hpp>
 
 BOOST_AUTO_TEST_CASE(matrix) {
-  Utils::Matrix<int, 3, 3> mat{{1, 2, 3, 4, 5, 6, 7, 8, 9}};
+  Utils::Matrix<int, 2, 2> mat2{{8, 2}, {3, 4}};
+  BOOST_CHECK((mat2(0, 0) == 8));
+  BOOST_CHECK((mat2(1, 0) == 3));
+  BOOST_CHECK((mat2(0, 1) == 2));
+  BOOST_CHECK((mat2(1, 1) == 4));
+
+  Utils::Matrix<int, 3, 3> mat{1, 2, 3, 4, 5, 6, 7, 8, 9};
 
   Utils::Vector3i diagonal = boost::qvm::diag(mat);
   BOOST_CHECK((diagonal == Utils::Vector3i{1, 5, 9}));
