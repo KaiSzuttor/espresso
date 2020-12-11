@@ -25,6 +25,7 @@
 
 #include <array>
 
+// These includes need to come first due to ADL reasons.
 // clang-format off
 #include <boost/qvm/mat_operations.hpp>
 #include <boost/qvm/vec_mat_operations.hpp>
@@ -61,7 +62,7 @@ template <typename T, std::size_t Rows, std::size_t Cols> struct Matrix {
     std::copy(init_list.begin(), init_list.end(), begin());
   }
   Matrix(std::initializer_list<std::initializer_list<T>> init_list) {
-    assert(init_list.size() == Rows);
+    assert(init_list.size() == Cols);
     std::array<T, Rows * Cols> tmp;
     Utils::flatten(init_list, tmp.begin());
     std::copy(tmp.begin(), tmp.end(), begin());
@@ -79,10 +80,23 @@ template <typename T, std::size_t Rows, std::size_t Cols> struct Matrix {
   constexpr pointer data() { return m_data.data(); }
   constexpr const_pointer data() const noexcept { return m_data.data(); }
   constexpr iterator begin() noexcept { return m_data.begin(); };
-
   constexpr const_iterator begin() const noexcept { return m_data.begin(); };
   constexpr iterator end() noexcept { return m_data.end(); };
   constexpr const_iterator end() const noexcept { return m_data.end(); };
+
+  static Matrix<T, Rows, Cols> identity() {
+    static_assert(Rows == Cols,
+                  "Identity matrix only defined for square matrices.");
+    return boost::qvm::identity_mat<T, Rows>();
+  }
+
+  Matrix<T, Cols, Rows> transposed() const {
+    return boost::qvm::transposed(*this);
+  }
+
+  constexpr std::pair<std::size_t, std::size_t> shape() const noexcept {
+    return {Rows, Cols};
+  }
 };
 
 using boost::qvm::operator*;
@@ -127,19 +141,28 @@ struct mat_traits<Utils::Matrix<T, Rows, Cols>> {
   }
 };
 
-template <typename T, typename U, std::size_t N>
-struct deduce_vec2<Utils::Matrix<T, N, N>, Utils::Vector<U, N>, N> {
-  using type = Utils::Vector<std::common_type_t<T, U>, N>;
+template <typename T, typename U>
+struct deduce_vec2<Utils::Matrix<T, 2, 2>, Utils::Vector<U, 2>, 2> {
+  using type = Utils::Vector<std::common_type_t<T, U>, 2>;
 };
 
-template <typename T, std::size_t M, std::size_t N>
-struct deduce_mat<Utils::Matrix<T, M, N>, M, N> {
-  using type = Utils::Matrix<T, M, N>;
+template <typename T, typename U>
+struct deduce_vec2<Utils::Matrix<T, 3, 3>, Utils::Vector<U, 3>, 3> {
+  using type = Utils::Vector<std::common_type_t<T, U>, 3>;
 };
 
-template <typename T, typename U, std::size_t M, std::size_t N>
-struct deduce_mat2<Utils::Matrix<T, M, N>, Utils::Matrix<U, M, N>, M, N> {
-  using type = Utils::Matrix<std::common_type_t<T, U>, M, N>;
+template <typename T, typename U>
+struct deduce_vec2<Utils::Matrix<T, 4, 4>, Utils::Vector<U, 4>, 4> {
+  using type = Utils::Vector<std::common_type_t<T, U>, 4>;
+};
+
+template <typename T> struct deduce_mat<Utils::Matrix<T, 3, 3>, 3, 3> {
+  using type = Utils::Matrix<T, 3, 3>;
+};
+
+template <typename T, typename U>
+struct deduce_mat2<Utils::Matrix<T, 3, 3>, Utils::Matrix<U, 3, 3>, 3, 3> {
+  using type = Utils::Matrix<std::common_type_t<T, U>, 3, 3>;
 };
 
 template <typename T, typename U, std::size_t M, std::size_t N, std::size_t O,
