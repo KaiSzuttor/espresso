@@ -19,6 +19,7 @@
 #ifndef ESPRESSO_ROTATION_MATRIX_HPP
 #define ESPRESSO_ROTATION_MATRIX_HPP
 
+#include "utils/matrix.hpp"
 #include "utils/quaternion.hpp"
 
 namespace Utils {
