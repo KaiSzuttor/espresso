@@ -109,7 +109,7 @@ void pressure_calc() {
           for (int k = 0; k < 3; k++)
             for (int l = 0; l < 3; l++)
               obs_pressure.bonded_contribution(bond_id)[k * 3 + l] +=
-                  tensor[k][l];
+                  tensor(k, l);
 
           return false;
         }
@@ -126,7 +126,8 @@ void pressure_calc() {
 #ifdef VIRTUAL_SITES
   if (!obs_pressure.virtual_sites.empty()) {
     auto const vs_pressure = virtual_sites()->pressure_tensor();
-    boost::copy(flatten(vs_pressure), obs_pressure.virtual_sites.begin());
+    boost::copy(Utils::flatten(vs_pressure),
+                obs_pressure.virtual_sites.begin());
   }
 #endif
 

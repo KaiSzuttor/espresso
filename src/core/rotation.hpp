@@ -61,7 +61,7 @@ convert_vector_body_to_space(const Particle &p, const Utils::Vector3d &vec) {
 
 inline Utils::Vector3d convert_vector_space_to_body(const Particle &p,
                                                     const Utils::Vector3d &v) {
-  return transpose(rotation_matrix(p.r.quat)) * v;
+  return rotation_matrix(p.r.quat).transposed() * v;
 }
 
 /**
@@ -84,7 +84,7 @@ inline Utils::Vector3d convert_vector_space_to_body(const Particle &p,
 template <class T>
 auto convert_body_to_space(const Particle &p, const Utils::Matrix<T, 3, 3> &A) {
   auto const O = rotation_matrix(p.r.quat);
-  return transpose(O) * A * O;
+  return boost::qvm::transposed(O) * A * O;
 }
 
 #ifdef DIPOLES

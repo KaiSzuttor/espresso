@@ -30,6 +30,7 @@
 #include <utils/interpolation/bspline_3d.hpp>
 #include <utils/interpolation/bspline_3d_gradient.hpp>
 #include <utils/math/gaussian.hpp>
+#include <utils/matrix.hpp>
 #include <utils/raster.hpp>
 
 #include <array>
@@ -44,9 +45,9 @@ BOOST_AUTO_TEST_CASE(jacobian_type_test) {
   using std::is_same;
 
   static_assert(is_same<jacobian_type<double, 1>, Utils::Vector3d>::value, "");
-  static_assert(is_same<jacobian_type<double, 2>,
-                        Utils::Vector<Utils::Vector3d, 2>>::value,
-                "");
+  static_assert(
+      is_same<jacobian_type<double, 2>, Utils::Matrix<double, 2, 3>>::value,
+      "");
 }
 
 BOOST_AUTO_TEST_CASE(constant_scalar_field) {
@@ -99,9 +100,9 @@ BOOST_AUTO_TEST_CASE(constant_vector_field) {
   /* Types */
   {
     static_assert(std::is_same<Field::value_type, Utils::Vector2d>::value, "");
-    static_assert(std::is_same<Field::jacobian_type,
-                               Utils::Vector<Utils::Vector3d, 2>>::value,
-                  "");
+    static_assert(
+        std::is_same<Field::jacobian_type, Utils::Matrix<double, 2, 3>>::value,
+        "");
   }
 
   /* ctor */
@@ -195,9 +196,6 @@ BOOST_AUTO_TEST_CASE(affine_scalar_field) {
   }
 }
 
-template <size_t N, size_t M, typename T>
-using Matrix = Utils::Vector<Utils::Vector<T, M>, N>;
-
 BOOST_AUTO_TEST_CASE(affine_vector_field) {
   using Field = AffineMap<double, 2>;
 
@@ -205,12 +203,13 @@ BOOST_AUTO_TEST_CASE(affine_vector_field) {
   {
     static_assert(std::is_same<Field::value_type, Utils::Vector2d>::value, "");
     static_assert(
-        std::is_same<Field::jacobian_type, Matrix<2, 3, double>>::value, "");
+        std::is_same<Field::jacobian_type, Utils::Matrix<double, 2, 3>>::value,
+        "");
   }
 
   /* Field value unshifted */
   {
-    const Utils::Vector<Utils::Vector3d, 2> A = {{1., 2., 3}, {4., 5., 6.}};
+    const Utils::Matrix<double, 2, 3> A = {{1., 2., 3}, {4., 5., 6.}};
     const Utils::Vector2d b = {7., 8.};
     Field field(A, b);
 
@@ -218,13 +217,13 @@ BOOST_AUTO_TEST_CASE(affine_vector_field) {
 
     auto const res = field(x);
 
-    BOOST_CHECK((A[0][0] + A[0][1] + A[0][2] + b[0]) == res[0]);
-    BOOST_CHECK((A[1][0] + A[1][1] + A[1][2] + b[1]) == res[1]);
+    BOOST_CHECK((A(0, 0) + A(0, 1) + A(0, 2) + b[0]) == res[0]);
+    BOOST_CHECK((A(1, 0) + A(1, 1) + A(1, 2) + b[1]) == res[1]);
   }
 
   /* Gradient */
   {
-    const Utils::Vector<Utils::Vector3d, 2> A = {{1., 2., 3}, {4., 5., 6.}};
+    const Utils::Matrix<double, 2, 3> A = {{1., 2., 3}, {4., 5., 6.}};
     const Utils::Vector2d b = {7., 8.};
     Field field(A, b);
 
@@ -322,9 +321,9 @@ BOOST_AUTO_TEST_CASE(interpolated_vector_field) {
   /* Types */
   {
     static_assert(std::is_same<Field::value_type, Utils::Vector2d>::value, "");
-    static_assert(std::is_same<Field::jacobian_type,
-                               Utils::Vector<Utils::Vector3d, 2>>::value,
-                  "");
+    static_assert(
+        std::is_same<Field::jacobian_type, Utils::Matrix<double, 2, 3>>::value,
+        "");
   }
 
   /* field value */

@@ -97,3 +97,43 @@ BOOST_AUTO_TEST_CASE(shape) {
   BOOST_CHECK((mat.transposed().shape().first == 3));
   BOOST_CHECK((mat.transposed().shape().second == 2));
 }
+
+BOOST_AUTO_TEST_CASE(tensor_product) {
+  // outer product of two vectors with same size
+  auto const v1 = Utils::Vector<int, 2>{1, 2};
+  auto const v2 = Utils::Vector<int, 2>{3, 4};
+  Utils::Matrix<int, 2, 2> mat1 =
+      boost::qvm::col_mat(v1) * boost::qvm::row_mat(v2);
+  BOOST_CHECK((mat1(0, 0) == 3));
+  BOOST_CHECK((mat1(0, 1) == 4));
+  BOOST_CHECK((mat1(1, 0) == 6));
+  BOOST_CHECK((mat1(1, 1) == 8));
+
+  // outer product of two vectors with *different* size
+  auto const v3 = Utils::Vector3i{5, 6, 7};
+  Utils::Matrix<int, 2, 3> mat2 =
+      boost::qvm::col_mat(v1) * boost::qvm::row_mat(v3);
+  BOOST_CHECK((mat2(0, 0) == 5));
+  BOOST_CHECK((mat2(0, 1) == 6));
+  BOOST_CHECK((mat2(0, 2) == 7));
+  BOOST_CHECK((mat2(1, 0) == 10));
+  BOOST_CHECK((mat2(1, 1) == 12));
+  BOOST_CHECK((mat2(1, 2) == 14));
+}
+
+BOOST_AUTO_TEST_CASE(diagonal_matrix) {
+  auto const v = Utils::Vector<int, 2>{1, 2};
+  auto const m = Utils::Matrix<int, 2, 2>::diagonal(v);
+  BOOST_CHECK((m(0, 0) == 1));
+  BOOST_CHECK((m(0, 1) == 0));
+  BOOST_CHECK((m(1, 0) == 0));
+  BOOST_CHECK((m(1, 1) == 2));
+}
+
+BOOST_AUTO_TEST_CASE(flatten) {
+  auto const m = Utils::Matrix<int, 2, 2>{1, 2, 3, 4};
+  auto const m_flat = Utils::flatten(m);
+  static_assert(
+      std::is_same<decltype(m_flat), const Utils::Vector<int, 4>>::value, "");
+  BOOST_CHECK((m_flat == Utils::Vector<int, 4>{1, 2, 3, 4}));
+}

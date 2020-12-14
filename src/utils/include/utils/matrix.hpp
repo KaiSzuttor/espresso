@@ -56,6 +56,12 @@ template <typename T, std::size_t Rows, std::size_t Cols> struct Matrix {
 
   container m_data;
 
+  friend class boost::serialization::access;
+  template <class Archive>
+  void serialize(Archive &ar, const unsigned int version) {
+    ar &m_data;
+  }
+
   Matrix() = default;
   Matrix(std::initializer_list<T> init_list) {
     assert(init_list.size() == Rows * Cols);
@@ -90,6 +96,11 @@ template <typename T, std::size_t Rows, std::size_t Cols> struct Matrix {
     return boost::qvm::identity_mat<T, Rows>();
   }
 
+  static Matrix<T, Rows, Cols> diagonal(Utils::Vector<T, Rows> const &v) {
+    static_assert(Rows == Cols, "Diagonal matrix has to be a square matrix.");
+    return boost::qvm::diag_mat(v);
+  }
+
   Matrix<T, Cols, Rows> transposed() const {
     return boost::qvm::transposed(*this);
   }
@@ -100,6 +111,38 @@ template <typename T, std::size_t Rows, std::size_t Cols> struct Matrix {
 };
 
 using boost::qvm::operator*;
+using boost::qvm::operator+;
+using boost::qvm::operator+=;
+using boost::qvm::operator==;
+
+/**
+ * @brief Flatten a matrix to a linear vector.
+ *
+ * @param m Input Matrix
+ * @return Flat vector with elements of the matrix.
+ */
+template <class T, size_t N, size_t M>
+Vector<T, N * M> flatten(Matrix<T, N, M> const &m) {
+  Vector<T, N * M> ret;
+
+  for (size_t i = 0; i < N; i++)
+    for (size_t j = 0; j < M; j++)
+      ret[i * M + j] = m(j, i);
+
+  return ret;
+}
+
+/**
+ * @brief Meta function to turns a Matrix<T, 1, 1> into T.
+ */
+template <typename T, std::size_t M, std::size_t N>
+struct decay_to_scalar<Matrix<T, M, N>> {
+  using type = Matrix<T, M, N>;
+};
+
+template <typename T> struct decay_to_scalar<Matrix<T, 1, 1>> {
+  using type = T;
+};
 
 } // namespace Utils
 
@@ -156,18 +199,21 @@ struct deduce_vec2<Utils::Matrix<T, 4, 4>, Utils::Vector<U, 4>, 4> {
   using type = Utils::Vector<std::common_type_t<T, U>, 4>;
 };
 
-template <typename T> struct deduce_mat<Utils::Matrix<T, 3, 3>, 3, 3> {
-  using type = Utils::Matrix<T, 3, 3>;
+template <typename T> struct deduce_mat<Utils::Matrix<T, 3, 4>, 3, 4> {
+  using type = Utils::Matrix<T, 3, 4>;
+};
+
+template <typename T> struct deduce_mat<Utils::Matrix<T, 4, 3>, 4, 3> {
+  using type = Utils::Matrix<T, 4, 3>;
 };
 
 template <typename T, typename U>
-struct deduce_mat2<Utils::Matrix<T, 3, 3>, Utils::Matrix<U, 3, 3>, 3, 3> {
-  using type = Utils::Matrix<std::common_type_t<T, U>, 3, 3>;
+struct deduce_mat2<Utils::Matrix<T, 4, 3>, Utils::Matrix<U, 4, 3>, 4, 3> {
+  using type = Utils::Matrix<std::common_type_t<T, U>, 4, 3>;
 };
 
-template <typename T, typename U, std::size_t M, std::size_t N, std::size_t O,
-          std::size_t P>
-struct deduce_scalar<Utils::Matrix<T, M, N>, Utils::Matrix<U, O, P>> {
+template <typename T, typename U>
+struct deduce_scalar<Utils::Matrix<T, 3, 3>, Utils::Matrix<U, 3, 3>> {
   using type = std::common_type_t<T, U>;
 };
 

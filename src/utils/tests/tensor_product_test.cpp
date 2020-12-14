@@ -27,6 +27,7 @@
 using Utils::tensor_product;
 
 #include <utils/Vector.hpp>
+#include <utils/matrix.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -35,7 +36,7 @@ BOOST_AUTO_TEST_CASE(square) {
   Utils::Vector<int, 4> x{1, 2, 3, 4};
   Utils::Vector<int, 4> y{5, 6, 7, 8};
 
-  using expected_type = Utils::Vector<Utils::Vector<int, 4>, 4>;
+  using expected_type = Utils::Matrix<int, 4, 4>;
   using actual_type = decltype(tensor_product(x, y));
 
   /* Check return type */
@@ -46,7 +47,7 @@ BOOST_AUTO_TEST_CASE(square) {
   /* Check values */
   for (std::size_t i = 0; i < x.size(); i++)
     for (std::size_t j = 0; j < y.size(); j++) {
-      BOOST_CHECK(prod[i][j] == x[i] * y[j]);
+      BOOST_CHECK(prod(i, j) == x[i] * y[j]);
     }
 }
 
@@ -54,7 +55,7 @@ BOOST_AUTO_TEST_CASE(non_square) {
   Utils::Vector3i x{1, 2, 3};
   Utils::Vector<int, 4> y{5, 6, 7, 8};
 
-  using expected_type = Utils::Vector<Utils::Vector<int, 4>, 3>;
+  using expected_type = Utils::Matrix<int, 3, 4>;
   using actual_type = decltype(tensor_product(x, y));
 
   /* Check return type */
@@ -65,7 +66,7 @@ BOOST_AUTO_TEST_CASE(non_square) {
   /* Check values */
   for (std::size_t i = 0; i < x.size(); i++)
     for (std::size_t j = 0; j < y.size(); j++) {
-      BOOST_CHECK(prod[i][j] == x[i] * y[j]);
+      BOOST_CHECK(prod(i, j) == x[i] * y[j]);
     }
 }
 

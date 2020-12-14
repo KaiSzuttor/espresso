@@ -67,7 +67,8 @@ inline void add_non_bonded_pair_virials(Particle const &p1, Particle const &p2,
 
     auto const type1 = p1.p.mol_id;
     auto const type2 = p2.p.mol_id;
-    obs_pressure.add_non_bonded_contribution(type1, type2, flatten(stress));
+    obs_pressure.add_non_bonded_contribution(type1, type2,
+                                             Utils::flatten(stress));
   }
 
 #ifdef ELECTROSTATICS
@@ -77,7 +78,7 @@ inline void add_non_bonded_pair_virials(Particle const &p1, Particle const &p2,
 
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
-        obs_pressure.coulomb[i * 3 + j] += p_coulomb[i][j];
+        obs_pressure.coulomb[i * 3 + j] += p_coulomb(i, j);
       }
     }
   }

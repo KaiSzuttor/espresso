@@ -78,9 +78,10 @@ friction_thermo_langevin(LangevinThermostat const &langevin, Particle const &p,
   // In case of anisotropic particle: body-fixed reference frame. Otherwise:
   // lab-fixed reference frame.
   auto const friction_op =
-      aniso_flag ? convert_body_to_space(p, diag_matrix(pref_friction))
-                 : diag_matrix(pref_friction);
-  auto const noise_op = diag_matrix(pref_noise);
+      aniso_flag ? convert_body_to_space(
+                       p, Utils::Matrix<double, 3, 3>::diagonal(pref_friction))
+                 : Utils::Matrix<double, 3, 3>::diagonal(pref_friction);
+  auto const noise_op = Utils::Matrix<double, 3, 3>::diagonal(pref_noise);
 #else
   auto const &friction_op = pref_friction;
   auto const &noise_op = pref_noise;
