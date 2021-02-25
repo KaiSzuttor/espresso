@@ -1,0 +1,39 @@
+name: run tests on mac
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 3 * * *'
+
+jobs:
+  regular_check:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+      - name: Setup Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - name: Check without sanatizer
+        uses: ./.github/actions/build_and_check
+        with:
+          asan: false
+          ubsan: false
+
+  sanatizer_check:
+    runs-on: macos-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+      - name: Setup Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - name: Check with sanatizer
+        uses: ./.github/actions/build_and_check
+        with:
+          asan: true
+          ubsan: true
