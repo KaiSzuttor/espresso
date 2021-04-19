@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE interactions test
+#define BOOST_TEST_MODULE interactions central_potential
 #define BOOST_TEST_DYN_LINK
 #include <array>
 #include <boost/test/unit_test.hpp>
